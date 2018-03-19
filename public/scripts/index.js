@@ -141,10 +141,6 @@ function getRandomGenres(url) {
     return url;
 }
 
-function checkExistingSongs(obj){
-
-}
-
 // Get username.  *** Implement Error check if guest account ***
 spotifyGrab("https://api.spotify.com/v1/me")
 .then( (data) => {
