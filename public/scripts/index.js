@@ -1,6 +1,8 @@
-let username = document.getElementById('username');
 const genres = [ "acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime", "black-metal", "bluegrass", "blues", "bossanova", "brazil", "breakbeat", "british", "cantopop", "chicago-house", "children", "chill", "classical", "club", "comedy", "country", "dance", "dancehall", "death-metal", "deep-house", "detroit-techno", "disco", "disney", "drum-and-bass", "dub", "dubstep", "edm", "electro", "electronic", "emo", "folk", "forro", "french", "funk", "garage", "german", "gospel", "goth", "grindcore", "groove", "grunge", "guitar", "happy", "hard-rock", "hardcore", "hardstyle", "heavy-metal", "hip-hop", "holidays", "honky-tonk", "house", "idm", "indian", "indie", "indie-pop", "industrial", "iranian", "j-dance", "j-idol", "j-pop", "j-rock", "jazz", "k-pop", "kids", "latin", "latino", "malay", "mandopop", "metal", "metal-misc", "metalcore", "minimal-techno", "movies", "mpb", "new-age", "new-release", "opera", "pagode", "party", "philippines-opm", "piano", "pop", "pop-film", "post-dubstep", "power-pop", "progressive-house", "psych-rock", "punk", "punk-rock", "r-n-b", "rainy-day", "reggae", "reggaeton", "road-trip", "rock", "rock-n-roll", "rockabilly", "romance", "sad", "salsa", "samba", "sertanejo", "show-tunes", "singer-songwriter", "ska", "sleep", "songwriter", "soul", "soundtracks", "spanish", "study", "summer", "swedish", "synth-pop", "tango", "techno", "trance", "trip-hop", "turkish", "work-out", "world-music" ];
-
+let currentTracks = [];
+const access_token = getParameterByName("access_token");
+const formId = document.getElementById('form-emotion');
+const emotionVal = document.getElementById('emotion-value');
 
 
 // Get access_token from URI
@@ -13,8 +15,6 @@ function getParameterByName(name, url) {
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
-const access_token = getParameterByName("access_token");
-
 
 // Fetch to Spotify API... 
 function spotifyGrab(url){
@@ -29,31 +29,66 @@ function spotifyGrab(url){
     return spotifyData;
 }
 
-// Get username and image. Error check if guest 
-spotifyGrab("https://api.spotify.com/v1/me").then( (data) => {
-    data.json()
+// Fetch to Spotify API... 
+function spotifyProcessTracks(url){
+    spotifyGrab(url)
+    .then( (response) => {
+        response.json()
+        .then( (data) => {
+            // DON'T FORGET TO ERROR CHECK. NEED TO! ITERATE OVER THE DATA KEYS TO SEE WHICH IS UNDEFINED FOR OF OR FOR IN...FORGOT
+            console.log(data.tracks, `this is the data.tracks`);
+    
+            data.tracks.forEach((track) => {
+                // Check if song is already in the DOM
+                if(currentTracks.length > 0){
+                    for(let i = 0; i < currentTracks.length; i++){
+                        if(track.album.name === currentTracks[i].album_name) return;
+                    }
+                }
 
-    .then( (jsonData) => {
-       
-        jsonData.display_name ? username.textContent = jsonData.display_name : username.textContent = jsonData.id; // jshint ignore:line
-        console.log(jsonData);
+                if(track.preview_url && track.album.images[1]) {
+                    let newTrack = {
+                        album_name: track.album.name,
+                        album_img: track.album.images[1],
+                        artist: track.artists[0].name,
+                        preview_url: track.preview_url,
+                        song_title: track.name,
+                        trackID: track.id,
+                        uri: track.uri
+                    };
+            
+                    createSongBody(newTrack);
+                    currentTracks.push(newTrack);
+                }
+
+            });
+        })
+        .then( (resolve) => {
+            const totalTrackLinks = Array.from(document.getElementsByClassName('track-link'));
+
+            console.log(totalTrackLinks, `total tracks`);
+
+            totalTrackLinks.forEach((track)=> {
+                let audioTrack = new Audio(track.href);
+                track.addEventListener('click', (evt) => {
+                    evt.preventDefault();
+
+                    audioTrack.paused ? audioTrack.play() : audioTrack.pause(); 
+                });
+            });
+        });
     });
-})
-.catch((err) => {
-    console.log(err);
-});
+}
 
-//Grab Genre's (Filter these out on user input)
-// spotifyGrab('https://api.spotify.com/v1/recommendations/available-genre-seeds')
-
-
+// Play songs fetched from Spotify
 function playSound(url) {
     var a = new Audio(url);
     a.play();
 }
 
+// Create DOM structure from Fetched songs
 function createSongBody(trackObj){
-    // console.log(trackObj, `this is the trackobj`);
+    
     const div = document.createElement('div');
     const img = document.createElement('img');
     const trackLink = document.createElement('a');
@@ -90,23 +125,37 @@ function createSongBody(trackObj){
     div.appendChild(headings.h2);
 }
 
-function getRandomGenres() {
+// Generate random genres in the URL if no genre(s) specified
+function getRandomGenres(url) {
     let buildGenres;
 
     for(let i = 0; i < 5; i++){
         let randomNumber = Math.floor(Math.random() * Math.floor(genres.length));
-        if(buildGenres === undefined) buildGenres = genres[randomNumber];
+
+        if(buildGenres === undefined) buildGenres = `&seed_genres=${genres[randomNumber]}`;
         else{
             buildGenres += `,${genres[randomNumber]}`;
         }
     }
-    return buildGenres;
+    url += buildGenres;
+    return url;
 }
 
+// Get username.  *** Implement Error check if guest account ***
+spotifyGrab("https://api.spotify.com/v1/me")
+.then( (data) => {
+    data.json()
 
-// On form submission go to database dawg
-const formId = document.getElementById('form-emotion');
-const emotionVal = document.getElementById('emotion-value');
+    .then( (jsonData) => {
+        let username = document.getElementById('username');
+        jsonData.display_name ? username.textContent = jsonData.display_name : username.textContent = jsonData.id; // jshint ignore:line
+        console.log(jsonData);
+    });
+})
+.catch((err) => {
+    console.log(err);
+});
+
 
 formId.addEventListener('submit', (evt) => {
     evt.preventDefault();
@@ -119,100 +168,60 @@ formId.addEventListener('submit', (evt) => {
     }
     
     let storeEmotionVal = emotionVal.value;
-    console.log(storeEmotionVal)
+    console.log(storeEmotionVal);
     emotionVal.value = '';
-                            // fetch(`/?${access_token}&emotion=${storeVal}`)
+                            
 
-    // This data is from our databsae
+    // Fetch emotion json from my database
     fetch(`/${storeEmotionVal}`)
     .then( (data) => {
         return data.json();
     })
     .then( (audioFeatures) => {
-        let maxVal = Math.max(...audioFeatures[0].idNumbers);
-        let minVal = Math.min(...audioFeatures[0].idNumbers);
-        let url = `https://api.spotify.com/v1/recommendations?'`;
+        const maxVal = Math.max(...audioFeatures[0].idNumbers);
+        const minVal = Math.min(...audioFeatures[0].idNumbers);
+        let url = `https://api.spotify.com/v1/recommendations?max_valence=${maxVal}&min_valence=${minVal}&limit=30`;
         
-        // Match song energy levels with mood
+        // Match genres with energy levels specified with energy levels of songs
         if(audioFeatures[0].hasOwnProperty('minEnergy')){
-            url += `min_energy=${audioFeatures[0].minEnergy}`;
+            url += `&min_energy=${audioFeatures[0].minEnergy}`;
         }
         if(audioFeatures[0].hasOwnProperty('maxEnergy')){
-            url += `max_energy=${audioFeatures[0].maxEnergy}`;
+            url += `&max_energy=${audioFeatures[0].maxEnergy}`;
         }
 
         // If user doesn't use genre filter
-        let randomGenres = getRandomGenres(); 
-
-        console.log(`{url}&seed_genres=${randomGenres}&max_valence=${maxVal}&min_valence=${minVal}&limit=100`);
-
-        spotifyGrab(`${url}&seed_genres=${randomGenres}&max_valence=${maxVal}&min_valence=${minVal}&limit=100`)
-        .then( (response) => {
-            response.json()
-            .then( (data) => {
-                // DON'T FORGET TO ERROR CHECK. NEED TO! ITERATE OVER THE DATA KEYS TO SEE WHICH IS UNDEFINED FOR OF OR FOR IN...FORGOT
-                console.log(data.tracks, `this is the data.tracks`);
+        let newUrl = getRandomGenres(url); 
         
-                data.tracks.forEach((track) => {
+        // url += `&seed_genres=${randomGenres}`;
 
-                    if(track.preview_url) {
-                        let newTrack = {
-                            album_name: track.album.name,
-                            album_img: track.album.images[1],
-                            artist: track.artists[0].name,
-                            preview_url: track.preview_url,
-                            song_title: track.name,
-                            trackID: track.id,
-                            uri: track.uri
-                        };
-                
-                        createSongBody(newTrack);
-                        currentTracks.push(newTrack);
-                    }
-                });
-            })
-            .then( (resolve) => {
-                const totalTrackLinks = Array.from(document.getElementsByClassName('track-link'));
+        spotifyProcessTracks(newUrl);   
+        
 
-                console.log(totalTrackLinks, `total tracks`);
+        // Infinite Scroll
+        document.addEventListener('scroll', function() {
+        
+            // console.log(currentTracks, 'current tracks');
 
-                totalTrackLinks.forEach((track)=> {
-                    let audioTrack = new Audio(track.href);
-                    track.addEventListener('click', (evt) => {
-                        // console.log(evt,'this the event dawg'
-                        evt.preventDefault();
+            let scrollPosition = window.pageYOffset;
+            let windowSize     = window.innerHeight;
+            let bodyHeight     = document.body.offsetHeight;
+            
 
-                        audioTrack.paused ? audioTrack.play() : audioTrack.pause(); 
-                    });
-                });
-            })
-        });
-    })
-    .catch((err) => {
+            if(scrollPosition + windowSize >= bodyHeight){
+                let scrollUrl = getRandomGenres(url);
+                spotifyProcessTracks(scrollUrl); 
+            }
+        
+          });
+        })
+    .catch( (err) => {
         console.log(err);
     });
 });
 
-// https://api.spotify.com/v1/recommendations?seed_genres=hip-hop,r-n-b&max_valence=1&min_valence=.88"
-
-let currentTracks = [];
 
 
- // Make music play
 
-// setTimeout(function (){
-//     const totalTrackLinks = Array.from(document.getElementsByClassName('track-link'));
-
-//     console.log(totalTrackLinks, `total tracks`);
-//     totalTrackLinks.forEach((track)=> {
-//         let audioTrack = new Audio(track.href);
-//         track.addEventListener('click', (evt) => {
-//             // console.log(evt,'this the event dawg'
-//             evt.preventDefault();
-
-//             audioTrack.paused ? audioTrack.play() : audioTrack.pause(); 
-//         });
-//     });
-// }, 10000);
 
 
