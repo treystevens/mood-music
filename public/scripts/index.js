@@ -1,9 +1,36 @@
-const genres = [ "acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime", "black-metal", "bluegrass", "blues", "bossanova", "brazil", "breakbeat", "british", "cantopop", "chicago-house", "children", "chill", "classical", "club", "comedy", "country", "dance", "dancehall", "death-metal", "deep-house", "detroit-techno", "disco", "disney", "drum-and-bass", "dub", "dubstep", "edm", "electro", "electronic", "emo", "folk", "forro", "french", "funk", "garage", "german", "gospel", "goth", "grindcore", "groove", "grunge", "guitar", "happy", "hard-rock", "hardcore", "hardstyle", "heavy-metal", "hip-hop", "holidays", "honky-tonk", "house", "idm", "indian", "indie", "indie-pop", "industrial", "iranian", "j-dance", "j-idol", "j-pop", "j-rock", "jazz", "k-pop", "kids", "latin", "latino", "malay", "mandopop", "metal", "metal-misc", "metalcore", "minimal-techno", "movies", "mpb", "new-age", "new-release", "opera", "pagode", "party", "philippines-opm", "piano", "pop", "pop-film", "post-dubstep", "power-pop", "progressive-house", "psych-rock", "punk", "punk-rock", "r-n-b", "rainy-day", "reggae", "reggaeton", "road-trip", "rock", "rock-n-roll", "rockabilly", "romance", "sad", "salsa", "samba", "sertanejo", "show-tunes", "singer-songwriter", "ska", "sleep", "songwriter", "soul", "soundtracks", "spanish", "study", "summer", "swedish", "synth-pop", "tango", "techno", "trance", "trip-hop", "turkish", "work-out", "world-music" ];
-let currentTracks = [];
+const genres = [ "acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime", "black-metal", "bluegrass", "blues", "bossanova", "brazil", "breakbeat", "british", "cantopop", "chicago-house", "children", "chill", "classical", "club", "comedy", "country", "dance", "dancehall", "death-metal", "deep-house", "detroit-techno", "disco", "disney", "drum-and-bass", "dub", "dubstep", "edm", "electro", "electronic", "emo", "folk", "forro", "french", "funk", "garage", "german", "gospel", "goth", "grindcore", "groove", "grunge", "guitar", "happy", "hard-rock", "hardcore", "hardstyle", "heavy-metal", "hip-hop", "holidays", "honky-tonk", "house", "idm", "indian", "indie", "indie-pop", "industrial", "iranian", "j-dance", "j-idol", "j-pop", "j-rock", "jazz", "k-pop", "kids", "latin", "latino", "malay", "mandopop", "metal", "metal-misc", "metalcore", "minimal-techno", "movies", "mpb", "new-age", "new-release", "opera", "pagode", "party", "philippines-opm", "piano", "pop", "pop-film", "post-dubstep","power-pop", "progressive-house", "psych-rock", "punk", "punk-rock", "r-n-b", "rainy-day", "reggae", "reggaeton", "road-trip", "rock", "rock-n-roll", "rockabilly", "romance", "sad", "salsa", "samba", "sertanejo", "show-tunes", "singer-songwriter", "ska", "sleep", "songwriter", "soul", "soundtracks", "spanish", "study", "summer", "swedish", "synth-pop", "tango", "techno", "trance", "trip-hop", "turkish", "work-out", "world-music" ];
 const access_token = getParameterByName("access_token");
 const formId = document.getElementById('form-emotion');
 const emotionVal = document.getElementById('emotion-value');
+const clearGenres = document.querySelector('.genre-clear');
+let genreItems = Array.from(document.body.getElementsByClassName('genre-list__item'));
+let currentTracks = [];
 
+
+// Genre restriction
+genreItems.forEach( (genre) =>{
+    genre.addEventListener('click', (evt) =>{
+        let classLength = document.querySelectorAll('.genre-toggle').length;
+
+        if(classLength > 4) {
+            console.log(`Can't add another genre, sorry`);
+            evt.target.classList.remove("genre-toggle");
+        }
+        else{
+            evt.target.classList.toggle("genre-toggle");
+            console.log(classLength);
+        }
+    });
+});
+
+// Remove Genres clicked from user
+clearGenres.addEventListener('click', () => {
+    let classLength = Array.from(document.querySelectorAll('.genre-toggle'));
+    classLength.forEach( (genre) => {
+        genre.classList.remove('genre-toggle');
+    })
+    console.log(classLength)
+});
 
 // Get access_token from URI
 function getParameterByName(name, url) {
@@ -126,15 +153,30 @@ function createSongBody(trackObj){
 }
 
 // Generate random genres in the URL if no genre(s) specified
-function getRandomGenres(url) {
+function getGenres(url) {
     let buildGenres;
+    let classLength = Array.from(document.querySelectorAll('.genre-toggle'));
 
-    for(let i = 0; i < 5; i++){
-        let randomNumber = Math.floor(Math.random() * Math.floor(genres.length));
+    // Use user chosen genres
+    if(classLength.length > 0){
+        classLength.forEach( (genre) => {
+            if(buildGenres === undefined) {
+                buildGenres = `&seed_genres=${genre.textContent.toLowerCase().replace(/ /g,"-")}`;
+            }
+            else {
+                buildGenres += `,${(genre.textContent.toLowerCase().replace(/ /g,"-"))}`;
+            }
+        });
+    }
+    else {
+        // Randomize genres if user decides no genres
+        for(let i = 0; i < 5; i++){
+            let randomNumber = Math.floor(Math.random() * Math.floor(genres.length));
 
-        if(buildGenres === undefined) buildGenres = `&seed_genres=${genres[randomNumber]}`;
-        else{
-            buildGenres += `,${genres[randomNumber]}`;
+            if(buildGenres === undefined) buildGenres = `&seed_genres=${genres[randomNumber]}`;
+            else {
+                buildGenres += `,${genres[randomNumber]}`;
+            }
         }
     }
     url += buildGenres;
@@ -162,6 +204,7 @@ formId.addEventListener('submit', (evt) => {
     let trackContainer = document.querySelector('.track-container');
     let tracksDiv = document.querySelector('.tracks');
     
+    
     // Delete previous entries inside track div
     while (tracksDiv.firstChild) {
         tracksDiv.removeChild(tracksDiv.firstChild);
@@ -181,7 +224,18 @@ formId.addEventListener('submit', (evt) => {
         const maxVal = Math.max(...audioFeatures[0].idNumbers);
         const minVal = Math.min(...audioFeatures[0].idNumbers);
         let url = `https://api.spotify.com/v1/recommendations?max_valence=${maxVal}&min_valence=${minVal}&limit=30`;
-        
+
+        {
+            let playlistGrab = document.body.querySelector('.playlist');
+            
+            playlistGrab.style.display = `block`;
+
+            playlistGrab.addEventListener('click', () => {
+                playlistGrab.classList.remove('playlist');
+                playlistGrab.classList.add('playlist-circle');
+            });
+        }
+
         // Match genres with energy levels specified with energy levels of songs
         if(audioFeatures[0].hasOwnProperty('minEnergy')){
             url += `&min_energy=${audioFeatures[0].minEnergy}`;
@@ -190,26 +244,18 @@ formId.addEventListener('submit', (evt) => {
             url += `&max_energy=${audioFeatures[0].maxEnergy}`;
         }
 
-        // If user doesn't use genre filter
-        let newUrl = getRandomGenres(url); 
-        
-        // url += `&seed_genres=${randomGenres}`;
-
+        let newUrl = getGenres(url); 
+    
         spotifyProcessTracks(newUrl);   
-        
-
+    
         // Infinite Scroll
         document.addEventListener('scroll', function() {
-        
-            // console.log(currentTracks, 'current tracks');
-
             let scrollPosition = window.pageYOffset;
-            let windowSize     = window.innerHeight;
-            let bodyHeight     = document.body.offsetHeight;
+            let windowSize = window.innerHeight;
+            let bodyHeight = document.body.offsetHeight;
             
-
             if(scrollPosition + windowSize >= bodyHeight){
-                let scrollUrl = getRandomGenres(url);
+                let scrollUrl = getGenres(url);
                 spotifyProcessTracks(scrollUrl); 
             }
         

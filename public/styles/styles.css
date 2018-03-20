@@ -47,15 +47,42 @@ table {
 	border-spacing: 0;
 }
 
+/*********************************************
 
+
+*********************************************/
 /* .track-container{
     width: 1080px;
     margin: 0 auto;
 } */
 
+.content{
+    position: relative
+}
+
+.genre-container{
+    /* display: flex; */
+    height: 40vh;
+    overflow: auto;
+}
+
+.genre-list__item{
+    display: inline-block;
+    padding: 10px 20px;
+    width: 100px;
+}
+
+/* test styles */
+.genre-toggle{
+    background-color: rgb(93, 93, 93);
+    color: white;
+}
+
 .track-container{
     display: flex;
-    flex-flow: row wrap
+    flex-flow: row wrap;
+    /* height: 100vh; */
+    /* overflow: auto; */
 }
 
 .tracks{
@@ -79,6 +106,7 @@ table {
 }
 
 h1{
+    /* height: 500vh; */
     font-size: 2.2rem;
 }
 
@@ -96,4 +124,27 @@ h4{
 
 .track-link{
     display: inline-block;
+}
+
+.playlist{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    display: none;
+    background-color: rgba(42, 42, 42, .5);
+}
+
+.playlist-input{
+    padding: 10px 20px;
+}
+
+.playlist-circle{
+    position: fixed;
+    top: 70vh;
+    right: 0;
+    width: 100px;
+    background-color: yellow;
+    border-radius: 50%;
+
 }
