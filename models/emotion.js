@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 
 const EmotionSchema = new Schema ({
-    emotion: String,
+    mood: String,
     synonyms: [String],
     idNumbers: [Number]
 });
