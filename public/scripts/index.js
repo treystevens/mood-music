@@ -4,7 +4,8 @@ const access_token = getParameterByName("access_token");
 const moodForm = document.querySelector('.mood__form');
 const userMood = document.querySelector('.mood__val');
 const clearGenres = document.querySelector('.genres-filters__clear');
-const playlistSubmit = document.querySelector('.cr-pl__submit');
+const createPlaylistSubmit = document.querySelector('.cr-pl__submit');
+const importPlaylistSubmit = document.querySelector('.im-pl__submit');
 let genreItems = Array.from(document.getElementsByClassName('genres-list__item'));
 const genreDrop = document.querySelector('.genres-drop__header');
 let addPlaylist = Array.from(document.getElementsByClassName('cr-pl__btn'));
@@ -22,11 +23,6 @@ let playlistNameTab = Array.from(document.getElementsByClassName('playlist-list_
 
 
 
-
-
-playlistNameTab.forEach((div) => {
-
-})
 
 addPlaylist.forEach((btn) => {
     btn.addEventListener('click', (evt) => {
@@ -248,12 +244,24 @@ function createSongBody(trackObj){
     });   
 }
 
+function updateTotalPlaylistCount(name, id){
+    const playlistAmount = document.querySelector('.playlist-amount');
+
+    let playlist = {
+        name: name,
+        id: id
+    };
+    
+    totalPlaylists.push(playlist);
+    playlistAmount.textContent = totalPlaylists.length;
+}
+
 function spotifyCreatePlaylist(url){
 
     let data = {
-        description: document.querySelector('.cr-pl__description').value,
-        public: false,
-        name: document.querySelector('.cr-pl__name').value
+        description: '' || document.querySelector('.cr-pl__description').value,
+        public: true,
+        name: document.querySelector('.cr-pl__name').value || document.querySelector('.im-pl__name').value 
       };
 
     const init = {
@@ -270,17 +278,11 @@ function spotifyCreatePlaylist(url){
         return data.json();
     })
     .then( (createdPlaylist) => {
-        const playlistAmount = document.querySelector('.playlist-amount');
-        let playlist = {
-            name: createdPlaylist.name,
-            id: createdPlaylist.id
-        };
 
+        updateTotalPlaylistCount(createdPlaylist.name, createdPlaylist.id);
+        
 
-        totalPlaylists.push(playlist);
-        playlistAmount.textContent = totalPlaylists.length;
-
-        playlistPlate(playlist.name);
+        playlistPlate(createdPlaylist.name);
 
         if(songQueue.length > 0){
                
@@ -313,7 +315,7 @@ function playlistPlate(name){
         currentChosenPlaylist.name = playlistName;
         
 
-        console.dir(evt.target, `the event target`)
+        console.dir(evt.target, `the event target`);
         for(let k in totalPlaylists){
             
             if(playlistName === totalPlaylists[k].name) {
@@ -356,6 +358,7 @@ function addSongToPlaylist(url, songLinks, playlistID){
         return response.json();
     })
     .then((data) => {
+        // Get back updated playlist
         spotifyGrab(`https://api.spotify.com/v1/users/${userInfo.id}/playlists/${playlistID}/tracks`)
         .then((playlist) => {
             return playlist.json();
@@ -368,7 +371,7 @@ function addSongToPlaylist(url, songLinks, playlistID){
             let updateThisPlaylist;
             let trackWrapper = Array.from(document.getElementsByClassName('track-wrapper'));
             
-            console.dir(trackWrapper)
+            console.dir(trackWrapper);
 
             // playlistNameTab.forEach((listItem) => {
 
@@ -408,7 +411,7 @@ function addSongToPlaylist(url, songLinks, playlistID){
 }
 
 // Need to see what can be refactored from this and createSongBody function
-function createPlaylistBody(playlistObj){
+function createPlaylistBody(playlistObj, importedPlaylistName){
     const div = document.createElement('div');
     const img = document.createElement('img');
     const trackLink = document.createElement('a');
@@ -433,16 +436,21 @@ function createPlaylistBody(playlistObj){
     };
     
     
+
     // Append playlist songs to the playlist the user clicked
-    playlistNameBar.forEach((listItem) => {
-        if(listItem.childNodes[0].textContent === currentChosenPlaylist.name){
-            userChosenPlaylist = listItem.firstElementChild;
-            
-            
-        }
-    });
+        playlistNameBar.forEach((listItem) => {
+            if(listItem.childNodes[0].textContent === currentChosenPlaylist.name){
+                userChosenPlaylist = listItem.firstElementChild;
+            }
+            else if(importedPlaylistName){
+                if(listItem.childNodes[0].textContent === importedPlaylistName){
+                    userChosenPlaylist = listItem.firstElementChild;
+                }
+            }
+        });
+ 
     
-    console.dir(userChosenPlaylist)
+    console.dir(userChosenPlaylist);
 
 
     // Setting up classes
@@ -608,11 +616,64 @@ moodForm.addEventListener('submit', (evt) => {
           });
 
           
-        // Creating a new playlist on footer submission
-        playlistSubmit.addEventListener('submit', (evt) => {
+        // Creating a new playlist 
+        createPlaylistSubmit.addEventListener('submit', (evt) => {
 
             evt.preventDefault();
             spotifyCreatePlaylist(`https://api.spotify.com/v1/users/${userInfo.id}/playlists`);
+        });
+
+        // Importing a new playlist
+        importPlaylistSubmit.addEventListener('submit', (evt) => {
+
+            let importPlaylistName = document.querySelector('.im-pl__name').value;
+            let flexibleName = importPlaylistName.toLowerCase();
+            let importedPlaylistID;
+
+            evt.preventDefault();
+            
+
+            spotifyGrab(`https://api.spotify.com/v1/me/playlists`)
+            .then((data) => {
+                return data.json();
+            })
+            .then( (listOfUserPlaylists) => {
+                let playlist;
+
+                // Cycle through to get user requested playlist ID 
+                listOfUserPlaylists.items.forEach( (playlist) => {
+                    if(flexibleName == playlist.name.toLowerCase()){
+                        importedPlaylistID = playlist.id;
+                    }
+                });
+
+                updateTotalPlaylistCount(importPlaylistName, importedPlaylistID);
+                playlistPlate(importPlaylistName);
+
+
+                // Fetch for that specfic ID
+                // Fetch that URL get the returned tracks and put into creat Playlist tracks
+                spotifyGrab(`https://api.spotify.com/v1/users/${userInfo.id}/playlists/${importedPlaylistID}/tracks`)
+                .then((response) => {
+                    return response.json();
+                })
+                .then((importedTracks) => {
+                    console.log(importedTracks);
+                    importedTracks.items.forEach( (playlistSong) => {
+
+                        createPlaylistBody(playlistSong, importPlaylistName);
+                    });
+
+                });
+
+                console.log(listOfUserPlaylists);
+
+
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+           
         });
     })
     .catch( (err) => {
