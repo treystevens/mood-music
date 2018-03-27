@@ -15,16 +15,15 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended: true}));
 
 // app.get('/', (req, res) => {
-//     // console.log(req, `This is for PARAMS GET listener in 3000`);
-//     // console.log(req.body, 'this is the body');
+//     
+//    
 //     res.end();
 // });
 
-app.get('/:emotion', (req,res) => {
-    console.log(req.params, `this is req params`);
-    let word = req.params.emotion;
-    // console.log(req.params.emotion);
-    console.log(word, `is word coming through?`);
+app.get('/:mood', (req,res) => {
+    
+    let word = req.params.mood;
+    
 
     Emotion.find({synonyms: word})
     .then((results) => {
