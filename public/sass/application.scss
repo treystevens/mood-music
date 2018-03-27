@@ -1,0 +1,320 @@
+@import "_reset.scss";
+
+@import "_vars.scss";
+@import "_base.scss";
+@import "_mixins.scss";
+
+
+// Mood
+
+.mood{
+    display: flex;
+    // justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    &__header{
+        margin: .8em;
+        // text-align: center;
+    }
+
+    &__form{
+        width: 80%;
+    }
+
+    &__val{
+        border: none;
+        border-bottom: 1px solid black;
+        margin-bottom: 20px;
+        width: 80%;
+        font-size: 2rem;
+
+        &:focus{
+            outline: none;
+        }
+    }
+}
+
+
+// Genres
+
+.genres{
+    border: 2px solid green;
+
+    &-drop{
+        text-align: center;
+
+        &__header{
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+    }
+
+    &-filters{
+        display: flex;
+        justify-content: space-around;
+    }
+
+    &-list{
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        height: 200px;
+        overflow: auto;
+
+        &__item{
+            display: inline-block;
+            height: 75px;
+            width: 150px;
+            padding: 10px 20px;
+        }
+    }
+
+    &-toggle{
+        background-color: blue;
+        color: white;
+    }
+
+    &-filter__toggle{
+        display: none;
+    }
+
+    &-show{
+        display: block;
+        -webkit-animation: animateDrop 0.2s ease-in-out;
+        animation: animateDrop 0.2s ease-in-out;
+        
+    }
+}
+
+@-webkit-keyframes animateDrop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+
+@keyframes animateDrop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+
+// Tracks Div
+
+.tracks{
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+}
+
+.track {
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+    position: relative;
+    margin: 20px 20px;
+
+
+    &__pl-add{
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        background-color: $richblue;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+
+    &__img{
+        width: 100%;
+    }
+
+
+    &__name{
+        @include track-space;
+        font-weight: 700;
+    }
+
+    &__album{
+        @include track-space;
+        font-weight: 300;
+    }
+
+    &__arist{
+        @include track-space;
+        font-weight: 400;
+    }
+
+
+}
+
+.playlist-track{
+    display:flex;
+    justify-content: space-between;
+    height: 80px;
+    border: 1px solid red;
+
+    &__img{
+        width: 25%;
+    }
+
+    &__name{
+        @include track-space;
+        font-weight: 700;
+        font-size: 1rem
+    }
+
+    &__album{
+        @include track-space;
+        font-weight: 300;
+        font-size: .6rem;
+    }
+
+    &__arist{
+        @include track-space;
+        font-weight: 400;
+        font-size: .8rem;
+    }
+
+    &__play{
+        border-radius: 50%;
+        background-color: yellow;
+    }
+}
+
+// Modal
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+
+    &-content {
+        position: relative;
+        background-color: #fefefe;
+        margin: auto;
+        padding: 0;
+        border: 1px solid #888;
+        width: 80%;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+        // -webkit-animation-name: animatetop;
+        // -webkit-animation-duration: 0.4s;
+        // animation-name: animatetop;
+        // animation-duration: 0.4s
+    }
+}
+
+// Playlist Footer
+.playlist{
+    display: none;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 300px;
+    background-color: $richblue;
+    overflow: auto;
+
+    &-flex{
+        display: flex;
+        // justify-content: center;
+        flex-direction: column;
+    }
+
+    &-retract{
+        display: flex;
+        justify-content: space-between;
+    }
+
+    &-extended{
+        flex-direction: column;
+    }
+
+    &-bar{
+        // display: inline-block;
+        width: 250px;
+        height: 30px;
+        
+    }
+
+    &-add{
+        // display: inline-block;
+        border-left: 1px solid $tan;
+        height: 30px;
+        width: 50px;
+    }
+
+    &-list__name{
+        background-color: green;
+        height: 20px;
+        // width: 100%;
+        color: white;
+
+        margin-bottom: 350px; // delete. only for testing
+
+        &:hover{
+            background-color: orange;
+        }
+    }
+}
+    
+
+.hide-playlist{
+    display: none;
+}
+
+
+
+// Create Playlist/ Import form
+
+.cr-pl{
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    &__submit{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 80%;
+    }
+
+    &__name,
+    &__description{
+        width: 60%;
+        font-size: 1.2rem;
+        border: 1px solid $tan;
+        border-radius: 5px;
+        margin: 20px 0;
+    }
+
+    
+   
+}
+
+
+.cr-im-btn{
+    border-radius: 5px;
+    padding: 5px 10px;
+
+
+    &--danger{
+        background-color: rgb(197, 59, 59)
+    }
+
+    &--success{
+        background-color: rgba(46, 144, 21, 0.801)
+    }
+
+}
+
+.track-wrapper{
+    height: 300px;
+    overflow: auto;
+}
