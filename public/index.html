@@ -1,168 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Mood Music</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet">
     <link href="/styles/styles.css" rel="stylesheet" type="text/css">
 </head>
-<body>
-    <div class="content">
-        <h1>Welcome to Mood Music <span id='username'><span>!</h1>
-            <form method="GET" id="form-emotion" action="/">
-                <input type="text" name="emotion" placeholder="How are you feeling?" id="emotion-value"/>
-                <button>Click Me</button>
-            </form>
-            <section class="genre-container">
-                <div class="filter-tab">
-                    <label for="popular">Popular</label>
-                    <input type="checkbox" name="popular" id="popular">
-                    <button class="genre-clear">Clear All Genres</button>
-                </div>
-                <ul class="genre-list">
-                    <li class="genre-list__item">Acoustic</li>
-                    <li class="genre-list__item">Afrobeat</li>
-                    <li class="genre-list__item">Alt Rock</li>
-                    <li class="genre-list__item">Alternative</li>
-                    <li class="genre-list__item">Ambient</li>
-                    <li class="genre-list__item">Anime</li>
-                    <li class="genre-list__item">Black Metal</li>
-                    <li class="genre-list__item">Bluegrass</li>
-                    <li class="genre-list__item">Blues</li>
-                    <li class="genre-list__item">Bossanova</li>
-                    <li class="genre-list__item">Brazil</li>
-                    <li class="genre-list__item">Breakbeat</li>
-                    <li class="genre-list__item">British</li>
-                    <li class="genre-list__item">Cantopop</li>
-                    <li class="genre-list__item">Chicago House</li>
-                    <li class="genre-list__item">Children</li>
-                    <li class="genre-list__item">Chill</li>
-                    <li class="genre-list__item">Classical</li>
-                    <li class="genre-list__item">Club</li>
-                    <li class="genre-list__item">Comedy</li>
-                    <li class="genre-list__item">Country</li>
-                    <li class="genre-list__item">Dance</li>
-                    <li class="genre-list__item">Dancehall</li>
-                    <li class="genre-list__item">Death Metal</li>
-                    <li class="genre-list__item">Deep House</li>
-                    <li class="genre-list__item">Detroit Techno</li>
-                    <li class="genre-list__item">Disco</li>
-                    <li class="genre-list__item">Disney</li>
-                    <li class="genre-list__item">Drum &amp; Bass</li>
-                    <li class="genre-list__item">Dub</li>
-                    <li class="genre-list__item">Dubstep</li>
-                    <li class="genre-list__item">EDM</li>
-                    <li class="genre-list__item">Electro</li>
-                    <li class="genre-list__item">Electronic</li>
-                    <li class="genre-list__item">Emo</li>
-                    <li class="genre-list__item">Folk</li>
-                    <li class="genre-list__item">Forro</li>
-                    <li class="genre-list__item">French</li>
-                    <li class="genre-list__item">Funk</li>
-                    <li class="genre-list__item">Garage</li>
-                    <li class="genre-list__item">German</li>
-                    <li class="genre-list__item">Gospel</li>
-                    <li class="genre-list__item">Goth</li>
-                    <li class="genre-list__item">Grindcore</li>
-                    <li class="genre-list__item">Groove</li>
-                    <li class="genre-list__item">Grunge</li>
-                    <li class="genre-list__item">Guitar</li>
-                    <li class="genre-list__item">Happy</li>
-                    <li class="genre-list__item">Hard Rock</li>
-                    <li class="genre-list__item">Hardcore</li>
-                    <li class="genre-list__item">Hardstyle</li>
-                    <li class="genre-list__item">Heavy Metal</li>
-                    <li class="genre-list__item">Hip Hop</li>
-                    <li class="genre-list__item">Holidays</li>
-                    <li class="genre-list__item">Honky Tonk</li>
-                    <li class="genre-list__item">House</li>
-                    <li class="genre-list__item">IDM</li>
-                    <li class="genre-list__item">Indian</li> 
-                    <li class="genre-list__item">Indie</li>
-                    <li class="genre-list__item">Indie Pop</li>
-                    <li class="genre-list__item">Industrial</li>
-                    <li class="genre-list__item">Iranian</li>
-                    <li class="genre-list__item">J Dance</li>
-                    <li class="genre-list__item">J Idol</li>
-                    <li class="genre-list__item">J Pop</li>
-                    <li class="genre-list__item">J Rock</li>
-                    <li class="genre-list__item">Jazz</li>
-                    <li class="genre-list__item">K Pop</li>
-                    <li class="genre-list__item">Kids</li>
-                    <li class="genre-list__item">Latin</li>
-                    <li class="genre-list__item">Latino</li>
-                    <li class="genre-list__item">Malay</li>
-                    <li class="genre-list__item">Mandopop</li>
-                    <li class="genre-list__item">Metal</li>
-                    <li class="genre-list__item">Metal Misc</li>
-                    <li class="genre-list__item">Metalcore</li>
-                    <li class="genre-list__item">Minimal Techno</li>
-                    <li class="genre-list__item">Movies</li>
-                    <li class="genre-list__item">MPB</li>
-                    <li class="genre-list__item">New Age</li>
-                    <li class="genre-list__item">New Release</li>
-                    <li class="genre-list__item">Opera</li>
-                    <li class="genre-list__item">Pagode</li>
-                    <li class="genre-list__item">Party</li>
-                    <li class="genre-list__item">Philippines OPM</li>
-                    <li class="genre-list__item">Piano</li>
-                    <li class="genre-list__item">Pop</li>
-                    <li class="genre-list__item">Pop Film</li>
-                    <li class="genre-list__item">Post Dubstep</li>
-                    <li class="genre-list__item">Power Pop</li>
-                    <li class="genre-list__item">Progressive House</li>
-                    <li class="genre-list__item">Psych Rock</li>
-                    <li class="genre-list__item">Punk</li>
-                    <li class="genre-list__item">Punk Rock</li>
-                    <li class="genre-list__item">R&amp;B</li>
-                    <li class="genre-list__item">Rainy Day</li>
-                    <li class="genre-list__item">Reggae</li>
-                    <li class="genre-list__item">Reggaeton</li>    
-                    <li class="genre-list__item">Road Trip</li>
-                    <li class="genre-list__item">Rock</li>
-                    <li class="genre-list__item">Rock &amp; Roll</li>
-                    <li class="genre-list__item">Rockabilly</li>
-                    <li class="genre-list__item">Romance</li>
-                    <li class="genre-list__item">Sad</li>
-                    <li class="genre-list__item">Salsa</li>
-                    <li class="genre-list__item">Samba</li>
-                    <li class="genre-list__item">Sertanejo</li>
-                    <li class="genre-list__item">Show Tunes</li>
-                    <li class="genre-list__item">Singer Songwriter</li>
-                    <li class="genre-list__item">Ska</li>
-                    <li class="genre-list__item">Sleep</li>
-                    <li class="genre-list__item">Songwriter</li>
-                    <li class="genre-list__item">Soul</li>
-                    <li class="genre-list__item">Soundtracks</li>
-                    <li class="genre-list__item">Spanish</li>
-                    <li class="genre-list__item">Study</li>
-                    <li class="genre-list__item">Summer</li>
-                    <li class="genre-list__item">Swedish</li>
-                    <li class="genre-list__item">Synth Pop</li>
-                    <li class="genre-list__item">Tango</li>
-                    <li class="genre-list__item">Techno</li>
-                    <li class="genre-list__item">Trance</li>
-                    <li class="genre-list__item">Trip Hop</li>
-                    <li class="genre-list__item">Turkish</li>
-                    <li class="genre-list__item">Work Out</li>
-                    <li class="genre-list__item">World Music</li>
-                </ul>
-            </section>
 
-            <div class="track-container">
-                <div class="tracks"></div>
-            </div>
-        
-            <section class="playlist">
-                <div class="playlist-container">
-                    <form method="POST" action=>
-                        <input type="text" placeholder="Create a playlist" class="playlist-input">
-                        <button>Add playlist</button>
+<body>
+    
+    <div class="modal">
+        <div class="modal-content">
+            <section class="cr-im-pl">
+                <div class="cr-im-pl-tabs">
+                    <a class="cr-im-pl-tabs__item" href="#create">Create a Playlist</a>
+                    <a class="cr-im-pl-tabs__item" href="#import">Import a Playlist</a>
+                </div>
+
+                <div class="cr-pl">
+                    <form class="cr-pl__submit" method="POST">
+                        <input type="text" placeholder="Playlist Name" class="cr-pl__name" name="name">
+                        <input type="text" placeholder="Description" name="description" class="cr-pl__description">
+                        <button class="cr-im-btn  cr-im-btn--danger">Exit</button>
+                        <button class="cr-im-btn  cr-im-btn--success">Create Playlist</button>
+                    </form>
+                </div>
+
+                <div class="im-pl">
+                    <form class="im-pl__submit" method="POST">
+                        <label>Name of Playlist You Wish To Import
+                            <input type="text" placeholder="Playlist Name" class="cr-pl__name" name="name">
+                            </label>
+                        <button class="cr-im-btn--danger">Exit</button>
+                        <button class="cr-im-btn--success">Create Playlist</button>
                     </form>
                 </div>
             </section>
+        </div>
     </div>
+
+    <section class="mood">
+        <h1 class="mood__header">Welcome to Mood Music,
+            <span id='username'></span>!
+
+            </h1>
+        <form method="GET" class="mood__form" action="/">
+            <input type="text" name="mood" placeholder="How are you feeling?" class="mood__val" />
+            <button class="btn mood__btn">Search</button>
+        </form>
+    </section>
+    <section class="genres">
+        <section class="genres-drop">
+            <h3 class="genres-drop__header">Genres &#9662;</h3>
+        </section>
+
+        <div class=genres-filter__toggle>
+            <section class="genres-filters">
+                <label>Popular
+                    <input type="checkbox" name="popular" class="genres-filters__pop">
+                </label>
+                <input type="text" class="genre-filter__search" placeholder="Search for genre...">
+                <button class="genres-filters__clear">Clear All</button>
+            </section>
+            <ul class="genres-list">
+                <li class="genres-list__item">Acoustic</li>
+                <li class="genres-list__item">Afrobeat</li>
+                <li class="genres-list__item">Alt Rock</li>
+                <li class="genres-list__item">Alternative</li>
+                <li class="genres-list__item">Ambient</li>
+                <li class="genres-list__item">Anime</li>
+                <li class="genres-list__item">Black Metal</li>
+                <li class="genres-list__item">Bluegrass</li>
+                <li class="genres-list__item">Blues</li>
+                <li class="genres-list__item">Bossanova</li>
+                <li class="genres-list__item">Brazil</li>
+                <li class="genres-list__item">Breakbeat</li>
+                <li class="genres-list__item">British</li>
+                <li class="genres-list__item">Cantopop</li>
+                <li class="genres-list__item">Chicago House</li>
+                <li class="genres-list__item">Children</li>
+                <li class="genres-list__item">Chill</li>
+                <li class="genres-list__item">Classical</li>
+                <li class="genres-list__item">Club</li>
+                <li class="genres-list__item">Comedy</li>
+                <li class="genres-list__item">Country</li>
+                <li class="genres-list__item">Dance</li>
+                <li class="genres-list__item">Dancehall</li>
+                <li class="genres-list__item">Death Metal</li>
+                <li class="genres-list__item">Deep House</li>
+                <li class="genres-list__item">Detroit Techno</li>
+                <li class="genres-list__item">Disco</li>
+                <li class="genres-list__item">Disney</li>
+                <li class="genres-list__item">Drum &amp; Bass</li>
+                <li class="genres-list__item">Dub</li>
+                <li class="genres-list__item">Dubstep</li>
+                <li class="genres-list__item">EDM</li>
+                <li class="genres-list__item">Electro</li>
+                <li class="genres-list__item">Electronic</li>
+                <li class="genres-list__item">Emo</li>
+                <li class="genres-list__item">Folk</li>
+                <li class="genres-list__item">Forro</li>
+                <li class="genres-list__item">French</li>
+                <li class="genres-list__item">Funk</li>
+                <li class="genres-list__item">Garage</li>
+                <li class="genres-list__item">German</li>
+                <li class="genres-list__item">Gospel</li>
+                <li class="genres-list__item">Goth</li>
+                <li class="genres-list__item">Grindcore</li>
+                <li class="genres-list__item">Groove</li>
+                <li class="genres-list__item">Grunge</li>
+                <li class="genres-list__item">Guitar</li>
+                <li class="genres-list__item">Happy</li>
+                <li class="genres-list__item">Hard Rock</li>
+                <li class="genres-list__item">Hardcore</li>
+                <li class="genres-list__item">Hardstyle</li>
+                <li class="genres-list__item">Heavy Metal</li>
+                <li class="genres-list__item">Hip Hop</li>
+                <li class="genres-list__item">Holidays</li>
+                <li class="genres-list__item">Honky Tonk</li>
+                <li class="genres-list__item">House</li>
+                <li class="genres-list__item">IDM</li>
+                <li class="genres-list__item">Indian</li>
+                <li class="genres-list__item">Indie</li>
+                <li class="genres-list__item">Indie Pop</li>
+                <li class="genres-list__item">Industrial</li>
+                <li class="genres-list__item">Iranian</li>
+                <li class="genres-list__item">J Dance</li>
+                <li class="genres-list__item">J Idol</li>
+                <li class="genres-list__item">J Pop</li>
+                <li class="genres-list__item">J Rock</li>
+                <li class="genres-list__item">Jazz</li>
+                <li class="genres-list__item">K Pop</li>
+                <li class="genres-list__item">Kids</li>
+                <li class="genres-list__item">Latin</li>
+                <li class="genres-list__item">Latino</li>
+                <li class="genres-list__item">Malay</li>
+                <li class="genres-list__item">Mandopop</li>
+                <li class="genres-list__item">Metal</li>
+                <li class="genres-list__item">Metal Misc</li>
+                <li class="genres-list__item">Metalcore</li>
+                <li class="genres-list__item">Minimal Techno</li>
+                <li class="genres-list__item">Movies</li>
+                <li class="genres-list__item">MPB</li>
+                <li class="genres-list__item">New Age</li>
+                <li class="genres-list__item">New Release</li>
+                <li class="genres-list__item">Opera</li>
+                <li class="genres-list__item">Pagode</li>
+                <li class="genres-list__item">Party</li>
+                <li class="genres-list__item">Philippines OPM</li>
+                <li class="genres-list__item">Piano</li>
+                <li class="genres-list__item">Pop</li>
+                <li class="genres-list__item">Pop Film</li>
+                <li class="genres-list__item">Post Dubstep</li>
+                <li class="genres-list__item">Power Pop</li>
+                <li class="genres-list__item">Progressive House</li>
+                <li class="genres-list__item">Psych Rock</li>
+                <li class="genres-list__item">Punk</li>
+                <li class="genres-list__item">Punk Rock</li>
+                <li class="genres-list__item">R&amp;B</li>
+                <li class="genres-list__item">Rainy Day</li>
+                <li class="genres-list__item">Reggae</li>
+                <li class="genres-list__item">Reggaeton</li>
+                <li class="genres-list__item">Road Trip</li>
+                <li class="genres-list__item">Rock</li>
+                <li class="genres-list__item">Rock &amp; Roll</li>
+                <li class="genres-list__item">Rockabilly</li>
+                <li class="genres-list__item">Romance</li>
+                <li class="genres-list__item">Sad</li>
+                <li class="genres-list__item">Salsa</li>
+                <li class="genres-list__item">Samba</li>
+                <li class="genres-list__item">Sertanejo</li>
+                <li class="genres-list__item">Show Tunes</li>
+                <li class="genres-list__item">Singer Songwriter</li>
+                <li class="genres-list__item">Ska</li>
+                <li class="genres-list__item">Sleep</li>
+                <li class="genres-list__item">Songwriter</li>
+                <li class="genres-list__item">Soul</li>
+                <li class="genres-list__item">Soundtracks</li>
+                <li class="genres-list__item">Spanish</li>
+                <li class="genres-list__item">Study</li>
+                <li class="genres-list__item">Summer</li>
+                <li class="genres-list__item">Swedish</li>
+                <li class="genres-list__item">Synth Pop</li>
+                <li class="genres-list__item">Tango</li>
+                <li class="genres-list__item">Techno</li>
+                <li class="genres-list__item">Trance</li>
+                <li class="genres-list__item">Trip Hop</li>
+                <li class="genres-list__item">Turkish</li>
+                <li class="genres-list__item">Work Out</li>
+                <li class="genres-list__item">World Music</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="track-container">
+        <div class="tracks"></div>
+    </section>
+
+    <footer class="playlist">
+        <div class="playlist-flex">
+            <div class="playlist-retract">
+                <div class="playlist-bar">Playlist (<span class="playlist-amount">0</span>)</div>
+                <div class="playlist-add  cr-pl__btn">+</div>
+            </div>
+            <div class="playlist-extended">
+                <div class="playlist-import">Import Playlist +</div>
+                <div class="playlist-list"></div>
+            </div>
+        </div>
+        
+            <!-- Fill in Playlist footer -->
+    </footer>
     <script src="scripts/index.js"></script>
 </body>
+
 </html>
