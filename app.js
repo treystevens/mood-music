@@ -8,7 +8,8 @@ mongoose.connect('mongodb://localhost/testmood');
 mongoose.Promise = global.Promise;
 
 mongoose.connection.once('open', (mssg) =>{
-    console.log(`connection has been made, now make fireworks`)});
+    console.log(`connection has been made, now make fireworks`);
+});
 
 app.use(express.static('public'));
 
