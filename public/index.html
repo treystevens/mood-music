@@ -14,6 +14,7 @@
     
     <div class="modal">
         <div class="modal-content">
+            <span class="close-btn  delete-modal__close-btn">Close &times;</span>
             <section class="cr-im-pl">
                 <div class="cr-im-pl-tabs">
                     <a class="cr-im-pl-tabs__item" href="#create">Create a Playlist</a>
@@ -41,6 +42,7 @@
             </section>
         </div>
     </div>
+    
 
     <section class="mood">
         <h1 class="mood__header">Welcome to Mood Music,
@@ -62,7 +64,7 @@
                 <label>Popular
                     <input type="checkbox" name="popular" class="genres-filters__pop">
                 </label>
-                <input type="text" class="genre-filter__search" placeholder="Search for genre...">
+                <input type="text" class="genres-filter__search" placeholder="Search for genre...">
                 <button class="genres-filters__clear">Clear All</button>
             </section>
             <ul class="genres-list">
@@ -160,7 +162,7 @@
                 <li class="genres-list__item">Psych Rock</li>
                 <li class="genres-list__item">Punk</li>
                 <li class="genres-list__item">Punk Rock</li>
-                <li class="genres-list__item">R&amp;B</li>
+                <li class="genres-list__item">R &amp; B</li>
                 <li class="genres-list__item">Rainy Day</li>
                 <li class="genres-list__item">Reggae</li>
                 <li class="genres-list__item">Reggaeton</li>
@@ -200,6 +202,7 @@
         <div class="tracks"></div>
     </section>
 
+
     <footer class="playlist">
         <div class="playlist-flex">
             <div class="playlist-retract">
@@ -211,9 +214,29 @@
                 <div class="playlist-list"></div>
             </div>
         </div>
-        
-            <!-- Fill in Playlist footer -->
     </footer>
+
+    <div class="delete-modal">
+        <form action="/" class="delete-modal__content" method="post">
+            <span class="close-btn  delete-modal__close-btn">Close &times;</span>
+            <h1 class="delete-modal__verify">Are you sure you want to delete <span class="song-delete"></span> by <span class="artist-delete"></span> from <span class="delete-from-playlist"></span>
+            </h1>
+            <button class="decline-btn  delete-modal-btn">No</button> 
+            <button class="success-btn  delete-modal-btn">Yes</button>
+        </form>
+    </div>
+
+    <div class="mvs-modal">
+        <form action="/" class="mvs-modal__content" method="post">
+            <span class="close-btn  mvs-modal__close-btn">Close &times;</span>
+            <h1 class="mvs-modal__otp">Pick the playlist you'd like to move <span class="song-mvs"></span> by <span class="artist-mvs"></span> from <span class="mvs-from-playlist"></span>
+            </h1>
+
+            <button class="decline-btn  mvs-delete-modal-btn">No</button> 
+            <button class="success-btn  mvs-modal-btn">Move</button>
+        </form>
+    </div>
+
     <script src="scripts/index.js"></script>
 </body>
 
