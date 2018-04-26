@@ -84,6 +84,10 @@ body {
   display: flex;
   flex-direction: column; }
 
+.tab-content-container {
+  margin: 0 auto;
+  width: 70%; }
+
 .container {
   width: 80%;
   margin: 0 auto; }
@@ -121,6 +125,21 @@ body {
 .svg-inline--fa.fa-w-16 {
   width: 2em; }
 
+.close-modal-btn {
+  position: absolute;
+  top: -20px;
+  right: 0;
+  line-height: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  background-color: lightgray;
+  padding: 0.5em 2em; }
+  .close-modal-btn:hover {
+    background-color: darkgray; }
+  .close-modal-btn--tran {
+    top: -50px; }
+
 .mood {
   display: flex;
   align-items: center;
@@ -132,12 +151,12 @@ body {
   .mood__header {
     margin: 1.2em .8em; }
   .mood__form {
-    width: 80%; }
+    width: 100%; }
   .mood__val {
     border: none;
     border-bottom: 1px solid black;
     padding-bottom: 5px;
-    width: 80%;
+    width: 100%;
     font-size: 2rem; }
     .mood__val:focus {
       outline: none; }
@@ -163,10 +182,8 @@ body {
     .mood-filter-genre__tag {
       border: 1px solid #979797;
       border-radius: 5px;
-      margin-bottom: 5px;
       margin-right: 5px;
-      background-color: rgba(197, 197, 197, 0.5);
-      padding: 5px 10px 5px 10px;
+      padding: 0.2em 0.7em;
       font-size: .8em; }
 
 .genres {
@@ -415,6 +432,7 @@ body {
     border-radius: 50%; }
   .track__img {
     width: 100%;
+    height: 300px;
     border-radius: 5px 5px 0 0; }
   .track__name {
     margin-bottom: 0.4em;
@@ -428,6 +446,14 @@ body {
     margin-bottom: 0.4em;
     text-align: center;
     font-weight: 400; }
+  .track__progress-bar {
+    height: 10px;
+    background-color: yellow; }
+  .track .media-controls {
+    width: 100%; }
+  .track__volume-container {
+    display: flex;
+    justify-content: flex-end; }
 
 .playlist-track {
   display: flex;
@@ -436,7 +462,7 @@ body {
   .playlist-track__img {
     width: 100px;
     height: 100px; }
-  .playlist-track__head-container {
+  .playlist-track__song-info-container {
     width: 50%; }
   .playlist-track__name {
     margin-bottom: 0.4em;
@@ -461,6 +487,12 @@ body {
   .playlist-track__play-svg {
     height: 80px;
     width: 70%; }
+  .playlist-track__progress-bar {
+    height: 10px;
+    background-color: yellow; }
+  .playlist-track__media {
+    display: flex;
+    flex-direction: column; }
 
 .modal {
   display: none;
@@ -481,7 +513,7 @@ body {
   /* Enable scroll if needed */
   background-color: black;
   /* Fallback color */
-  background-color: rgba(0, 0, 0, 0.4);
+  background-color: rgba(0, 0, 0, 0.6);
   /* Black w/ opacity */ }
   .modal-content {
     position: relative;
@@ -491,6 +523,13 @@ body {
     border: 1px solid #888;
     width: 80%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); }
+  .modal__btn-container {
+    display: flex;
+    justify-content: space-around;
+    width: 60%;
+    margin-top: 7em; }
+  .modal--show {
+    display: block; }
 
 .extended-playlist {
   height: 90vh;
@@ -518,10 +557,14 @@ body {
       border-left: none;
       text-align: center;
       height: auto; } }
-  .extended-playlist .playlist-list__name {
+  .extended-playlist .playlist-list__playlist {
     margin-bottom: 0; }
-    .extended-playlist .playlist-list__name--hide {
+    .extended-playlist .playlist-list__playlist--hide {
       display: none; }
+    .extended-playlist .playlist-list__playlist--show {
+      height: auto; }
+  .extended-playlist .playlist-list__name {
+    padding: 5px; }
   .extended-playlist .track-wrapper {
     display: none; }
   .extended-playlist .track-wrapper--show {
@@ -539,7 +582,9 @@ body {
   width: 100%;
   background-color: #325386;
   overflow: auto;
-  color: white; }
+  color: white;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px; }
   @media screen and (min-width: 768px) {
     .playlist {
       width: 40%;
@@ -566,14 +611,16 @@ body {
     border-left: 1px solid #e7d19c;
     height: 30px;
     width: 50px; }
-  .playlist-list__name {
+  .playlist-list__playlist {
     position: relative;
-    background-color: green;
-    height: 20px;
-    color: white;
-    margin-bottom: 250px; }
-    .playlist-list__name:hover {
-      background-color: orange; }
+    color: white; }
+    .playlist-list__playlist:hover {
+      background-color: rgba(0, 0, 0, 0.2); }
+  .playlist-list__name {
+    display: inline-block;
+    padding: 10px; }
+  .playlist__show {
+    display: flex; }
 
 .hide-playlist {
   display: none; }
@@ -622,6 +669,8 @@ body {
     border: 1px solid #e7d19c;
     border-radius: 5px;
     margin: 20px 0; }
+  .im-pl__error {
+    color: #aa3535; }
 
 .cr-im-btn {
   border-radius: 5px;
@@ -658,85 +707,62 @@ body {
 .show__options {
   display: block; }
 
-.delete-modal {
+.tran-modal {
+  display: none;
   position: fixed;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
   opacity: 0;
   visibility: hidden;
   transform: scale(1.1);
   transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s; }
+  .tran-modal__content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    height: 60vh;
+    width: 60%;
+    border-radius: 0.5rem; }
+  .tran-modal__show-modal {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+    transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
+    padding: 1em 1.8em; }
+  .tran-modal__form {
+    display: none; }
+  .tran-modal__show-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    padding: 1em 1.5em;
+    height: 100%; }
 
-.delete-modal__content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: white;
-  padding: 1rem 1.5rem;
-  width: 24rem;
-  border-radius: 0.5rem; }
+.btn {
+  border-radius: 5px;
+  padding: .5em 1.4em;
+  font-size: 1.3em;
+  color: white; }
+  .btn:hover {
+    background-color: rgba(0, 0, 0, 0.2); }
+  .btn--success {
+    background-color: green; }
+  .btn--decline {
+    background-color: red; }
 
-.delete-modal__close-button {
-  float: right;
-  width: 1.5rem;
-  line-height: 1.5rem;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 0.25rem;
-  background-color: lightgray; }
-
-.delete-modal__close-button:hover {
-  background-color: darkgray; }
-
-.delete-modal__show-modal {
-  opacity: 1;
-  visibility: visible;
-  transform: scale(1);
-  transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s; }
-
-.mvs-modal {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  opacity: 0;
-  visibility: hidden;
-  transform: scale(1.1);
-  transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s; }
-
-.mvs-modal__content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: white;
-  padding: 1rem 1.5rem;
-  width: 24rem;
-  border-radius: 0.5rem; }
-
-.mvs-modal__close-button {
-  float: right;
-  width: 1.5rem;
-  line-height: 1.5rem;
-  text-align: center;
-  cursor: pointer;
-  border-radius: 0.25rem;
-  background-color: lightgray; }
-
-.mvs-modal__close-button:hover {
-  background-color: darkgray; }
-
-.mvs-modal__show-modal {
-  opacity: 1;
-  visibility: visible;
-  transform: scale(1);
-  transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s; }
+.mvs-select {
+  width: 60%;
+  margin-top: 40px;
+  font-size: 1.4em;
+  height: 40px; }
 
 .tabs {
   position: relative;
@@ -766,7 +792,12 @@ body {
   bottom: 0;
   padding: 20px;
   border: 1px solid #ccc;
-  height: 50vh; }
+  height: 50vh;
+  border-radius: 5px; }
+
+[type=radio] ~ label {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px; }
 
 [type=radio]:checked ~ label {
   background: white;
@@ -847,5 +878,32 @@ body {
   stroke-dasharray: none !important; }
   .inactive-dash-pause {
     display: none; }
+
+.tab-content--error {
+  animation: tabError 1s cubic-bezier(0.3, 0.13, 0.6, 0.89) forwards; }
+
+@keyframes tabError {
+  0% {
+    transform: translate(5px); }
+  25% {
+    transform: translate(-5px); }
+  50% {
+    transform: translate(5px); }
+  100% {
+    transform: translate(0px); } }
+.song-action {
+  display: flex;
+  border: 1px solid black; }
+  .song-action__img {
+    width: 100px;
+    height: 100px; }
+  .song-action__song-info {
+    display: flex;
+    align-items: center;
+    flex-direction: column; }
+  .song-action__song-name {
+    color: black; }
+  .song-action__song-artist {
+    color: black; }
 
 /*# sourceMappingURL=styles.css.map */
