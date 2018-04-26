@@ -6,12 +6,20 @@
 
 
 
-
+@mixin roundTopCorners($int){
+    border-top-left-radius: $int;
+    border-top-right-radius: $int;
+}
 
 .content-wrapper{
     display: flex; 
     flex-direction: column;
     // background-color: #ED6A5A;
+}
+
+.tab-content-container{
+    margin: 0 auto;
+    width: 70%;
 }
 
 .container{
@@ -66,7 +74,27 @@
     width: 2em;
 }
 
+.close-modal-btn{
+    position: absolute;
+    top: -20px;
+    right: 0;
+    // float: right;
+    // width: 1.5rem;
+    line-height: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    background-color: lightgray;
+    padding: 0.5em 2em;
 
+    &:hover{
+        background-color: darkgray;
+    }
+
+    &--tran{
+        top: -50px;
+    }
+}
 
 
 // Mood Input Fields
@@ -88,7 +116,7 @@
     }
 
     &__form{
-        width: 80%;
+        width: 100%;
         
     }
 
@@ -99,7 +127,7 @@
         border-bottom: 1px solid black;
         // margin-bottom: 20px;
         padding-bottom: 5px;
-        width: 80%;
+        width: 100%;
         font-size: 2rem;
 
         &:focus{
@@ -140,12 +168,13 @@
         &__tag{
             border: 1px solid $baseblack;
             border-radius: 5px;
-            margin-bottom: 5px;
+            // margin-bottom: 5px;
             margin-right: 5px;
             // height: 30px;
             // vertical-align: center;
-            background-color: rgba(197, 197, 197, 0.5);
-            padding: 5px 10px 5px 10px;
+            // background-color: rgba(197, 197, 197, 0.5);
+            // padding: 5px 10px 5px 10px;
+            padding: 0.2em 0.7em;
             font-size: .8em;
         }
     }
@@ -555,6 +584,7 @@
 
     &__img{
         width: 100%;
+        height: 300px;
         border-radius: 5px 5px 0 0;
     }
 
@@ -574,8 +604,36 @@
         font-weight: 400;
     }
 
+    &__progress-bar{
+        height: 10px;
+        // width: 100%; 
+        background-color: yellow;
+    }
+
+    & .media-controls{
+        width: 100%;
+    }
+
+    &__volume-container{
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    &__volume-slider{
+        
+        // align-self: flex-end;
+
+        // &::before{
+        //     content: 'icon here';
+        //     height: 20px;
+        //     margin-right: 40px;
+        // }
+    }
 
 }
+
+
+
 
 .playlist-track{
     display:flex;
@@ -589,7 +647,7 @@
         height: 100px;
     }
 
-    &__head-container{
+    &__song-info-container{
         width: 50%;
     }
 
@@ -626,6 +684,18 @@
         width: 70%;
     }
 
+    &__progress-bar{
+        height: 10px;
+        // width: 100%;
+        background-color: yellow;
+    }
+
+    &__media{
+        display: flex;
+        flex-direction: column;
+        
+    }
+
     // &__play-container{
     //     width: 30%;
     // }
@@ -646,7 +716,7 @@
     height: 100%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
     background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
 
     &-content {
         position: relative;
@@ -660,6 +730,17 @@
         // -webkit-animation-duration: 0.4s;
         // animation-name: animatetop;
         // animation-duration: 0.4s
+    }
+
+    &__btn-container{
+        display: flex;
+        justify-content: space-around;
+        width: 60%;
+        margin-top: 7em;
+    }
+
+    &--show{
+        display: block;
     }
 }
 
@@ -718,13 +799,20 @@
         }
     }
 
-    & .playlist-list__name{
+    & .playlist-list__playlist{
         margin-bottom: 0;
         // height: auto;
 
         &--hide{
             display: none;
         }
+        &--show{
+            height: auto;
+        }
+    }
+
+    & .playlist-list__name{
+        padding: 5px;
     }
 
     & .track-wrapper{
@@ -757,6 +845,8 @@
     background-color: #325386;
     overflow: auto;
     color: white;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 
     @media #{$tablet-view} {
         width: 40%;
@@ -811,18 +901,27 @@
         // }
     }
 
-    &-list__name{
+    &-list__playlist{
         position: relative;
-        background-color: green;
-        height: 20px;
+        
+        
         // width: 100%;
         color: white;
 
-        margin-bottom: 250px; // delete. only for testing
+
 
         &:hover{
-            background-color: orange;
+            background-color: rgba(0, 0, 0, 0.2);
         }
+    }
+
+    &-list__name{
+        display: inline-block;
+        padding: 10px;
+    }
+
+    &__show{
+        display: flex;
     }
 
 }
@@ -900,6 +999,10 @@
         border-radius: 5px;
         margin: 20px 0;
     }
+
+    &__error{
+        color: rgb(170, 53, 53);
+    }
 }
 
 
@@ -956,94 +1059,85 @@
 
 // Refactor into mixins
 
-.delete-modal {
-    // display: none;
+.tran-modal {
+    display: none;
     position: fixed;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.7);
     opacity: 0;
     visibility: hidden;
     transform: scale(1.1);
     transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s;
-}
-.delete-modal__content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 1rem 1.5rem;
-    width: 24rem;
-    border-radius: 0.5rem;
-}
-.delete-modal__close-button {
-    float: right;
-    width: 1.5rem;
-    line-height: 1.5rem;
-    text-align: center;
-    cursor: pointer;
-    border-radius: 0.25rem;
-    background-color: lightgray;
-}
-.delete-modal__close-button:hover {
-    background-color: darkgray;
-}
-
-.delete-modal__show-modal {
-    opacity: 1;
-    visibility: visible;
-    transform: scale(1.0);
-    transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
-}
 
 
-.mvs-modal {
-    // display: none;
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    visibility: hidden;
-    transform: scale(1.1);
-    transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s;
-}
-.mvs-modal__content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: white;
-    padding: 1rem 1.5rem;
-    width: 24rem;
-    border-radius: 0.5rem;
-}
-.mvs-modal__close-button {
-    float: right;
-    width: 1.5rem;
-    line-height: 1.5rem;
-    text-align: center;
-    cursor: pointer;
-    border-radius: 0.25rem;
-    background-color: lightgray;
-}
-.mvs-modal__close-button:hover {
-    background-color: darkgray;
-}
-
-.mvs-modal__show-modal {
-    opacity: 1;
-    visibility: visible;
-    transform: scale(1.0);
-    transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
-}
+    &__content{
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        // padding: 1rem 1.5rem;
+        height: 60vh;
+        width: 60%;
+        border-radius: 0.5rem;
+    }
 
 
+    &__show-modal{
+        display: block;
+        opacity: 1;
+        visibility: visible;
+        transform: scale(1.0);
+        transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
+        padding: 1em 1.8em;
+    }
+
+    &__form{
+        display: none;
+    }
+
+    &__show-form{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        position: relative;
+        padding: 1em 1.5em;
+        height: 100%;
+
+    }
+
+}
+
+.btn{
+    border-radius: 5px;
+    padding: .5em 1.4em;
+    font-size: 1.3em;// delete this make decline btn an actual button and return false in javascript
+    color: white;
+
+
+    &:hover{
+        background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    &--success{
+        background-color: green;
+    }
+
+    &--decline{
+        background-color: red;
+    }
+}
+
+.mvs-select{
+    width: 60%;
+    margin-top: 40px;
+    font-size: 1.4em;
+    height: 40px;
+}
 
 
 .tabs {
@@ -1077,11 +1171,17 @@
     padding: 20px;
     border: 1px solid #ccc; 
     height: 50vh;
+    border-radius: 5px;
   }
+  [type=radio] ~ label{
+    @include roundTopCorners(5px);
+  }
+
   [type=radio]:checked ~ label {
     background: white;
     border-bottom: 1px solid white;
     z-index: 2;
+    
   }
   [type=radio]:checked ~ label ~ .content {
     z-index: 1;
@@ -1229,3 +1329,45 @@
     }
   }
   
+
+.tab-content--error{
+    animation: tabError 1s $cbc forwards;
+}
+
+@keyframes tabError{
+    0%{
+        transform: translate(5px);
+    }
+    25%{
+        transform: translate(-5px);
+    }
+    50%{
+        transform: translate(5px);
+    }
+    100%{
+        transform: translate(0px);
+    }
+}
+
+
+
+.song-action{
+    display: flex;
+    border: 1px solid black;
+
+    &__img{
+        width: 100px;
+        height: 100px;
+    }
+    &__song-info{
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    }
+    &__song-name{   
+        color: black;
+    }
+    &__song-artist{
+        color: black;
+    }
+}
