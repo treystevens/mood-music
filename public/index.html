@@ -21,41 +21,11 @@
             <h6 class="logo-container__logo">Mood Music</h6>
         </header>
         
-        <!-- <div class="modal">
-            <div class="modal-content">
-                <span class="close-btn  delete-modal__close-btn">Close &times;</span>
-                <section class="cr-im-pl">
-                    <div class="cr-im-pl-tabs">
-                        <a class="cr-im-pl-tabs__item" href="#create">Create a Playlist</a>
-                        <a class="cr-im-pl-tabs__item" href="#import">Import a Playlist</a>
-                    </div>
-
-                    <div class="cr-pl">
-                        <form class="cr-pl__submit" method="POST">
-                            <input type="text" placeholder="Playlist Name" class="cr-pl__name" name="name">
-                            <input type="text" placeholder="Description" name="description" class="cr-pl__description">
-                            <button class="cr-im-btn  cr-im-btn--danger">Exit</button>
-                            <button class="cr-im-btn  cr-im-btn--success">Create Playlist</button>
-                        </form>
-                    </div>
-
-                    <div class="im-pl">
-                        <form class="im-pl__submit" method="get">
-                            <label>Name of Playlist You Wish To Import
-                                <input type="text" placeholder="Playlist Name" class="im-pl__name" name="name">
-                                </label>
-                            <button class="cr-im-btn--danger">Exit</button>
-                            <button class="cr-im-btn--success">Create Playlist</button>
-                        </form>
-                    </div>
-                </section>
-            </div>
-        </div> -->
-        
-
         <section class="modal">
-            <div class="modal-content">
+            <div class="tab-content-container">
+                <!-- <span class="close-modal-btn  tran-modal__close-btn">Close &times;</span> -->
                 <div class="tabs">
+                    <span class="close-modal-btn">Close &times;</span>
                     <div class="tab">
 
                         <!-- <label> -->
@@ -64,31 +34,34 @@
 
                         <div class="cr-pl  content">
                                 <form class="cr-pl__submit" method="POST">
-                                    <input type="text" placeholder="Playlist Name" class="cr-pl__name" name="name">
-                                    <input type="text" placeholder="Description" name="description" class="cr-pl__description">
-                                    <button class="cr-im-btn  cr-im-btn--danger">Exit</button>
-                                    <button class="cr-im-btn  cr-im-btn--success">Create Playlist</button>
+                                    <label>Playlist Name:
+                                        <input type="text" placeholder="Playlist Name" class="cr-pl__name" name="name">
+                                    </label>
+                                    <label>Description:
+                                        <input type="text" placeholder="Description" name="description" class="cr-pl__description">
+                                    </label>
+                                    <div class="modal__btn-container">
+                                        <button class="btn btn--decline" type="button">Exit</button>
+                                        <button class="btn btn--success">Create Playlist</button>
+                                    </div>
                                 </form>
                         </div>
                     </div>
 
                     <div class="tab">
-                        <!-- <input type="radio" class="im-pl-tab" name="tab-group-1">
-                        <label for="im-pl-tab">Import a Playlist</label> -->
-
-                        <!-- <label> -->
+    
                             <input type="radio" id="im-pl-tab" name="tab-group-1">
-                            <label for="im-pl-tab">Import a Playlist</label>
-                        <!-- </label> -->
-                        
+                            <label for="im-pl-tab">Import a Playlist</label>                
 
-                        <div class="im-pl  content">
+                        <div class="im-pl  content  content__import">
                             <form class="im-pl__submit" method="get">
-                                <label>Name of Playlist You Want To Import
+                                <label>Name of Playlist You Want To Import:
                                     <input type="text" placeholder="Playlist Name" class="im-pl__name" name="name">
                                     </label>
-                                <button class="cr-im-btn--danger">Exit</button>
-                                <button class="cr-im-btn--success">Create Playlist</button>
+                                    <div class="modal__btn-container">
+                                        <button class="btn btn--decline" type="button">Exit</button>
+                                        <button class="btn btn--success">Import Playlist</button>
+                                    </div>
                             </form>
                         </div>
 
@@ -108,7 +81,7 @@
                     <div class="mood__container">
                         <button class="btn mood__btn">
                             <i class="fa fa-search mood__search" aria-hidden="true"></i>
-                            <!-- Search -->
+                        
                         </button>
                     </div>
                 </div>
@@ -128,15 +101,10 @@
                         <input type="search" class="genres-filter__search genres-container" placeholder="Search genres...">
                     </div>
                     <div class="genres-filter-tab genres-container">
-                        <p class="genres-filter-tab__genres-p">Choose up to 5 genres</p>
+                        <p class="genres-filter-tab__genres-p">Choose up to 5 genres for your search</p>
                         <div class="genres-filter-tab-container">
                             <div class="genres-filter-tab__genres-chosen">
                                 <ul class="genres-filter-tab__list">
-                                    <!-- <li class="genres-filter-tab__tag">Philippines OPM</li>
-                                    <li class="genres-filter-tab__tag">Singer Songwriter</li>
-                                    <li class="genres-filter-tab__tag">Detroit Techno</li>
-                                    <li class="genres-filter-tab__tag">Minimal Techno</li>
-                                    <li class="genres-filter-tab__tag">Progressive House</li> -->
                                 </ul>
                             </div>
                                 <button class="genres-filter-tab__clear">Clear All</button>
@@ -284,7 +252,7 @@
             <div class="playlist-flex">
                 <div class="playlist-retract">
                     <div class="playlist-bar">Playlist (<span class="playlist-amount">0</span>)</div>
-                    <div class="playlist-create  cr-pl__btn">+</div>
+                    <div class="playlist-create">+</div>
                     <div class="playlist-import">Import Playlist +</div>
                     <div class="playlist-list"></div>
                 </div>
@@ -294,26 +262,60 @@
             </div>
         </footer>
 
-        <div class="delete-modal">
-            <form action="/" class="delete-modal__content" method="post">
-                <span class="close-btn  delete-modal__close-btn">Close &times;</span>
-                <h1 class="delete-modal__verify">Are you sure you want to delete <span class="song-delete"></span> by <span class="artist-delete"></span> from <span class="delete-from-playlist"></span>
-                </h1>
-                <button class="decline-btn  delete-modal-btn">No</button> 
-                <button class="success-btn  delete-modal-btn">Yes</button>
-            </form>
+        <div class="tran-modal">
+            <div class="tran-modal__content">
+                <form class="tran-modal__form   tran-modal__del-song" method="post">
+                    <span class="close-modal-btn  close-modal-btn--tran  tran-modal__del-song">Close &times;</span>
+                    <h1 class="delete-modal__verify  tran-modal__del-verify-head">Are you sure you want to delete: </h1>
+                    <!-- <div class="song-action">
+                            <img class="song-action__img" />
+                            <div class="song-action__song-info">
+                                <h5 class="song-action__song-name"></h5>
+                                <h6 class="song-action__song-artist"></h6>
+                            </div>
+                    </div> -->
+                    <div class="modal__btn-container">
+                        <button class="btn btn--decline" type="button">No</a> 
+                        <button class="btn btn--success">Yes</button>
+                    </div>
+                </form>
+                
+                <form class="tran-modal__form  tran-modal__mv-song" method="post">
+                    <span class="close-modal-btn  close-modal-btn--tran">Close &times;</span>
+                    <h1 class="mvs-modal__otp  tran-modal__mv-verify-head">Pick the playlist you'd like to move the song to</h1>
+                    <!-- <div class="song-action">
+                            <img class="song-action__img" />
+                            <div class="song-action__song-info">
+                                <h5 class="song-action__song-name"></h5>
+                                <h6 class="song-action__song-artist"></h6>
+                            </div>
+                    </div> -->
+                    <div class="modal__btn-container">
+                        <button class="btn btn--decline  mvs-delete-modal-btn" type="button">No</a> 
+                        <button class="btn btn--success">Move</button>
+                    </div>
+                </form>
+
+                <form action="/" method="get" class="tran-modal__form  tran-modal__rm-playlist">
+                    <span class="close-modal-btn close-modal-btn--tran">Close &times;</span>
+                    <h1>Are you sure you'd like to remove playlist <span class="rm-playlist"></span></h1>
+                    <div class="modal__btn-container">
+                        <button class="btn btn--decline" type="button">No</a> 
+                        <button class="btn btn--success">Yes</button>
+                    </div>
+                </form>
+                    
+            </div>
         </div>
 
-        <div class="mvs-modal">
-            <form action="/" class="mvs-modal__content" method="post">
-                <span class="close-btn  mvs-modal__close-btn">Close &times;</span>
-                <h1 class="mvs-modal__otp">Pick the playlist you'd like to move <span class="song-mvs"></span> by <span class="artist-mvs"></span> from <span class="mvs-from-playlist"></span>
-                </h1>
-
-                <button class="decline-btn  mvs-delete-modal-btn">No</button> 
-                <button class="success-btn  mvs-modal-btn">Move</button>
-            </form>
-        </div>
+        <!-- <div class="song-action">
+            <img class="song-action__img" />
+            <div class="song-action__song-info">
+                <h5 class="song-action__song-name"></h5>
+                <h6 class="song-action__song-artist"></h6>
+            </div>
+        </div> -->
+        
     </div>
 
     <script src="scripts/index.js"></script>
