@@ -2,10 +2,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const Emotion = require('./models/emotion');
+const Mood = require('./models/mood.js');
 let app = express();
 
-mongoose.connect('mongodb://localhost/testmood');
 mongoose.Promise = global.Promise;
+
+// mongoose.connect('mongodb://localhost/testmood');
+mongoose.connect('mongodb://localhost/moodmusic')
+
+
 
 mongoose.connection.once('open', (mssg) =>{
     console.log(`connection has been made, now make fireworks`);
@@ -26,7 +31,7 @@ app.get('/:mood', (req,res) => {
     let word = req.params.mood;
     
 
-    Emotion.find({synonyms: word})
+    Mood.find({synonyms: word})
     .then((results) => {
         console.log(results, `these are the results`);
         res.send(results);
