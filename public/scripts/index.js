@@ -999,7 +999,7 @@ function createPlaylistTrackBody(playlistObj, importedPlaylistName){
     let progressBar = document.createElement('div');
     progressBar.classList.add('playlist-track__progress-bar');
 
-    progressBar.style.backgroundColor = document.querySelector('.wrap').style.backgroundColor;
+    progressBar.style.backgroundColor = document.body.style.backgroundColor;
     // console.log(document.querySelector('.wrap').style.backgroundColor)
 
     const volumeContainer = document.createElement('div');
@@ -2207,7 +2207,8 @@ document.addEventListener('scroll', function() {
     let scrollPosition = window.pageYOffset;
     let windowSize = window.innerHeight;
     let bodyHeight = document.body.offsetHeight;
-    const wrapWrap = document.querySelector('.wrap');
+    // const wrapWrap = document.querySelector('.wrap');
+
 
     
     // console.log(scrollPosition)
@@ -2256,7 +2257,7 @@ document.addEventListener('scroll', function() {
                 progressBar.style.backgroundColor = myModule.scrollPositionTracker[i].color;
             });
 
-            wrapWrap.style.backgroundColor = myModule.scrollPositionTracker[i].color;
+            document.body.style.backgroundColor = myModule.scrollPositionTracker[i].color;
 
             
         }
@@ -2271,7 +2272,7 @@ document.addEventListener('scroll', function() {
                 progressBar.style.backgroundColor = '#E47A67';
             });
 
-            wrapWrap.style.backgroundColor = '#E47A67';
+            document.body.style.backgroundColor = '#E47A67';
         }
     }
 
@@ -2315,7 +2316,7 @@ document.addEventListener('scroll', function() {
             });
             
 
-            wrapWrap.style.backgroundColor = currentColor;
+            document.body.style.backgroundColor = currentColor;
             
             // console.dir(wrapWrap);
             

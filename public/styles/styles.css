@@ -80,11 +80,21 @@ body {
   color: #5a5a5a;
   font-family: 'Avenir', 'Open Sans', sans-serif; }
 
+html {
+  margin: 0px;
+  height: 100%;
+  width: 100%; }
+
+body {
+  margin: 0px;
+  min-height: 100%;
+  width: 100%;
+  background-color: #E47A67; }
+
 .no-scroll {
   overflow: hidden; }
 
 .wrap {
-  background-color: #E47A67;
   transition: background-color 0.5s ease; }
 
 .content-wrapper {
@@ -188,7 +198,7 @@ body {
     width: 100%;
     display: flex;
     justify-content: center;
-    border-bottom: 1px solid black; }
+    border-bottom: 1px solid #EFA09B; }
   .mood__header {
     font-size: 3rem;
     align-self: flex-start;

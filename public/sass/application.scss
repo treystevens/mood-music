@@ -11,17 +11,18 @@
     border-top-right-radius: $int;
 }
 
-// html {
-//     margin: 0px;
-//     height: 100%;
-//     width: 100%;
-//  }
+html {
+    margin: 0px;
+    height: 100%;
+    width: 100%;
+ }
  
-//  body {
-//     margin: 0px;
-//     min-height: 100%;
-//     width: 100%;
-//  }
+ body {
+    margin: 0px;
+    min-height: 100%;
+    width: 100%;
+    background-color: #E47A67;
+ }
 
 // html, body {
 //     min-height:100%;
@@ -37,7 +38,7 @@
 
 // testing 
 .wrap{
-    background-color: #E47A67;
+    // background-color: #E47A67;
     transition: background-color 0.5s ease;
 
     // &:hover{
@@ -201,7 +202,7 @@
         width: 100%;
         display: flex;
         justify-content: center;
-        border-bottom: 1px solid black;
+        border-bottom: 1px solid #EFA09B;
 
 
     }

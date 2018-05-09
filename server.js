@@ -1,16 +1,31 @@
-let express = require('express');
-let request = require('request');
-let querystring = require('querystring');
 
-let app = express();
+const request = require('request');
+const querystring = require('querystring');
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const Mood = require('./models/mood');
 
-let redirect_uri = 
-  process.env.REDIRECT_URI || 
-  'http://localhost:8888/callback/';
+const app = express();
+
+const redirect_uri = process.env.REDIRECT_URI || 'http://localhost:3000/callback/';
+
+mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost/moodmusic');
+mongoose.connection.once('open', (mssg) =>{
+    console.log(`Connected to mongoDB`);
+});
+
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({extended: true}));
+
+app.get('/', (req, res) => {
+   console.log(`got you`);
+});
 
 
-app.get('/login', function(req, res) {
-  console.log(process.env.SPOTIFY_CLIENT_ID, `meee`);
+app.get('/spotifylogin', function(req, res) {
+  
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
@@ -40,12 +55,34 @@ app.get('/callback', function(req, res) {
   };
   request.post(authOptions, function(error, response, body) {
     var access_token = body.access_token;
-    let uri = process.env.FRONTEND_URI || 'http://localhost:3000'
+    let uri = process.env.FRONTEND_URI || 'http://localhost:3000';
     res.redirect(uri + '?access_token=' + access_token);
   });
 });
 
-let port = process.env.PORT || 8888;
+app.get('/login', (req, res) => {
+    res.sendFile(__dirname + '/public/login.html');
+})
+
+
+app.get('/:mood', (req,res) => {
+    
+  let word = req.params.mood;
+  console.log(word)
+  console.log(req.params, `params`)
+
+  Mood.find({synonyms: word})
+  .then((results) => {
+      console.log(results, `these are the results`);
+      res.send(results);
+  })
+  .catch((err) => {
+      console.log(err);
+  });
+});
+
+
+let port = process.env.PORT || 3000;
 console.log(`Listening on port ${port}. Go /login to initiate authentication flow.`);
 app.listen(port);
 
