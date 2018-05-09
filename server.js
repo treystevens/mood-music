@@ -11,7 +11,7 @@ const app = express();
 const redirect_uri = process.env.REDIRECT_URI || 'http://localhost:3000/callback/';
 
 mongoose.Promise = global.Promise;
-mongoose.connect(MONGODB_URI);
+mongoose.connect(process.env.MONGO_CLIENT_BASH);
 // mongoose.connect('mongodb://localhost/moodmusic');
 mongoose.connection.once('open', (mssg) =>{
     console.log(MONGODB_URI);
