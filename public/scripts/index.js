@@ -1717,7 +1717,7 @@ eventModule.moodForm.addEventListener('submit', (evt) => {
     .then( (audioFeatures) => {
         console.log(audioFeatures);
         // No music for that mood
-        if(audioFeatures == false){
+        if(audioFeatures.length === 0){
             noTrackResult();
             smoothingScroll('.no-result');
             return -1;
