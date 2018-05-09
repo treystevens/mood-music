@@ -1305,7 +1305,7 @@ spotifyGrab("https://api.spotify.com/v1/me")
                 content.removeChild(content.firstChild)
             }
 
-            loginLink.setAttribute('href', 'login.html');
+            loginLink.setAttribute('href', '/login');
             loginLink.textContent = `login here!`;
 
             document.body.appendChild(loginLink);
@@ -1711,7 +1711,7 @@ eventModule.moodForm.addEventListener('submit', (evt) => {
     // Fetch emotion json from my database
     fetch(`/${userMoodValue}`)
     .then( (data) => {
-        
+        console.log(data)
         return data.json();
     })
     .then( (audioFeatures) => {
@@ -2210,9 +2210,9 @@ document.addEventListener('scroll', function() {
     const wrapWrap = document.querySelector('.wrap');
 
     
-    console.log(scrollPosition)
+    // console.log(scrollPosition)
     
-    console.log(tracksDiv.getBoundingClientRect().top);
+    // console.log(tracksDiv.getBoundingClientRect().top);
 
 
     // Mobile scrolling features
