@@ -6,15 +6,18 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const Mood = require('./models/mood');
 
+
 const app = express();
 
-const redirect_uri = process.env.REDIRECT_URI || 'http://localhost:3000/callback/';
+const redirect_uri = process.env.REDIRECT_URI || 'http://localhost:5000/callback/';
+
+
 
 mongoose.Promise = global.Promise;
-mongoose.connect(process.env.MONGO_CLIENT_BASH);
-// mongoose.connect('mongodb://localhost/moodmusic');
+mongoose.connect(process.env.MONGODB_URI);
+
 mongoose.connection.once('open', (mssg) =>{
-    console.log(MONGODB_URI);
+  console.log(process.env.MONGODB_URI)
     console.log(`Connected to mongoDB`);
 });
 
@@ -57,7 +60,7 @@ app.get('/callback', function(req, res) {
   };
   request.post(authOptions, function(error, response, body) {
     var access_token = body.access_token;
-    let uri = process.env.FRONTEND_URI || 'http://localhost:3000';
+    let uri = process.env.FRONTEND_URI || 'http://localhost:5000';
     res.redirect(uri + '?access_token=' + access_token);
   });
 });
@@ -67,7 +70,7 @@ app.get('/login', (req, res) => {
 })
 
 
-app.get('/mood/:mood', (req,res) => {
+app.get('/:mood', (req,res) => {
     
   let word = req.params.mood;
   console.log(word);
