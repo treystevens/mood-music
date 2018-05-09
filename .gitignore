@@ -1,2 +1,6 @@
-
 public/.sass-cache/
+.vscode/
+/node_modules
+npm-debug.log
+.DS_Store
+/*.env

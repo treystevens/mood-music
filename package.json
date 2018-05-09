@@ -4,7 +4,6 @@
   "description": "Matching your mood with music",
   "main": "server.js",
   "scripts": {
-    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Trey Stevens",
