@@ -1,8 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const Emotion = require('./models/emotion');
-const Mood = require('./models/mood.js');
+const Mood = require('./models/mood');
 let app = express();
 
 mongoose.Promise = global.Promise;
