@@ -11,8 +11,10 @@ const app = express();
 const redirect_uri = process.env.REDIRECT_URI || 'http://localhost:3000/callback/';
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/moodmusic');
+mongoose.connect(MONGODB_URI);
+// mongoose.connect('mongodb://localhost/moodmusic');
 mongoose.connection.once('open', (mssg) =>{
+    console.log(MONGODB_URI);
     console.log(`Connected to mongoDB`);
 });
 
@@ -65,11 +67,11 @@ app.get('/login', (req, res) => {
 })
 
 
-app.get('/:mood', (req,res) => {
+app.get('/mood/:mood', (req,res) => {
     
   let word = req.params.mood;
-  console.log(word)
-  console.log(req.params, `params`)
+  console.log(word);
+  console.log(req.params, `params`);
 
   Mood.find({synonyms: word})
   .then((results) => {
