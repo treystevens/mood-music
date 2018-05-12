@@ -13,11 +13,13 @@ body{
     @media (orientation:landscape){
         min-height: initial;
         height: initial;
+        width: initial;
     }
 
     @media #{$tablet-view} and (orientation: landscape){
         min-height: initial;
         height: initial;
+        width: initial;
     }
 
     @media #{$desktop-view}{
@@ -165,6 +167,7 @@ body{
         background-color: #1ED760;
         color: white;
         margin: 5% 0;
+        font-weight: $f-normal;
         // font-size: 1.2rem;
         // position: fixed;
         // bottom: 0;
