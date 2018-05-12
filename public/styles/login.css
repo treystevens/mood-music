@@ -188,7 +188,8 @@ body {
     background-color: #1ED760;
     color: white;
     margin: 5% 0;
-    text-align: center; }
+    text-align: center;
+    font-weight: 300; }
     @media screen and (min-width: 768px) {
       .login__spotify-login {
         padding: .8em;
