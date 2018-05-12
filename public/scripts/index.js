@@ -1,7 +1,7 @@
 let myModule = (function (){
     let module = {};
 
-    module.access_token = getParameterByName("access_token");
+    module.accessToken = getParameterByName('access_token');
 
     module.closureURL = '';
 
@@ -31,7 +31,7 @@ let myModule = (function (){
         happened: false,
         moment: ''
         
-    }
+    };
 
     module.wasSubmitted = false;
     module.startTime = undefined;
@@ -55,7 +55,7 @@ function smoothingScrollSupportCheck(){
     else{
         return false;
       }
-};
+}
 
 let eventModule = (function (){
     let events = {};
@@ -84,15 +84,26 @@ function mobileCheck(){
     let cssProp = window.getComputedStyle(logoContainer, null).getPropertyValue("position");
 
     if(cssProp == 'fixed'){
+        let genreModalCloseBtn = Array.from(document.querySelectorAll('.close-modal-btn'));
         logoContainer.classList.toggle('show__elem');
         isMobile = true; 
+        
+
+        // Remove Modal Close Button on phones
+        if(genreModalCloseBtn.length > 0){
+            genreModalCloseBtn.forEach((element) => {
+                removeElementFromDOM(element);
+            });
+            
+        }
+
 
     }
     else{
         isMobile = false;
     }
 
-    console.log(isMobile);
+    
     return isMobile;
 }
 
@@ -116,6 +127,7 @@ function closeModal(){
     let crImPlaylistModalDisplayed = document.querySelector('.modal--show');
     let songAttachment = document.querySelector('.song-action');
     let importErrorMessage = document.querySelector('.im-pl__error');
+    let importErrorContainer = document.querySelector('.tab-content--error');
     let genreAnimation = document.querySelector('.genres-active-animation');
     let genres = document.querySelector('.genres-show');
 
@@ -144,6 +156,7 @@ function closeModal(){
         crImPlaylistModalDisplayed.classList.toggle('modal--show');
     }
     if(importErrorMessage){
+        importErrorContainer.classList.remove('tab-content--error');
         removeElementFromDOM(importErrorMessage);
     }
 }
@@ -181,7 +194,7 @@ function handleGenres(url, storedGenres) {
     return url;
 }
 
-// Get access_token from URI
+// Get accessToken from URI
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
     name = name.replace(/[\[\]]/g, "\\$&");
@@ -265,8 +278,9 @@ function startTimer(duration, element, percentage, targetedElement){
         pausePath.classList.toggle('pause-ani');
       }
       if(targetedElement.classList.contains('playlist-track__progress-bar')){
-        let parentOfTarget = targetedElement.parentNode;
-        let trackMedia = getChildElementByClass(parentOfTarget, 'track__media');
+          console.dir(targetedElement)
+        let grandparentTarget = targetedElement.parentNode.parentNode;
+        let trackMedia = getChildElementByClass(grandparentTarget, 'playlist-track__media');
         let mediaControls = getChildElementByClass(trackMedia, 'media-controls');
         let gPath = getChildElementByClass(mediaControls, 'media-controls').firstChild;
         let playPath = gPath.lastChild;
@@ -314,12 +328,11 @@ function spotifyGrab(url){
     const init = {
         headers:{
             'Content-Type': 'application/json' ,
-            'Authorization': 'Bearer ' + myModule.access_token
+            'Authorization': 'Bearer ' + myModule.accessToken
         }
     };
 
-    let spotifyData = fetch(url, init)
-    console.log(spotifyData)
+    let spotifyData = fetch(url, init);
     return spotifyData;
 }
 
@@ -338,7 +351,7 @@ function deleteSong(url, track){
         method: 'DELETE',
         headers:{
             'Content-Type': 'application/json' ,
-            'Authorization': 'Bearer ' + myModule.access_token
+            'Authorization': 'Bearer ' + myModule.accessToken
         },
         body: JSON.stringify(data)
      };
@@ -354,11 +367,11 @@ function spotifyProcessTracks(url){
     .then( (response) => {
         response.json()
         .then( (data) => {     
-            console.log(data)
+            
             if(data.tracks.length === 0){
                 noTrackResult();
-                smoothingScroll('.no-result');
-                return -1
+                // smoothingScroll('.no-result');
+                return -1;
             }
             
             data.tracks.forEach((track) => {
@@ -466,7 +479,7 @@ function spotifyCreatePlaylist(url){
         method: 'POST',
         headers:{
             'Content-Type': 'application/json' ,
-            'Authorization': 'Bearer ' + myModule.access_token
+            'Authorization': 'Bearer ' + myModule.accessToken
         },
         body: JSON.stringify(data)
     };
@@ -476,15 +489,24 @@ function spotifyCreatePlaylist(url){
         return data.json();
     })
     .then( (createdPlaylist) => {
-    
+        let crPlName = document.querySelector('.cr-pl__name');
+        let crPlDescription = document.querySelector('.cr-pl__description');
 
         updateTotalPlaylists(createdPlaylist.name, createdPlaylist.id);
         playlistPlate(createdPlaylist.name, createdPlaylist.id);
 
+
+    
+
+        crPlName.value = '';
+        crPlDescription.value = '';
+
         // If there are songs in the queue add them to the newly created playlist
         if(myModule.songQueue.length > 0){
             addSongToPlaylist(`https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${createdPlaylist.id}/tracks`, myModule.songQueue, createdPlaylist.id);
-            }       
+            }   
+        
+            confirmAction(createdPlaylist.name, 'create');
     })
     .catch((err) => {
         console.log(err);
@@ -589,20 +611,32 @@ function playlistPlate(name, id){
     playlistColorSequence();
 }
 
-function confirmAddedSong(playlistName){
+function confirmAction(playlistName, source){
     let confirmationContainer = document.createElement('div');
     let confirmationInfo = document.createElement('h1');
 
     
     
-    confirmationContainer.innerHTML = `<svg class="confirm-song-checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="confirm-song-checkmark__circle" cx="26" cy="26" r="25" fill="none"/><path class="confirm-song-checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/></svg>`;
+    confirmationContainer.innerHTML = `<svg class="confirm-action-checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52"><circle class="confirm-action-checkmark__circle" cx="26" cy="26" r="25" fill="none"/><path class="confirm-actioncheckmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/></svg>`;
     
-    confirmationContainer.classList.add('confirm-song');
-    confirmationContainer.classList.add('confirm-song--fade');
+    confirmationContainer.classList.add('confirm-action');
+    confirmationContainer.classList.add('confirm-action--fade');
     
     // tranModalContent.classList.add('confirm-song--fade');
-    confirmationInfo.classList.add('confirm-song__info');
-    confirmationInfo.textContent = `Added to "${playlistName}"`;
+    confirmationInfo.classList.add('confirm-action__info');
+
+    if(source === 'song'){
+        confirmationInfo.textContent = `Added to "${playlistName}"`;
+    }
+
+    if(source === 'create'){
+        confirmationInfo.textContent = `Created "${playlistName}"`;
+    }
+
+    if(source === 'import'){
+        confirmationInfo.textContent = `Imported "${playlistName}"`;
+    }
+    
 
     document.body.appendChild(confirmationContainer);
     confirmationContainer.appendChild(confirmationInfo);
@@ -617,7 +651,7 @@ function confirmAddedSong(playlistName){
 }
 
 function addSongToPlaylist(url, songLinks, playlistID){
-    console.log(songLinks);
+    
     
     let data = {
         uris: songLinks
@@ -626,10 +660,12 @@ function addSongToPlaylist(url, songLinks, playlistID){
         method: 'POST',
         headers:{
             'Content-Type': 'application/json' ,
-            'Authorization': 'Bearer ' + myModule.access_token
+            'Authorization': 'Bearer ' + myModule.accessToken
         },
         body: JSON.stringify(data)
     };
+
+    
 
     // Add song(s) to playlist
     fetch(url, init)
@@ -651,7 +687,7 @@ function addSongToPlaylist(url, songLinks, playlistID){
             updatedPlaylist.items.forEach( (playlistSong) => {
                 createPlaylistTrackBody(playlistSong);
             });
-            confirmAddedSong(myModule.currentChosenPlaylist.name);
+            confirmAction(myModule.currentChosenPlaylist.name, 'song');
 
         });
     })
@@ -766,7 +802,7 @@ function createSongBody(trackObj){
 
     playlistAddBtn.innerHTML = '<svg class="track__svg-add-btn" xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 100 100"><g fill="none" fill-rule="evenodd"><circle cx="50" cy="50" r="50" fill="#469B6E"/><g fill="#FFF" transform="translate(25.926 25.926)"><rect width="11.111" height="48.148" x="18.519" rx="5" transform="rotate(-90 24.074 24.074)"/><rect width="11.111" height="48.148" x="18.519" rx="5"/></g></g></svg>';
 
-    // Preview Songs change to add an audio event
+    // Preview Songs change to add an   event
     let audioTrack = new Audio(trackLink.href);    
     trackLink.addEventListener('click', (evt) => {
         evt.preventDefault();
@@ -774,31 +810,26 @@ function createSongBody(trackObj){
         audioTrack.paused ? audioTrack.play() : audioTrack.pause(); 
     });
 
-    let tracksDiv = document.querySelector('.tracks')
+    let tracksDiv = document.querySelector('.tracks');
     let tracksDomPosition = tracksDiv.getBoundingClientRect().top;
     let scrollPosition = window.pageYOffset;
     
 
-
-    if(myModule.wasSubmitted){
-        if(scrollPosition != tracksDomPosition){
-            if(myModule.smoothingSupported){
-                smoothingScroll('.tracks');
-            }
-            else{
-                requestAnimationFrame(function(timestamp){
-                    myModule.startTime = timestamp || new Date().getTime();
-                    moveScrollPosition(timestamp, 703, 900);
-                });
-            }
-            //    animateScroll();
-            // animate(800, quad, draw);
-            
-
-            
-                
-        }
-    }
+    // Automatic scroll to content
+    // if(myModule.wasSubmitted){
+    //     if(scrollPosition != tracksDomPosition){
+    //         if(myModule.smoothingSupported){
+    //             smoothingScroll('.tracks');
+    //         }
+    //         else{
+    //             requestAnimationFrame(function(timestamp){
+    //                 myModule.startTime = timestamp || new Date().getTime();
+    //                 moveScrollPosition(timestamp, tracksDomPosition, 900);
+    //                 // moveScrollPosition(timestamp, 703, 900);
+    //             });
+    //         }        
+    //     }
+    // }
     
 
 
@@ -857,7 +888,7 @@ function createSongBody(trackObj){
     playlistAddBtn.addEventListener('click', (evt) => {
     
         // let addedSong = [getSongURI(evt.target)];
-        let addedSong = [evt.target.getAttribute('data-track-uri')];
+        let addedSong = evt.target.getAttribute('data-track-uri');
         let crImPlaylistModal = document.querySelector('.modal');
         const createTab = document.getElementById('cr-pl-tab');
         createTab.checked = true;
@@ -867,6 +898,7 @@ function createSongBody(trackObj){
             let queuedSong = addedSong;
             myModule.songQueue.push(queuedSong);
             
+            
             // Pop out Playlist create modal..change to toggle class
             
             crImPlaylistModal.classList.toggle('modal--show');
@@ -875,10 +907,10 @@ function createSongBody(trackObj){
             myModule.currentChosenPlaylist.name = myModule.totalPlaylists[0].name;
             myModule.currentChosenPlaylist.id = myModule.totalPlaylists[0].id;
             
-            addSongToPlaylist(`https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${myModule.currentChosenPlaylist.id}/tracks`, addedSong, myModule.currentChosenPlaylist.id);    
+            addSongToPlaylist(`https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${myModule.currentChosenPlaylist.id}/tracks`, [addedSong], myModule.currentChosenPlaylist.id);    
         }
         else{
-            addSongToPlaylist(`https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${myModule.currentChosenPlaylist.id}/tracks`, addedSong, myModule.currentChosenPlaylist.id); 
+            addSongToPlaylist(`https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${myModule.currentChosenPlaylist.id}/tracks`, [addedSong], myModule.currentChosenPlaylist.id); 
         }       
     });   
 
@@ -932,8 +964,10 @@ function createPlaylistTrackBody(playlistObj, importedPlaylistName){
         uri: playlistObj.track.uri
     };
     
+    if(newPlaylistTrack.preview_url !== null){
+        trackLink.src = newPlaylistTrack.preview_url;
+    }
     
-    trackLink.src = newPlaylistTrack.preview_url;
 
     playlistNameBar.forEach( (childElement) => {
         if(importedPlaylistName){
@@ -989,18 +1023,25 @@ function createPlaylistTrackBody(playlistObj, importedPlaylistName){
 
     options.textContent = '\u2026';
 
+    
+        
+    
 
     // Play-Pause SVG
-    playerControl.classList.add('playlist-track__media');
+    if(trackLink.src){
+        playerControl.classList.add('playlist-track__media');
 
-    playerControl.innerHTML = '<svg class="media-controls" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><g fill="none" fill-rule="evenodd"><path class="media-controls__pause inactive-dash-pause" stroke="#3F3E3E" stroke-linecap="round" stroke-linejoin="round" stroke-width="5" d="M48,25 L48,71.8053097 C45.1666667,73.6017699 42.3333333,74.5 39.5,74.5 C36.6666667,74.5 33.8333333,73.6017699 31,71.8053097"/><path class="media-controls__play inactive-dash" stroke-linecap="round" stroke="#3F3E3E" stroke-width="5" d="M72.0763886,68.3352333 L62.1474475,68.3352333 L27.2723011,68.3352333 C25.0631621,68.3352333 23.2723011,66.5443723 23.2723011,64.3352333 C23.2723011,63.4859068 23.542644,62.6586256 24.0441798,61.9731933 L46.4462236,31.3570669 C47.7507422,29.5742247 50.2535427,29.1864669 52.0363849,30.4909855 C52.3678287,30.7335054 52.6599463,31.025623 52.9024662,31.3570669 L75.3045099,61.9731933 C76.6090286,63.7560355 76.2212708,66.258836 74.4384286,67.5633546 C73.7529963,68.0648904 72.9257152,68.3352333 72.0763886,68.3352333 L68.7548694,68.3352333" transform="rotate(90 49.674 49.027)"/></g></svg>';
+        playerControl.innerHTML = '<svg class="media-controls" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><g fill="none" fill-rule="evenodd"><path class="media-controls__pause inactive-dash-pause" stroke="#3F3E3E" stroke-linecap="round" stroke-linejoin="round" stroke-width="5" d="M48,25 L48,71.8053097 C45.1666667,73.6017699 42.3333333,74.5 39.5,74.5 C36.6666667,74.5 33.8333333,73.6017699 31,71.8053097"/><path class="media-controls__play inactive-dash" stroke-linecap="round" stroke="#3F3E3E" stroke-width="5" d="M72.0763886,68.3352333 L62.1474475,68.3352333 L27.2723011,68.3352333 C25.0631621,68.3352333 23.2723011,66.5443723 23.2723011,64.3352333 C23.2723011,63.4859068 23.542644,62.6586256 24.0441798,61.9731933 L46.4462236,31.3570669 C47.7507422,29.5742247 50.2535427,29.1864669 52.0363849,30.4909855 C52.3678287,30.7335054 52.6599463,31.025623 52.9024662,31.3570669 L75.3045099,61.9731933 C76.6090286,63.7560355 76.2212708,66.258836 74.4384286,67.5633546 C73.7529963,68.0648904 72.9257152,68.3352333 72.0763886,68.3352333 L68.7548694,68.3352333" transform="rotate(90 49.674 49.027)"/></g></svg>';
+    }    
+
+    
     
 
     let progressBar = document.createElement('div');
     progressBar.classList.add('playlist-track__progress-bar');
 
     progressBar.style.backgroundColor = document.body.style.backgroundColor;
-    // console.log(document.querySelector('.wrap').style.backgroundColor)
+    
 
     const volumeContainer = document.createElement('div');
     const volumeSlider = document.createElement('input');
@@ -1136,7 +1177,7 @@ function songVolume(element){
 
 // For songs that are in the body
 function getSongURI(evt){
-    // console.log(evt)
+    
     songReference = evt.parentElement.getElementsByTagName('a')[0].href;
     let addedSong;
     for(let k in myModule.currentTracks){
@@ -1178,7 +1219,7 @@ function moveSongFromPlaylist(url, songLinks, playlistID){
         method: 'POST',
         headers:{
             'Content-Type': 'application/json' ,
-            'Authorization': 'Bearer ' + myModule.access_token
+            'Authorization': 'Bearer ' + myModule.accessToken
         },
         body: JSON.stringify(data)
     };
@@ -1297,19 +1338,9 @@ spotifyGrab("https://api.spotify.com/v1/me")
 .then( (data) => {
     // Check if user is logged into their account
         if(data.status === 401){
-            let content = document.querySelector('.content-wrapper');
-            let loginLink = document.createElement('a');
 
-        
-            while(content.firstChild){
-                content.removeChild(content.firstChild)
-            }
+            window.location.href = '/login';
 
-            loginLink.setAttribute('href', '/login');
-            loginLink.textContent = `login here!`;
-
-            document.body.appendChild(loginLink);
-            return -1;
         }
     
         data.json()
@@ -1331,13 +1362,13 @@ spotifyGrab("https://api.spotify.com/v1/me")
 
     // content.removeChild(content.firstChild);
     while(content.firstChild){
-        content.removeChild(content.firstChild)
+        content.removeChild(content.firstChild);
     }
 
     loginLink.setAttribute('href', 'login.html');
     loginLink.textContent = `login here!`;
 
-    document.body.appendChild(loginLink)
+    document.body.appendChild(loginLink);
     
 
 
@@ -1375,7 +1406,7 @@ window.addEventListener('click', (evt) => {
     let tranModal = document.querySelector('.tran-modal');
     let crImPlaylistModal = document.querySelector('.modal');
     let genres = document.querySelector('.genres-show');
-    let genreModal = document.querySelector('.tran-modal--genre')
+    let genreModal = document.querySelector('.tran-modal--genre');
 
     
     
@@ -1395,16 +1426,16 @@ window.addEventListener('click', (evt) => {
 
     // Move playlist modal view
     if (evt.target === tranModal){
-        console.log('clicking tranModal')
+        
         closeModal();
     }
 
     if(evt.target === genreModal){
-        console.log('clicking genre modal');
+        
         closeModal();
     }
     if(evt.target.classList.contains('tran-modal--genre')){
-        console.log('clicking genre modal')
+        
         closeModal();
     }
 
@@ -1426,11 +1457,6 @@ window.addEventListener('click', (evt) => {
 
     }
 
-    // if (evt.target === tranModal){
-    //     console.log('clicking tranModal')
-    //     closeModal();
-    // }
-
 });
 
 
@@ -1438,14 +1464,18 @@ window.addEventListener('click', (evt) => {
 
 // Creating a new playlist 
 eventModule.createPlaylistSubmit.addEventListener('submit', (evt) => {
-
     evt.preventDefault();
+    
+
     spotifyCreatePlaylist(`https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists`);
+    closeModal();
+    
 });
 
 // Importing a new playlist
 eventModule.importPlaylistSubmit.addEventListener('submit', (evt) => {
     evt.preventDefault();
+    
 
     let importPlaylistName = document.querySelector('.im-pl__name').value;
     let clearValue = document.querySelector('.im-pl__name');
@@ -1513,7 +1543,7 @@ eventModule.importPlaylistSubmit.addEventListener('submit', (evt) => {
 
                 createPlaylistTrackBody(playlistSong, importPlaylistName);
             });
-
+            confirmAction(importPlaylistName, 'import');
         });
 
     })
@@ -1702,32 +1732,35 @@ eventModule.moodForm.addEventListener('submit', (evt) => {
     let storeGenres = cleanUpGenres(); 
     moodSubmitCleanUp();
 
-    playlistFooter.classList.add('playlist__show');
+    
     
     userMood.value = '';
 
     
 
     // Fetch emotion json from my database
-    fetch(`/${userMoodValue}`)
+    fetch(`/user/mood/${userMoodValue}`)
     .then( (data) => {
-        console.log(data)
+        
         return data.json();
     })
     .then( (audioFeatures) => {
-        console.log(audioFeatures);
+        
         // No music for that mood
         if(audioFeatures.length === 0){
             noTrackResult();
-            smoothingScroll('.no-result');
+            // smoothingScroll('.no-result');
             return -1;
         }
         else{
+            
             const maxVal = Math.max(...audioFeatures[0].idNumbers);
             const minVal = Math.min(...audioFeatures[0].idNumbers);
 
             myModule.closureURL = buildURL(storeGenres, maxVal, minVal, audioFeatures);
             let newURL = myModule.closureURL();
+
+            playlistFooter.classList.add('playlist__show');
 
             spotifyProcessTracks(newURL);  
             
@@ -1770,6 +1803,11 @@ eventModule.playlistFooter.addEventListener('click', (evt) => {
 
     if(evt.target.className === 'playlist-bar'){
         playlist.classList.toggle('extended-playlist');
+
+        if(myModule.isMobile){
+            let logoContainer = document.querySelector('.logo-container');
+            logoContainer.classList.toggle('show__elem');
+        }
     }
     
 
@@ -1808,7 +1846,7 @@ eventModule.playlistFooter.addEventListener('click', (evt) => {
         let playlistShow = document.querySelector('.playlist-list__playlist--show');
         let playlistHidden = document.querySelectorAll('.playlist-list__playlist--hide');
         let playlistAll = document.querySelectorAll('.playlist-list__playlist');
-        console.dir(evt.target)
+        
 
         svgContainer.classList.remove('no-animation');
         svgContainer.classList.toggle('playlist-active-animation');
@@ -1821,7 +1859,7 @@ eventModule.playlistFooter.addEventListener('click', (evt) => {
         playlistHidden.forEach((playlist) => {
             let playlistSVG = playlist.children[0].firstElementChild.firstChild;
             playlistSVG.classList.add('no-animation');
-        })
+        });
 
         
         // let trackWrapper = getChildElementByClass(evt.target, 'track-wrapper');
@@ -1961,6 +1999,30 @@ eventModule.playlistFooter.addEventListener('click', (evt) => {
 
 });
 
+// Refactor with "genres search "
+document.querySelector('.genres-filter__search').addEventListener('input', (evt) => {
+    let currentValue = evt.target.value;
+    
+    if(currentValue === ''){
+        let input = document.getElementsByClassName('genres-list__item');
+        let filter = document.querySelector('.genres-filter__search').value.toUpperCase();
+    
+    
+
+        // Loop through all list items, and hide those who don't match the search query
+        for (i = 0; i < input.length; i++) {
+            let currentElem = input[i];
+            if (currentElem.textContent.toUpperCase().indexOf(filter) > -1) {
+                currentElem.style.display = "";
+            } else {
+                currentElem.style.display = "none";
+            }
+        }
+        
+
+    }
+});
+
 // Genres Section
 eventModule.genres.addEventListener('click', (evt) => {
     evt.stopPropagation();
@@ -1993,17 +2055,17 @@ eventModule.genres.addEventListener('click', (evt) => {
             
             
 
-            setTimeout(function(){
-                let genresFilterTabHeight = document.querySelector('.genres-filter-tab').offsetHeight
-                let genresSearchHeadHeight = document.querySelector('.genres-filter__search-head').offsetHeight;
-                let genresDropHeight = document.querySelector('.genres-search-filter').offsetHeight;
-                let genresList = document.querySelector('.genres-list');
+            // setTimeout(function(){
+            //     let genresFilterTabHeight = document.querySelector('.genres-filter-tab').offsetHeight
+            //     let genresSearchHeadHeight = document.querySelector('.genres-filter__search-head').offsetHeight;
+            //     let genresDropHeight = document.querySelector('.genres-search-filter').offsetHeight;
+            //     let genresList = document.querySelector('.genres-list');
 
 
-                genresList.style.height = `calc(100vh - (${genresFilterTabHeight}px + ${genresSearchHeadHeight}px + ${genresDropHeight}px + 20px))`;
+            //     genresList.style.height = `calc(100vh - (${genresFilterTabHeight}px + ${genresSearchHeadHeight}px + ${genresDropHeight}px + 20px))`;
             
 
-            }, 10);
+            // }, 10);
             
         }
 
@@ -2167,10 +2229,10 @@ eventModule.genres.addEventListener('click', (evt) => {
 
 // Genre search filter
 eventModule.genresFilterSearch.addEventListener('keyup', () => {
-    let input;
-    let filter;
-    input = document.getElementsByClassName('genres-list__item');
-    filter = document.querySelector('.genres-filter__search').value.toUpperCase();
+    let input = document.getElementsByClassName('genres-list__item');
+    let filter = document.querySelector('.genres-filter__search').value.toUpperCase();
+    
+    
 
     // Loop through all list items, and hide those who don't match the search query
     for (i = 0; i < input.length; i++) {
@@ -2186,19 +2248,19 @@ eventModule.genresFilterSearch.addEventListener('keyup', () => {
 eventModule.logoContainer.addEventListener('click', () => {
     let logoContainer = document.querySelector('.logo-container');
 
-    console.log(`clicking bro`)
+    
     if(myModule.smoothingSupported){
-        console.log('supported')
+        
         smoothingScroll('.mood');
     }
     else{
         requestAnimationFrame(function(timestamp){
-            console.log('not supported')
+            
             myModule.startTime = timestamp || new Date().getTime();
-            moveScrollPosition(timestamp, 0, 600);
+            moveScrollPosition(timestamp, 0, 500);
         });
     }
-})
+});
 
 
 // Infinite Scroll
@@ -2208,12 +2270,7 @@ document.addEventListener('scroll', function() {
     let windowSize = window.innerHeight;
     let bodyHeight = document.body.offsetHeight;
     // const wrapWrap = document.querySelector('.wrap');
-
-
     
-    // console.log(scrollPosition)
-    
-    // console.log(tracksDiv.getBoundingClientRect().top);
 
 
     // Mobile scrolling features
@@ -2222,7 +2279,7 @@ document.addEventListener('scroll', function() {
         clearTimeout(myModule.mobileIsScrolling);
 
         myModule.mobileIsScrolling = setTimeout(function() {
-            webLogo.classList.remove('logo--size')
+            webLogo.classList.remove('logo--size');
         }, 200);
 
 
@@ -2305,11 +2362,11 @@ document.addEventListener('scroll', function() {
             
 
             myModule.scrollPositionTracker.push(referenceObj);
-            // console.log(myModule.scrollPositionTracker);
+            
 
            
            
-            console.log('fetching new')
+            
 
             allMedia.forEach((progressBar) => {
                 progressBar.style.backgroundColor = currentColor;
@@ -2318,13 +2375,20 @@ document.addEventListener('scroll', function() {
 
             document.body.style.backgroundColor = currentColor;
             
-            // console.dir(wrapWrap);
+            
             
         }
     }
 });
 
-
+document.querySelector('.tran-modal--genre').addEventListener('click', (evt) => {
+    
+    // evt.stopPropagation()
+    if(evt.target === document.querySelector('.tran-modal--genre')){
+        closeModal();
+    }
+    
+});
 
 function handleBackgroundColor(){
     let count = 0;
