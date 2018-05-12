@@ -1815,6 +1815,12 @@ eventModule.playlistFooter.addEventListener('click', (evt) => {
     if(evt.target.className === 'playlist-bar'){
         playlist.classList.toggle('extended-playlist');
 
+        // So Extended Playlist is not underneath mobile address bar
+        if(myModule.isMobile){
+            evt.target.style.width = window.innerHeight;
+            
+        }
+
         if(myModule.isMobile){
             let logoContainer = document.querySelector('.logo-container');
             logoContainer.classList.toggle('show__elem');
