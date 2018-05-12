@@ -7,18 +7,16 @@
     <meta http-equiv="ScreenOrientation" content="autoRotate:disabled">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Mood Music</title>
-    <!-- <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet"> -->
+    
     <link href="/styles/styles.css" rel="stylesheet" type="text/css">
-    <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous"> -->
-    <!-- <link href="/static/fontawesome/fontawesome-all.css" rel="stylesheet"> -->
-    <!-- <link href="styles/fontawesome-all.min.css" rel="stylesheet" type="text/css"></link> -->
-    <script src="scripts/fontawesome-all.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,400,700" rel="stylesheet">
+    <script src="/scripts/fontawesome-all.min.js"></script>
 </head>
 
 <body>
     <div class="wrap">
     <header class="logo-container">
-            <img src="assets/logo.png" class="logo" alt="Mood Music" />
+            <img src="/assets/logo.png" class="logo" alt="Mood Music" />
         </header>
     <div class="content-wrapper">
         <div class="content-wrapper spread container">
@@ -82,14 +80,14 @@
                 <span id='username'></span>!
 
             </h1> -->
-            <a href="login.html">hey</a>
+
             <h1 class="mood__header">Hello
                     <span id='username'></span>, how are you feeling?
     
             </h1>
-            <form method="GET" class="mood__form" action="/" autocomplete="off">
+            <form method="GET" class="mood__form" autocomplete="off">
                 <div class="mood__input-container">
-                    <div class="mood__input-field">
+                    <div class="mood__input-search">
                         <input type="text" name="mood" placeholder="sad, mad, happy" class="mood__val"  autofocus/>
                     </div>
                     <div class="mood__i-container">
@@ -286,7 +284,7 @@
             <div class="tran-modal__content">
                 <form class="tran-modal__form   tran-modal__del-song" method="post">
                     <span class="close-modal-btn  close-modal-btn--tran  tran-modal__del-song">Close &times;</span>
-                    <h1 class="delete-modal__verify  tran-modal__del-verify-head">Are you sure you want to delete: </h1>
+                    <h5 class="delete-modal__verify  tran-modal__del-verify-head">Are you sure you want to delete: </h5>
                     <div class="modal__btn-container">
                         <button class="btn btn--decline" type="button">No</a> 
                         <button class="btn btn--success">Yes</button>
@@ -295,7 +293,7 @@
                 
                 <form class="tran-modal__form  tran-modal__mv-song" method="post">
                     <span class="close-modal-btn  close-modal-btn--tran">Close &times;</span>
-                    <h1 class="mvs-modal__otp  tran-modal__mv-verify-head">Pick the playlist you'd like to move the song to</h1>
+                    <h5 class="mvs-modal__otp  tran-modal__mv-verify-head">Pick the playlist you'd like to move the song to</h5>
 
                     <div class="modal__btn-container">
                         <button class="btn btn--decline  mvs-delete-modal-btn" type="button">Exit</a> 
@@ -303,9 +301,9 @@
                     </div>
                 </form>
 
-                <form action="/" method="get" class="tran-modal__form  tran-modal__rm-playlist">
+                <form method="get" class="tran-modal__form  tran-modal__rm-playlist">
                     <span class="close-modal-btn close-modal-btn--tran">Close &times;</span>
-                    <h1>Are you sure you'd like to remove playlist <span class="rm-playlist"></span></h1>
+                    <h5>Are you sure you'd like to remove playlist <span class="rm-playlist"></span></h5>
                     <div class="modal__btn-container">
                         <button class="btn btn--decline" type="button">No</a> 
                         <button class="btn btn--success">Yes</button>
@@ -317,7 +315,7 @@
         
     </div>
 </div>
-    <script src="scripts/index.js"></script>
+    <script src="/scripts/index.js"></script>
 </body>
 
 </html>
