@@ -42,6 +42,8 @@ let myModule = (function (){
 
     module.mobileIsScrolling = undefined;
     
+    module.inRange = false;
+    module.scrollCount = 0;
 
     return module;
 })();
@@ -813,6 +815,11 @@ function createSongBody(trackObj){
     let tracksDiv = document.querySelector('.tracks');
     let tracksDomPosition = tracksDiv.getBoundingClientRect().top;
     let scrollPosition = window.pageYOffset;
+
+
+    // Reset the count for Scrolling Fetch
+    myModule.scrollCount = 0;
+    console.log(myModule.scrollCount, `inside tracks div`)
     
 
     // Automatic scroll to content
@@ -1089,6 +1096,7 @@ function createPlaylistTrackBody(playlistObj, importedPlaylistName){
 
     // Preview Songs... set up in tracks div
     // let audioTrack = new Audio(trackLink.href);  
+
       
     img.addEventListener('click', (evt) => {
 
@@ -1162,18 +1170,21 @@ function songVolume(element){
 
     sliderValue = sliderValue / 100;
 
-    if(sliderValue < 0.4){
-        let volumeIcon = element.parentElement.firstElementChild;
-        volumeIcon.innerHTML = '<i class="fas fa-volume-down"></i>';
+    // Change volume slider icon. Doesn't work in Safari.
+    // if(sliderValue < 0.4){
+    //     let volumeIcon = element.parentElement.firstElementChild;
+    //     // volumeIcon.innerHTML = '<i class="fas fa-volume-down"></i>';
     
-    }
-    if(sliderValue > 0.4){
-        let volumeIcon = element.parentElement.firstElementChild;
-        volumeIcon.innerHTML = '<i class="fas fa-volume-up"></i>';
-    }
+    // }
+    // if(sliderValue > 0.4){
+    //     let volumeIcon = element.parentElement.firstElementChild;
+    //     // volumeIcon.innerHTML = '<i class="fas fa-volume-up"></i>';
+    // }
     song.volume = sliderValue;
     
 }
+
+
 
 // For songs that are in the body
 function getSongURI(evt){
@@ -2262,6 +2273,32 @@ eventModule.logoContainer.addEventListener('click', () => {
     }
 });
 
+// function scrolledInto(){
+//     let executed = false;
+
+//     return function(){
+//         if(!executed){
+//             let scrollURL = myModule.closureURL();
+//             spotifyProcessTracks(scrollURL);
+//             executed = true;
+//         }
+//         else{
+//             return -1;
+//         }
+//     }
+// }
+
+// if(scrollPosition + windowSize >=  bodyHeight - (bodyHeight * 0.20)){
+//     myModule.inRange = true;
+            // let scrollURL = myModule.closureURL();
+            // spotifyProcessTracks(scrollURL);
+// }
+// 
+// if (myModule.inRange === true && scrollPosition + windowSize >= bodyHeight){
+//     let shootFetch = scrolledInto();
+// }
+
+//  oNce that is done and dom is back loaded, myModule.inRange = false;
 
 // Infinite Scroll
 document.addEventListener('scroll', function() {
@@ -2339,41 +2376,42 @@ document.addEventListener('scroll', function() {
 
     // Only fetch new songs if a mood was submitted
     if(tracksDiv.childNodes.length > 0){
-        if(scrollPosition + windowSize >= bodyHeight){
-            let scrollURL = myModule.closureURL();
-            myModule.wasSubmitted = false;
+        if(scrollPosition + windowSize >= bodyHeight - (bodyHeight * 0.05)){
 
-            spotifyProcessTracks(scrollURL); 
-
-            if(myModule.initScroll.happened === false){
-                myModule.initScroll.happened = true;
-                myModule.initScroll.moment = scrollPosition;
-            }
+            myModule.scrollCount++;
             
+            if(myModule.scrollCount === 1){
+                let scrollURL = myModule.closureURL();
             
-            let allMedia = Array.from(document.querySelectorAll('.track__progress-bar'));
-            let currentColor = myModule.initColor();
+                myModule.wasSubmitted = false;
+                
+                spotifyProcessTracks(scrollURL); 
 
-            let referenceObj = {
-                color: currentColor,
-                scrollPosition: scrollPosition
-            };
+                if(myModule.initScroll.happened === false){
+                    myModule.initScroll.happened = true;
+                    myModule.initScroll.moment = scrollPosition;
+                }
+                
+                
+                let allMedia = Array.from(document.querySelectorAll('.track__progress-bar'));
+                let currentColor = myModule.initColor();
 
+                let referenceObj = {
+                    color: currentColor,
+                    scrollPosition: scrollPosition
+                };
+
+                myModule.scrollPositionTracker.push(referenceObj);
+                
+
+                allMedia.forEach((progressBar) => {
+                    progressBar.style.backgroundColor = currentColor;
+                });
+                
+
+                document.body.style.backgroundColor = currentColor;
+                }
             
-
-            myModule.scrollPositionTracker.push(referenceObj);
-            
-
-           
-           
-            
-
-            allMedia.forEach((progressBar) => {
-                progressBar.style.backgroundColor = currentColor;
-            });
-            
-
-            document.body.style.backgroundColor = currentColor;
             
             
             
