@@ -1,0 +1,213 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline; }
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block; }
+
+body {
+  line-height: 1; }
+
+ol, ul {
+  list-style: none; }
+
+blockquote, q {
+  quotes: none; }
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+*,
+*:before,
+*:after {
+  -webkit-border-sizing: border-box;
+  box-sizing: border-box; }
+
+h1 {
+  font-size: 2.4rem; }
+
+h2 {
+  font-size: 2.2rem; }
+
+h3 {
+  font-size: 2rem; }
+
+h4 {
+  font-size: 1.8rem; }
+
+h5 {
+  font-size: 1.6rem; }
+
+h6 {
+  font-size: 1.4rem; }
+
+p {
+  font-size: 1rem; }
+
+a {
+  text-decoration: none; }
+
+body {
+  color: #5a5a5a;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 200; }
+
+html,
+body {
+  min-height: 100%;
+  height: 100%;
+  width: 100% }
+  @media (orientation: landscape) {
+    html,
+    body {
+      min-height: initial;
+      height: initial;
+      width: initial; } }
+  @media screen and (min-width: 768px) and (orientation: landscape) {
+    html,
+    body {
+      min-height: initial;
+      height: initial;
+      width: initial; } }
+  @media screen and (min-width: 1024px) {
+    html,
+    body {
+      min-height: 100%;
+      height: 100%; } }
+
+.login-content {
+  background: linear-gradient(to bottom, #E47A67, #FED4CA);
+  height: 100%; }
+
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90%;
+  margin: 0 auto;
+  height: 100%; }
+  @media screen and (min-width: 768px) {
+    .login {
+      width: 90%; } }
+  @media screen and (min-width: 1024px) {
+    .login {
+      width: 100%; } }
+  .login__welcome {
+    color: white;
+    font-size: 2rem;
+    text-align: center;
+    padding: 20px 0;
+    margin: 5% 0; }
+    @media screen and (min-width: 768px) {
+      .login__welcome {
+        font-size: 3rem; } }
+    @media screen and (min-width: 1024px) {
+      .login__welcome {
+        font-size: 4rem;
+        height: initial; } }
+  .login__directions {
+    height: 30%; }
+    @media screen and (min-width: 1024px) {
+      .login__directions {
+        height: initial;
+        width: 80%; } }
+  .login__directions-info {
+    text-align: center;
+    width: 100%;
+    margin-bottom: .8em;
+    color: black;
+    line-height: 1.6em;
+    font-weight: 300; }
+    @media screen and (min-width: 768px) {
+      .login__directions-info {
+        font-size: 1.4rem; } }
+    @media screen and (min-width: 1024px) {
+      .login__directions-info {
+        width: 100%; } }
+  .login__guest {
+    border: 1px solid black;
+    padding: 1em; }
+    @media screen and (min-width: 768px) {
+      .login__guest {
+        display: flex;
+        justify-content: center;
+        padding: 2em;
+        width: 80%; } }
+    @media screen and (min-width: 1024px) {
+      .login__guest {
+        padding: 2em;
+        width: 50%;
+        margin: 20px 0; } }
+    .login__guest-username, .login__guest-password {
+      font-size: 1.2rem;
+      line-height: 1.4em;
+      color: black; }
+      @media screen and (min-width: 768px) {
+        .login__guest-username, .login__guest-password {
+          font-size: 1.6rem; } }
+  @media screen and (min-width: 768px) {
+    .login__guest-fx {
+      display: flex;
+      justify-content: center;
+      flex-direction: column; } }
+  .login__account {
+    font-size: 1.2rem;
+    line-height: 1.4em;
+    color: black; }
+  .login__spotify-login {
+    width: 100%;
+    padding: 1em 2em;
+    background-color: #1ED760;
+    color: white;
+    margin: 5% 0;
+    text-align: center; }
+    @media screen and (min-width: 768px) {
+      .login__spotify-login {
+        padding: .8em;
+        width: 80%;
+        font-size: 1.4rem;
+        position: relative;
+        border-radius: 20px;
+        margin: 1em; } }
+    @media screen and (min-width: 1024px) {
+      .login__spotify-login {
+        position: relative;
+        bottom: initial;
+        border-radius: 20px;
+        width: 50%;
+        background-color: #1ED760;
+        color: white;
+        font-size: 1.6rem;
+        padding: 1em 4em; } }
+
+/*# sourceMappingURL=login.css.map */
+
+/*# sourceMappingURL=login.css.map */
