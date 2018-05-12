@@ -1,0 +1,198 @@
+@import "_reset.scss";
+@import "_vars.scss";
+@import "_base.scss";
+
+
+// Login HTML
+
+html,
+body{
+    min-height: 100%;
+    height: 100%;
+
+    @media (orientation:landscape){
+        min-height: initial;
+        height: initial;
+    }
+
+    @media #{$tablet-view} and (orientation: landscape){
+        min-height: initial;
+        height: initial;
+    }
+
+    @media #{$desktop-view}{
+        min-height: 100%;
+        height: 100%;
+    }
+}
+
+
+.login-content{
+    background: linear-gradient(to bottom, $flatred, #FED4CA);
+    height: 100%;
+}
+
+.login{
+    display: flex;
+    // justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    width: 90%;
+    margin: 0 auto;
+    height: 100%;
+    
+    
+    @media #{$tablet-view}{
+        width: 90%;
+    }
+
+    @media #{$desktop-view}{
+        width: 100%;
+    }
+
+    &__welcome{
+        // margin-bottom: 10px;
+        color: white;
+        font-size: 2rem;
+        text-align: center;
+        padding: 20px 0;
+        // height: 20%;
+        margin: 5% 0;
+
+        @media #{$tablet-view}{
+            // margin: 1em;
+            font-size: 3rem;
+            
+        }
+
+        @media #{$desktop-view}{
+            font-size: 4rem;
+            // margin: 1em 0;
+            height: initial;
+        }
+    }
+
+    &__directions{
+        height: 30%;
+
+        @media #{$desktop-view}{
+           height: initial;
+           width: 80%;
+        }
+    }
+
+    &__directions-info{
+        text-align: center;
+        width: 100%;
+        margin-bottom: .8em;
+        // font-size: 1.2rem;
+        color: black;
+        line-height: 1.6em;
+        font-weight: 300;
+
+        // @media #{$l-mobile-view}{
+        //     font-size: 1.4rem;
+        // }
+        
+        @media #{$tablet-view}{
+            font-size: 1.4rem;
+            // width: 100%;
+        }
+
+        @media #{$desktop-view}{
+            width: 100%;
+        }
+    }
+
+
+    &__guest{
+
+        border: 1px solid black;
+        padding: 1em;
+
+        @media #{$tablet-view}{
+            display: flex;
+            justify-content: center;
+            padding: 2em;
+            width: 80%;
+            
+        }
+
+        @media #{$desktop-view}{
+            padding: 2em;
+            width: 50%;
+            margin: 20px 0;
+
+        }
+
+        &-username,
+        &-password{
+            font-size: 1.2rem;
+            line-height: 1.4em;
+            color: black;
+            // text-align: center;
+
+            @media #{$tablet-view}{
+               font-size: 1.6rem;
+            }
+        }
+
+        &-username{
+            // text-align: center;
+        }  
+    }
+
+    &__guest-fx{
+        @media #{$tablet-view}{
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            
+            
+            
+        }
+    }
+
+    &__account{
+        font-size: 1.2rem;
+        line-height: 1.4em;
+        color: black;
+    }
+
+    &__spotify-login{
+        width: 100%;
+        padding: 1em 2em;
+        background-color: #1ED760;
+        color: white;
+        margin: 5% 0;
+        // font-size: 1.2rem;
+        // position: fixed;
+        // bottom: 0;
+        text-align: center;
+
+        @media #{$tablet-view}{
+            // padding: 1em 1.6em;
+            padding: .8em;
+            width: 80%;
+            font-size: 1.4rem;
+            position: relative;
+            border-radius: 20px;
+            margin: 1em;
+            
+        }
+
+
+
+        @media #{$desktop-view}{
+            position: relative;
+            bottom: initial;
+            border-radius: 20px;
+            width: 50%;
+            background-color: #1ED760;
+            color: white;
+            font-size: 1.6rem;
+
+            padding: 1em 4em;
+        }
+    }
+}

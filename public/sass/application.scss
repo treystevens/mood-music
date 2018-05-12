@@ -1,5 +1,4 @@
 @import "_reset.scss";
-
 @import "_vars.scss";
 @import "_base.scss";
 @import "_mixins.scss";
@@ -12,16 +11,17 @@
 }
 
 html {
-    margin: 0px;
-    height: 100%;
-    width: 100%;
+    // margin: 0px;
+    // height: 100%;
+    // width: 100%;
  }
  
  body {
-    margin: 0px;
-    min-height: 100%;
-    width: 100%;
-    background-color: #E47A67;
+    // margin: 0px;
+    // min-height: 100%;
+    // height: 100%;
+    // width: 100%;
+    background-color: $flatred;
  }
 
 // html, body {
@@ -38,7 +38,7 @@ html {
 
 // testing 
 .wrap{
-    // background-color: #E47A67;
+    // background-color: $flatred;
     transition: background-color 0.5s ease;
 
     // &:hover{
@@ -67,18 +67,41 @@ html {
 }
 
 .tab-content-container{
+
     margin: 0 auto;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
     width: 100%;
+
+    @media (orientation:landscape){
+        
+        top: 5%;
+    }
 
     @media #{$tablet-view}{
         width: 70%
     }
+
+    @media #{$desktop-view}{
+        top: 20%;
+        width: 60%;
+    }
 }
 
 .container{
-    width: 80%;
+    // width: 80%;
     margin: 0 auto;
     // background-color: #ED6A5A;
+
+    @media #{$tablet-view}{
+        width: 80%;
+    }
+
+    @media #{$desktop-view}{
+        width: 80%;
+    }
 }
 
 // Header
@@ -88,7 +111,7 @@ html {
     position: fixed;
     top: 0;
     width: 100%;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid $baseblack;
     z-index: 10;
     background-color: rgb(245, 245, 245);
 
@@ -107,7 +130,7 @@ html {
 }
 
 .logo{
-    width: 20%;
+    width: 15%;
     height: auto;
     display: block;
     margin: 0 auto;
@@ -204,7 +227,13 @@ html {
         justify-content: center;
         border-bottom: 1px solid #EFA09B;
 
+        
 
+
+    }
+
+    &__input-search{
+        width: 100%;
     }
 
     &__header{
@@ -213,15 +242,22 @@ html {
         // testing New styles under here testing **************
         font-size: 3rem;
         align-self: flex-start;
-        margin-top: 40px;
-        margin-bottom: 20px;
+        // margin-top: 40px;
+        // margin-bottom: 20px;
+        margin: 1.5em 0;
         width: 100%;
         overflow-wrap: break-word;
         color: white;
+        font-weight: $f-light;
         
+        @media #{$tablet-view}{
+            font-size: 4.5rem;
+            margin: 2em 0;
+        }
 
         @media #{$desktop-view}{
             font-size: 6rem;
+            margin: 1em 0;
         }
     }
 
@@ -229,7 +265,7 @@ html {
         width: 100%;
 
         @media #{$desktop-view}{
-            margin-top: 100px;
+            // margin-top: 100px;
         }
         
     }
@@ -238,15 +274,11 @@ html {
         
         border: none;
         border-radius: 10px;
-        // border: 1px solid black;
-        
-        // margin-bottom: 20px;
         padding: 10px 0 10px 5px;
         width: 100%;
-        font-size: 1.2rem;
-        background-color: #E47A67;
+        background-color: $flatred;
         color: white;
-        font-size: 1.6em;
+        font-size: 1.8em;
 
          // testing
 
@@ -270,18 +302,13 @@ html {
         @media #{$tablet-view}{
             
             
-            font-size: 2em;
+            font-size: 3.5em;
             border-radius: 0;
             padding-left: 5px;
             
         }
 
         @media #{$desktop-view}{
-            // border: none;
-            // border-bottom: 1px solid black;
-            // font-size: 2em;
-
-            // testing
 
             &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
                 font-size: 4rem;
@@ -301,7 +328,7 @@ html {
             font-size: 7rem;
             border-radius: 0;
             padding-left: 5px;
-            // background-color: #E47A67;
+            // background-color: $flatred;
             // color: #5a5a5a;
             
         }
@@ -391,6 +418,12 @@ html {
     }
 
     &-search-filter{
+
+        @media #{$tablet-view}{
+            display: flex;
+            justify-content: space-between;
+            height: 80px;
+        }
 
 
         @media #{$desktop-view}{
@@ -499,7 +532,9 @@ html {
             display: inline-block;
             margin: 20px 0;
             transition: font-size .2s, color .2s;
+            color: #dbdbdb; // $offwhite
             cursor: pointer;
+            font-weight: $f-normal;
             // margin-bottom: 20px;
             
             &:hover{
@@ -514,7 +549,8 @@ html {
         &__header-mb{
             font-size: 1.2em;
             margin: 10px 0;
-            transition: font-size .5s;
+            transition: all .5s;
+            color: #7a7a7a
         }
     }
     
@@ -552,6 +588,10 @@ html {
             margin-top: 10px;
             font-size: 1.2em;
             padding-left: .8em;
+
+            @media #{$desktop-view}{
+                height: 30px;
+            }
             
         }
     }
@@ -599,8 +639,8 @@ html {
             display: flex;
             flex-flow: row wrap;
             // justify-content: space-between;
-            height: 65px;
-            max-height: 65px;
+            height: 90px;
+            max-height: 90px;
 
 
             @media #{$tablet-view}{
@@ -611,7 +651,8 @@ html {
     
             @media #{$desktop-view}{
                 
-                // height: initial;
+                height: 60px;
+                max-height: 60px;
             }
         }
 
@@ -695,7 +736,7 @@ html {
         border: 1px solid $baseblack;
 
         @media #{$tablet-view}{
-            height: 45vh;   
+            height: 30vh;   
         }
 
         @media #{$desktop-view}{
@@ -754,6 +795,12 @@ html {
         display: block;
         -webkit-animation: animateDrop 0.2s $cbc;
         animation: animateDrop 0.2s $cbc;
+        height: 85vh;
+        overflow: auto;
+
+        @media #{$tablet-view}{
+            height: initial;   
+        }
 
         // testing
         // position: absolute;
@@ -883,6 +930,11 @@ html {
     width: 90%;
     position: relative;
     margin: 40px 0;
+
+
+    @media #{$l-mobile-view} and (orientation: landscape){
+        width: 45%;
+    }
     
     @media #{$tablet-view}{
         width: 42%;
@@ -944,7 +996,7 @@ html {
     &__name{
         text-align: center;
         height: 77px;
-        font-weight: 700;
+        font-weight: f-heavy;
         overflow: hidden;
         line-height: 1.1em;
         margin-bottom: 10px;
@@ -974,15 +1026,11 @@ html {
 
     }
 
-    &__album{
-        @include track-space;
-        font-weight: 300;
-    }
 
     &__arist{
         // @include track-space;
         text-align: center;
-        font-weight: 400;
+        font-weight: $f-normal;
         margin-top: auto;
         margin-bottom: 20px;
     }
@@ -990,7 +1038,7 @@ html {
     &__progress-bar{
         height: 20px;
         // background-color: rgb(42, 128, 207);
-        background-color: #E47A67;
+        background-color: $flatred;
     }
 
     & .media-controls{
@@ -1054,20 +1102,15 @@ html {
 
     &__name{
         @include track-space;
-        font-weight: 700;
+        font-weight: $f-heavy;
         font-size: 1rem;
         
     }
 
-    &__album{
-        @include track-space;
-        font-weight: 300;
-        font-size: .6rem;
-    }
 
     &__arist{
         @include track-space;
-        font-weight: 400;
+        font-weight: $f-normal;
         font-size: .8rem;
     }
 
@@ -1089,7 +1132,7 @@ html {
     &__progress-bar{
         height: 10px;
         // width: 100%;
-        background-color: #E47A67;
+        background-color: $flatred;
         // background-color: rgba(248, 248, 89, 0.856);
     }
 
@@ -1127,8 +1170,8 @@ html {
 .modal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    padding-top: 100px; /* Location of the box */
+    z-index: 20; /* Sit on top */
+    // padding-top: 100px; /* Location of the box */
     left: 0;
     top: 0;
     width: 100%; /* Full width */
@@ -1136,6 +1179,10 @@ html {
     overflow: auto; /* Enable scroll if needed */
     background-color: rgb(0,0,0); /* Fallback color */
     background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+
+    @media #{$tablet-view}{
+        padding-top: 200px;
+    }
 
     &-content {
         position: relative;
@@ -1153,7 +1200,7 @@ html {
 
     &__btn-container{
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between;
         align-self: center;
         // margin-top: 20px;
         width: 100%;
@@ -1297,21 +1344,19 @@ html {
     display: none;
     position: fixed;
     bottom: 0;
-    // right: 20px;
+    left: 0;
     width: 100%;
-    // background-color: $richblue;
-    // background-color: #325386;
     background-color: #e4e4e4;
     overflow: auto;
-    // color: white;
     color: rgb(58, 58, 58);
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    border: 2px solid $baseblack;
+    border: 1px solid $baseblack;
 
     @media #{$tablet-view} {
-        width: 40%;
+        width: 70%;
         right: 20px;
+        left: initial;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
     }
 
     @media #{$desktop-view} {
@@ -1396,7 +1441,7 @@ html {
 
         &:hover{
             background-color: rgba(0, 0, 0, 0.3);
-            color: rgba(90, 88, 88, 0.9);
+            // color: rgba(90, 88, 88, 0.9);
         }
     }
 
@@ -1462,8 +1507,12 @@ html {
     &__submit{
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
         // align-items: center;
         width: 100%;
+        height: 100%;
+
+
 
         @media #{$tablet-view}{
             width: 80%
@@ -1474,10 +1523,11 @@ html {
     &__name,
     &__description{
         width: 100%;
-        font-size: 1.2rem;
+        font-size: 1.4rem;
         border: 1px solid $tan;
         border-radius: 5px;
         margin: 10px 0 10px 0;
+        padding: 10px 5px;
 
         @media #{$tablet-view}{
             padding: .5em .2em;
@@ -1492,11 +1542,14 @@ html {
     display: flex;
     align-items: center;
     flex-direction: column;
+    
 
     &__submit{
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
         width: 100%;
+        height: 100%;
 
         @media #{$tablet-view}{
             width: 80%;
@@ -1506,10 +1559,11 @@ html {
     &__name,
     &__description{
         width: 100%;
-        font-size: 1.2rem;
+        font-size: 1.4rem;
         border: 1px solid $tan;
         border-radius: 5px;
         margin: 10px 0 10px 0;
+        padding: 10px 5px;
 
         @media #{$tablet-view}{
             padding: .5em .2em;
@@ -1542,6 +1596,15 @@ html {
     position: absolute;
     top: 10px;
     right: 16px;
+    font-size: 1.8rem;
+
+    @media #{$tablet-view}{
+        font-size: 1.6rem;
+    }
+
+    @media #{$desktop-view}{
+        font-size: 1.4rem;
+    }
 
 }
 
@@ -1559,6 +1622,16 @@ html {
         padding: 12px 16px;
         text-decoration: none;
         display: block;
+        font-size: initial;
+
+
+        // @media #{$tablet-view}{
+        //     font-size: initial;
+        // }
+    
+        // @media #{$desktop-view}{
+        //     font-size: initial;
+        // }
 
         &:hover{
             background-color: rgba(39, 38, 38, 0.726)
@@ -1609,6 +1682,10 @@ html {
             width: 60%;
         }
 
+        @media #{$desktop-view}{
+            width: 40%;
+        }
+
         &--genre{
 
         }
@@ -1653,6 +1730,11 @@ html {
 
     }
 
+    &__rm-playlist{
+        justify-content: space-between;
+        height: 200px;
+    }
+
 }
 
 .btn{
@@ -1662,7 +1744,7 @@ html {
     padding: .2em .5em; 
     font-size: 1.3em;// delete this make decline btn an actual button and return false in javascript
     color: white;
-    width: 100px;
+    width: 45%;
 
     @media #{$tablet-view}{
         padding: .2em .8em;
@@ -1681,22 +1763,24 @@ html {
 
     &--success{
         background-color: #78b178;
+        border: 1px solid #78b178;
     }
 
     &--decline{
         background-color: #bc6969;
+        border: 1px solid #bc6969;
     }
 }
 
 .mvs-select{
     width: 100%;
-    margin-top: 20px;
+    margin: 3% 0;
     font-size: 1.2em;
     height: 40px;
 
     @media #{$tablet-view}{
         width: 60%;
-        margin-top: 40px;
+        margin: 5% 0;
         font-size: 1.4em;
         // height: 40px;
     }
@@ -1738,8 +1822,24 @@ html {
     bottom: 0;
     padding: 20px;
     border: 1px solid #ccc; 
-    height: 50vh;
+    height: 60vh;
     border-radius: 5px;
+
+    @media #{$l-mobile-view} and (orientation: landscape){
+        height: 80vh;
+    }
+
+    @media #{$tablet-view}{
+        height: 40vh;
+        // min-height: 40vh;
+    }
+
+    @media #{$tablet-view} and (orientation: landscape){
+        height: 60vh;
+        // min-height: 40vh;
+    }
+
+
   }
   [type=radio] ~ label{
     @include roundTopCorners(5px);
@@ -1910,10 +2010,10 @@ html {
 }
 
 .tab-field-container{
-    height: 150px;
+    // height: 100%;
 
     @media #{$tablet-view}{
-        height: 250px;
+        // height: 250px;
     }
 
     // @media #{$desktop-view}{
@@ -1923,16 +2023,16 @@ html {
 
 @keyframes tabError{
     0%{
-        transform: translate(5px);
+        transform: translate(-52%, -50%);
     }
     25%{
-        transform: translate(-5px);
+        transform: translate(-48%, -50%);
     }
     50%{
-        transform: translate(5px);
+        transform: translate(-52%, -50%);
     }
     100%{
-        transform: translate(0px);
+        transform: translate(-50%, -50%);
     }
 }
 
@@ -1941,7 +2041,7 @@ html {
 .song-action{
     display: flex;
     border: 1px solid black;
-    margin-top: 20px;
+    margin: 5% 0;
     width: 100%;
 
     @media #{$tablet-view}{
@@ -1981,7 +2081,7 @@ html {
 }
 
 
-.confirm-song{
+.confirm-action{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1994,6 +2094,7 @@ html {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    border: 1px solid $baseblack;
     background-color: white;
         // padding: 1rem 1.5rem;
         // height: 80vh;
@@ -2001,7 +2102,13 @@ html {
     border-radius: 0.5rem;
 
     @media #{$tablet-view}{
+        width: 50%;
+        height: 40%;
+    }
+
+    @media #{$desktop-view}{
         width: 40%;
+        height: 40%;
     }
     
 
@@ -2063,162 +2170,5 @@ html {
 
 
 
-// Login HTML
-
-
-.login-content{
-    background: linear-gradient(to bottom, #E47A67, #FED4CA);
-}
-
-.login{
-    display: flex;
-    // justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    width: 90%;
-    margin: 0 auto;
-    height: 100vh;
-    
-    
-    @media #{$tablet-view}{
-        width: 90%;
-    }
-
-    @media #{$desktop-view}{
-        width: 100%;
-    }
-
-    &__welcome{
-        // margin-bottom: 10px;
-        color: white;
-        font-size: 2rem;
-        text-align: center;
-        padding: 20px 0;
-        height: 20%;
-
-        @media #{$tablet-view}{
-            margin-bottom: 10px;
-            font-size: 3rem;
-        }
-
-        @media #{$desktop-view}{
-            font-size: 4rem;
-            margin: 1.4em 0;
-        }
-    }
-
-    &__directions{
-        height: 30%;
-    }
-
-    &__directions-info{
-        text-align: center;
-        width: 100%;
-        margin-bottom: .8em;
-        // font-size: 1.2rem;
-        color: black;
-        line-height: 1.2em;
-
-        // @media #{$l-mobile-view}{
-        //     font-size: 1.4rem;
-        // }
-        
-        @media #{$tablet-view}{
-            font-size: 1.6rem;
-            // width: 100%;
-        }
-
-        @media #{$desktop-view}{
-            width: 50%;
-        }
-    }
-
-
-    &__guest{
-
-        border: 1px solid black;
-        padding: 1em;
-
-        @media #{$tablet-view}{
-            display: flex;
-            justify-content: center;
-            padding: 2em;
-            width: 80%;
-            
-        }
-
-        @media #{$desktop-view}{
-            padding: 2em;
-
-        }
-
-        &-username,
-        &-password{
-            font-size: 1.2rem;
-            line-height: 1.4em;
-            color: black;
-            // text-align: center;
-
-            @media #{$tablet-view}{
-               font-size: 1.6rem;
-            }
-        }
-
-        &-username{
-            // text-align: center;
-        }  
-    }
-
-    &__guest-fx{
-        @media #{$tablet-view}{
-            display: flex;
-            justify-content: center;
-            flex-direction: column;
-            
-            
-            
-        }
-    }
-
-    &__account{
-        font-size: 1.2rem;
-        line-height: 1.4em;
-        color: black;
-    }
-
-    &__spotify-login{
-        width: 100%;
-        padding: 1em 2em;
-        background-color: #1ED760;
-        color: white;
-        // font-size: 1.2rem;
-        position: fixed;
-        bottom: 0;
-        text-align: center;
-
-        @media #{$tablet-view}{
-            // padding: 1em 1.6em;
-            padding: .8em;
-            width: 80%;
-            font-size: 1.4rem;
-            position: relative;
-            margin-top: 40px;
-            border-radius: 20px;
-            
-        }
-
-
-
-        @media #{$desktop-view}{
-            border-radius: 20px;
-            width: 100%;
-            background-color: #1ED760;
-            color: white;
-            font-size: 1.6rem;
-
-            padding: 1em 4em;
-        }
-    }
-}
 
 

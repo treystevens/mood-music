@@ -1,11 +1,15 @@
-$richblue: #1fa7e1;
 $tan: #e7d19c;
-$oceanblue: #22344c;
-$grayblue: #455b7a;
-$black: #243443;
-$color--green: #7ac142;
-$curve: cubic-bezier(0.650, 0.000, 0.450, 1.000);
 
+$flatred: #E47A67;
+$color--green: #7ac142;
+
+$curve: cubic-bezier(0.650, 0.000, 0.450, 1.000);
+$cbc: cubic-bezier(.3,.13,.60,.89);
+
+
+$f-light: 200;
+$f-normal: 400;
+$f-heavy: 700;
 
 $baseblack: #979797;
 $platinum: #E6EBE0;
@@ -15,4 +19,3 @@ $l-mobile-view: "screen and (min-width: 375px)";
 $tablet-view: "screen and (min-width: 768px)";
 $desktop-view: "screen and (min-width: 1024px)";
 
-$cbc: cubic-bezier(.3,.13,.60,.89);
