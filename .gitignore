@@ -4,4 +4,3 @@ npm-debug.log
 .DS_Store
 /*.env
 gulpfile.js
-public/styles/dist
