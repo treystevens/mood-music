@@ -24,14 +24,14 @@
     overflow: hidden;
 }
 
-// testing 
+
 .wrap{
-    // background-color: $flatred;
+    
     transition: background-color 0.5s ease;
 
-    // &:hover{
-    //     background-color: #6C95CC;
-    // }
+    
+    
+    
 }
 
 
@@ -40,11 +40,11 @@
     display: flex; 
     flex-direction: column;
 
-    // testing
+    
     width: 97%;
     margin: 0 auto;
-    // height: 100vh;
-    // background-color: #ED6A5A;
+    
+    
 }
 
 .tab-content-container{
@@ -72,9 +72,9 @@
 }
 
 .container{
-    // width: 80%;
+    
     margin: 0 auto;
-    // background-color: #ED6A5A;
+    
 
     @media #{$tablet-view}{
         width: 80%;
@@ -85,8 +85,8 @@
     }
 }
 
-// Header
-// Logo
+
+
 .logo-container{
     display: none;
     position: fixed;
@@ -96,10 +96,10 @@
     z-index: 10;
     background-color: rgb(245, 245, 245);
 
-    // &__logo{
-    //     text-align: center;
-    //     color: #943737
-    // }
+    
+    
+    
+    
 
     @media #{$tablet-view}{
         position: static;
@@ -117,7 +117,7 @@
     margin: 0 auto;
     padding: 5px 0;
     transition: width 1s;
-    // make width 20% when scroll position is past tracksdiv
+    
 }
 
 .logo--size{
@@ -128,7 +128,7 @@
     display: none;
 }
 
-// Solo classes
+
 .fa-caret-right,
 .fa-chevron-right{
     pointer-events: none;
@@ -156,7 +156,7 @@
         height: 5em
     }
 
-    // testing
+    
     @media #{$desktop-view}{
         width: 10em;
         height: 10em
@@ -168,8 +168,8 @@
     position: absolute;
     top: -80px;
     right: 10px;
-    // float: right;
-    // width: 1.5rem;
+    
+    
     line-height: 1.5rem;
     text-align: center;
     cursor: pointer;
@@ -199,7 +199,7 @@
 }
 
 
-// Mood Input Fields
+
 .mood{
     display: flex;
     align-items: center;
@@ -224,13 +224,13 @@
     }
 
     &__header{
-        // margin: 1.2em .8em;
+        
 
-        // testing New styles under here testing **************
+        
         font-size: 3rem;
         align-self: flex-start;
-        // margin-top: 40px;
-        // margin-bottom: 20px;
+        
+        
         margin: 1.5em 0;
         width: 100%;
         overflow-wrap: break-word;
@@ -252,7 +252,7 @@
         width: 100%;
 
         @media #{$desktop-view}{
-            // margin-top: 100px;
+            
         }
         
     }
@@ -267,7 +267,7 @@
         color: white;
         font-size: 1.8em;
 
-         // testing
+         
 
         &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
             color: #EFA09B;
@@ -311,12 +311,12 @@
                 color: #EFA09B;
               }
             border: none;
-            // border-bottom: 1px solid black;
+            
             font-size: 7rem;
             border-radius: 0;
             padding-left: 5px;
-            // background-color: $flatred;
-            // color: #5a5a5a;
+            
+            
             
         }
     }
@@ -326,17 +326,17 @@
         position: relative;
         bottom: -15px;
 
-        // testing
+        
         @media #{$desktop-view}{
             
         }
     }
 
     &__i-btn{
-        // background-color: none;
-        // border: none;
+        
+        
         cursor: pointer;
-        // padding: 0;
+        
         padding: 0;
         border: none;
         background: none;   
@@ -358,22 +358,22 @@
         display: flex;
         flex-flow: row wrap;
         align-self: flex-start;
-        // justify-content: flex-start;
+        
 
         &__tag{
             position: relative;
             border: 1px solid $baseblack;
             border-radius: 5px;
             margin-bottom: .6em;
-            // margin-right: .6em;
+            
             font-size: .8em;
-            // flex: 1 0 auto;
+            
             background-color: white;
             padding: 1em 1.8em 1em .8em;
-            // height: 28px;
-            // height: 30px;
+            
+            
             vertical-align: center;
-            // padding: 5px 30px 5px 10px;
+            
 
             &:hover{
                 background-color: rgba(0, 0, 0, 0.2);
@@ -395,7 +395,7 @@
 }
 
 
-// Genres
+
 .genres{
 
     position: relative;
@@ -421,28 +421,28 @@
 
         &-genre{
 
-            // margin-top: 10px;
-            // height: 20px;
+            
+            
             display: flex;
             flex-flow: row wrap;
             align-self: flex-start;
-            // justify-content: flex-start;
+            
     
             &__tag{
                 position: relative;
-                // border: 1px solid $baseblack;
+                
                 border-radius: 5px;
-                // margin-bottom: .6em;
+                
                 margin: 20px 5px 20px 0;
-                // margin-right: .6em;
+                
                 font-size: .8em;
-                // flex: 1 0 auto;
+                
                 background-color: white;
                 padding: 1em 1.8em 1em .8em;
-                // height: 28px;
-                // height: 30px;
+                
+                
                 vertical-align: center;
-                // padding: 5px 30px 5px 10px;
+                
     
                 &:hover{
                     background-color: rgba(0, 0, 0, 0.2);
@@ -478,29 +478,29 @@
         background-color: #fff;
         margin: 0 auto;
 
-        // border: 10px solid blue;
+        
 
         @media #{$tablet-view}{
             display: none;
-            // position: absolute;
-            // width: 60%;
+            
+            
             z-index: 5;
-            // left: 0;
-            // right: 0;
+            
+            
             margin: auto;
-            // margin-left: auto;
-            // margin-right: auto;
+            
+            
             
         }
 
         @media #{$desktop-view}{
             display: none;
-            // position: absolute;
+            
             z-index: 5;
         }
     }
 
-    // mobile view
+    
     &-mb{
         position: fixed;
         height: 100%;
@@ -508,7 +508,7 @@
         z-index: 10;
         width: 100%;
         left: 0;
-        // min-height: 736px;
+        
     }
 
     &-drop{
@@ -519,10 +519,10 @@
             display: inline-block;
             margin: 20px 0;
             transition: font-size .2s, color .2s;
-            color: #dbdbdb; // $offwhite
+            color: #dbdbdb; 
             cursor: pointer;
             font-weight: $f-normal;
-            // margin-bottom: 20px;
+            
             
             &:hover{
                 @media #{$desktop-view}{
@@ -543,8 +543,8 @@
     
 
     &-filter{
-        // display: flex;
-        // justify-content: space-around;
+        
+        
         position: relative;
         z-index: 2;
         border-top-left-radius: 5px;
@@ -571,7 +571,7 @@
             border: 1px solid $baseblack;
             border-radius: 10px;
             width: 100%;
-            // height: 30px;
+            
             margin-top: 10px;
             font-size: 1.2em;
             padding-left: .8em;
@@ -593,12 +593,12 @@
         margin-bottom: 10px;
         
         
-        // align-items: flex-end;
-        // position: fixed;
-        // z-index: 2;
-        // @media #{$tablet-view}{
-        //     // flex-direction: row;
-        // }
+        
+        
+        
+        
+        
+        
 
         &__genres-chosen{
             transition: height 0.66s ease-out;
@@ -614,7 +614,7 @@
         }
 
         &__genres-p{
-            // width: 100%;
+            
             text-align: center;
             align-self:stretch;
             font-size: .8em;
@@ -625,14 +625,14 @@
         &__list{
             display: flex;
             flex-flow: row wrap;
-            // justify-content: space-between;
+            
             height: 90px;
             max-height: 90px;
 
 
             @media #{$tablet-view}{
                 
-                // height: initial;
+                
                 
             }
     
@@ -652,7 +652,7 @@
             flex: 1 0 auto;
 
             height: 28px;
-            // height: 30px;
+            
             vertical-align: center;
             padding: 5px 30px 5px 10px;
 
@@ -668,16 +668,16 @@
                 pointer-events: none;
             }
             
-            // text-align: center;
+            
             @media #{$tablet-view}{
                 padding: 5px 30px 5px 10px;
-                // height: initial;
+                
                 
             }
     
             @media #{$desktop-view}{
                 padding: 5px 30px 5px 10px;
-                // height: initial;
+                
             }
         }
 
@@ -693,7 +693,7 @@
             padding: .8em 1.2em;
             background-color: white;
             text-align: center;
-            width: 100%; // great for desktop
+            width: 100%; 
             margin-top: 10px;
             align-self: flex-end;
 
@@ -714,7 +714,7 @@
 
     &-list{
         display: flex;
-        // justify-content: space-between;
+        
         flex-wrap: wrap;
         height: calc(100vh - 40px);
         overflow: auto;
@@ -732,7 +732,7 @@
 
         &__item{
             display: inline-block;
-            // height: auto;
+            
             width: 50%;
             padding: 1.5em .6em;
             line-height: 1.6em;
@@ -743,7 +743,7 @@
             background-position:right bottom;
             transition:all 0.4s ease-in-out;
 
-            // testing
+            
             display: flex;
             justify-content: center;
             flex-direction: column;
@@ -761,18 +761,18 @@
     }
 
     &-toggle{
-        // background: linear-gradient(to right,  $camblue 50%,  yellow 50%);
+        
         background-position: 0% 100%;
-        // background-size: 200% 100%;
-        // background-color: $camblue;
+        
+        
         color: white;
-        // transition: all 1s
+        
     }
 
-    // &-caret-animation{
-    //     // transform: rotate(100deg);
-    //     animation: animatedCaretReverse .6s $cbc forwards;
-    // }
+    
+    
+    
+    
 
     &-active-animation{
         animation: animatedCaret .6s $cbc forwards;
@@ -789,16 +789,16 @@
             height: initial;   
         }
 
-        // testing
-        // position: absolute;
-        // top: 50%;
-        // left: 50%;
-        // transform: translate(-50%, -50%);
-        // background-color: white;
-        // padding: 1rem 1.5rem;
-        // height: 80vh;
-        // width: 90%;
-        // border-radius: 0.5rem;
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
     }
 }
@@ -899,7 +899,7 @@
 
 
 
-// Tracks Div
+
 
 .tracks{
     display: flex;
@@ -940,8 +940,8 @@
         height: 40px;
         border-radius: 50%;
         cursor: pointer;
-        // transform: scale(1) rotate(-90deg);
-        // transition: transform .3s $cbc;
+        
+        
 
         @media #{$tablet-view}{
             top: -20px;
@@ -954,10 +954,10 @@
 
         &:hover{      
 
-            // @media #{$tablet-view}{
+            
                 transform: scale(1.2) rotate(90deg);
                 transition: transform .2s $cbc;
-            // }
+            
         }
 
     }
@@ -987,35 +987,35 @@
         overflow: hidden;
         line-height: 1.1em;
         margin-bottom: 10px;
-    //     position: relative;
-    //     line-height: 1em;
-    //     max-height: 80px;
-    //     text-align: justify;
-    //     margin-right: -1em;
-    //     padding-right: 1em;
+    
+    
+    
+    
+    
+    
       
-    //   &:before {
-    //     content: '...';
-    //     position: absolute;
-    //     right: 0;
-    //     bottom: 0;
-    //   }
-    //   &:after {
-    //     content: '';
-    //     position: absolute;
-    //     right: 0;
-    //     width: 1em;
-    //     height: 1em;
-    //     margin-top: 0.2em;
-    //     background: white;
-    //   }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
         
 
     }
 
 
     &__arist{
-        // @include track-space;
+        
         text-align: center;
         font-weight: $f-normal;
         margin-top: auto;
@@ -1024,7 +1024,7 @@
 
     &__progress-bar{
         height: 20px;
-        // background-color: rgb(42, 128, 207);
+        
         background-color: $flatred;
     }
 
@@ -1057,7 +1057,7 @@
     &__media{
         margin-bottom: 20px;
         height: 150px;
-        // border: 1px solid black;
+        
     }
 
     &__svg-add-btn{
@@ -1072,8 +1072,8 @@
 
 .playlist-track{
     display:flex;
-    // justify-content: space-between;
-    // align-items: center;
+    
+    
     height: 150px;
     border-bottom: 1px solid $baseblack;
 
@@ -1107,9 +1107,9 @@
         display:flex;
         justify-content: center;
         align-items: center;
-        // height: 100%;
-        // border-radius: 50%;
-        // background-color: yellow;
+        
+        
+        
     }
 
     &__play-svg{
@@ -1119,9 +1119,9 @@
 
     &__progress-bar{
         height: 10px;
-        // width: 100%;
+        
         background-color: $flatred;
-        // background-color: rgba(248, 248, 89, 0.856);
+        
     }
 
     &__media{
@@ -1143,23 +1143,23 @@
         align-items: center;
         align-self: center;
         margin-bottom: 10px;
-        // justify-content: space-around
+        
     }
 
-    // &__play-container{
-    //     width: 30%;
-    // }
+    
+    
+    
 
-    // playlist-track__play-btn
+    
 }
 
-// Modal
+
 
 .modal {
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 20; /* Sit on top */
-    // padding-top: 100px; /* Location of the box */
+    
     left: 0;
     top: 0;
     width: 100%; /* Full width */
@@ -1180,31 +1180,31 @@
         border: 1px solid #888;
         width: 80%;
         box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-        // -webkit-animation-name: animatetop;
-        // -webkit-animation-duration: 0.4s;
-        // animation-name: animatetop;
-        // animation-duration: 0.4s
+        
+        
+        
+        
     }
 
     &__btn-container{
         display: flex;
         justify-content: space-between;
         align-self: center;
-        // margin-top: 20px;
+        
         width: 100%;
-        // width: 60%;
+        
         
 
         @media #{$tablet-view}{
             margin-top: auto;
             width: 100%;
-            // margin-top: 7em;
-            // width: 60%;
-            // margin-top: 100px;
+            
+            
+            
         }
         @media #{$desktop-view}{
-            // margin-top: auto;
-            // width: 100%;
+            
+            
             
         }
     }
@@ -1238,12 +1238,12 @@
     & .playlist-list{
         display: block;
         
-        // border-bottom: 1px solid white;
+        
     }
 
 
     & .playlist-bar{
-        // border-bottom: 1px solid white;
+        
         height: auto;
         text-align: center;
         width: 100%;
@@ -1261,29 +1261,29 @@
     & .playlist-import{
         display: block;
         text-align: center;
-        // border-bottom: 1px solid white;
+        
     }
 
     & .playlist-create{
         width: 100%;
         border-left: none;
         font-size: 1em;
-            // border-bottom: 1px solid white;
+            
         text-align: center;
         height: auto;
 
         @media #{$tablet-view} {
-            // width: 100%;
-            // border-left: none;
-            // // border-bottom: 1px solid white;
-            // text-align: center;
-            // height: auto;
+            
+            
+            
+            
+            
         }
     }
 
     & .playlist-list__playlist{
         margin-bottom: 0;
-        // height: auto;
+        
 
         &--hide{
             display: none;
@@ -1327,7 +1327,7 @@
 
 }
 
-// Playlist Footer
+
 .playlist{
     display: none;
     position: fixed;
@@ -1354,7 +1354,7 @@
 
     &-flex{
         display: flex;
-        // justify-content: center;
+        
         flex-direction: column;
         width: 100%;
     }
@@ -1363,9 +1363,9 @@
         display: flex;
         justify-content: space-between;
 
-        // @media #{$tablet-view} {
-        //     flex-direction: column;
-        // }
+        
+        
+        
     }
 
     &-import{
@@ -1403,12 +1403,12 @@
 
     &-create{
         display: flex;
-        // border-left: 1px solid white;
+        
         border-left: 1px solid rgb(144, 144, 144);
         align-items: center;
         justify-content: center;
-        // font-size: 1.4em;
-        // height: 30px;
+        
+        
         width: 70px;
 
         &:hover{
@@ -1429,7 +1429,7 @@
 
         &:hover{
             background-color: rgba(0, 0, 0, 0.3);
-            // color: rgba(90, 88, 88, 0.9);
+            
         }
     }
 
@@ -1460,14 +1460,14 @@
     right: 0;
     font-size: 2em;
     width: 40px;
-    // content: "x";
+    
     
     &::after{
         content:"x";
     }
     &:hover::after{
         right: 10px;
-        // width: 80px;
+        
         border: 1px solid white;
         padding: 0.1em 0.4em;
         content: "remove";
@@ -1481,11 +1481,11 @@
         top: 10px;
         
     }
-    // }
+    
 
 }
 
-// Create Playlist/ Import form
+
 
 .cr-pl{
     display: flex;
@@ -1496,7 +1496,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        // align-items: center;
+        
         width: 100%;
         height: 100%;
 
@@ -1504,7 +1504,7 @@
 
         @media #{$tablet-view}{
             width: 80%
-            // align-items: center;
+            
         }
     }
 
@@ -1613,13 +1613,13 @@
         font-size: initial;
 
 
-        // @media #{$tablet-view}{
-        //     font-size: initial;
-        // }
+        
+        
+        
     
-        // @media #{$desktop-view}{
-        //     font-size: initial;
-        // }
+        
+        
+        
 
         &:hover{
             background-color: rgba(39, 38, 38, 0.726)
@@ -1632,7 +1632,7 @@
 }
 
 
-// Refactor into mixins
+
 
 .tran-modal {
     @include transition-modal;
@@ -1661,8 +1661,8 @@
         left: 50%;
         transform: translate(-50%, -50%);
         background-color: white;
-        // padding: 1rem 1.5rem;
-        // height: 80vh;
+        
+        
         width: 90%;
         border-radius: 0.5rem;
 
@@ -1692,8 +1692,8 @@
         left: 0;
         transform: initial;
         background-color: white;
-        // padding: 1rem 1.5rem;
-        // height: 80vh;
+        
+        
         width: 100%;
         border-radius: 0.5rem;
     }
@@ -1737,7 +1737,7 @@
 
     border-radius: 5px;
     padding: .2em .5em; 
-    font-size: 1.3em;// delete this make decline btn an actual button and return false in javascript
+    font-size: 1.3em;
     color: white;
     width: 45%;
 
@@ -1747,7 +1747,7 @@
     }
 
     @media #{$desktop-view}{
-        // padding: 2em 1.2em;
+        
         width: 200px;
     }
 
@@ -1777,19 +1777,19 @@
         width: 60%;
         margin: 5% 0;
         font-size: 1.4em;
-        // height: 40px;
+        
     }
 }
 
 
 .tabs {
     position: relative;   
-    // min-height: 200px; /* This part sucks */
+    
     clear: both;
     margin: 25px 0;
   }
   .tab {
-    // display: flex;
+    
     float: left;
   }
   .tab > label {
@@ -1800,10 +1800,10 @@
     position: relative;
     left: 1px; 
 
-    // &:hover{
-    //     background-color: rgba(204, 204, 204, 0.6);
-    //     color: white;
-    // }
+    
+    
+    
+    
   }
   .tab [type=radio] {
     display: none;   
@@ -1826,12 +1826,12 @@
 
     @media #{$tablet-view}{
         height: 40vh;
-        // min-height: 40vh;
+        
     }
 
     @media #{$tablet-view} and (orientation: landscape){
         height: 60vh;
-        // min-height: 40vh;
+        
     }
 
 
@@ -1853,8 +1853,8 @@
 
 .svg-try{
     position: absolute;
-    // top: 0;
-    // right: 0;
+    
+    
 
     &-half{
          & path{
@@ -1916,8 +1916,8 @@
   .media-controls{
       
     cursor: pointer;
-    // position: absolute;
-    // left: 8px;
+    
+    
   
     &__play{
       stroke-dasharray: 280 280;
@@ -2005,15 +2005,15 @@
 }
 
 .tab-field-container{
-    // height: 100%;
+    
 
     @media #{$tablet-view}{
-        // height: 250px;
+        
     }
 
-    // @media #{$desktop-view}{
-    //     height: 250px;
-    // }
+    
+    
+    
 }
 
 @keyframes tabError{
@@ -2083,16 +2083,16 @@
     flex-direction: column;
     height: 40%;
     width: 80%;
-    // opacity: 1;
-    // transition: opacity .5s linear;
+    
+    
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     border: 1px solid $baseblack;
     background-color: white;
-        // padding: 1rem 1.5rem;
-        // height: 80vh;
+        
+        
     
     border-radius: 0.5rem;
 
@@ -2108,7 +2108,7 @@
     
 
     &--fade{
-        // opacity: 0;
+        
         animation: fadeOut 2s forwards;
         
     }
@@ -2122,15 +2122,15 @@
         stroke-width: 2;
         stroke: $color--green;
         stroke-miterlimit: 10;
-        // margin: 10% auto;
-        // box-shadow: inset 0px 0px 0px $color--green;
+        
+        
         
         
         &__check{
             transform-origin: 50% 50%;
-            // stroke-dasharray: 48;
-            // stroke-dashoffset: 48;
-            // animation: stroke .1s $cbc .6s forwards;
+            
+            
+            
             
         }
           
