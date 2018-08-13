@@ -3,4 +3,4 @@ public/.sass-cache/
 npm-debug.log
 .DS_Store
 /*.env
-gulpfile.js
+node_modules
