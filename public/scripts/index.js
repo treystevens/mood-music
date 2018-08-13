@@ -1745,7 +1745,7 @@ eventModule.moodForm.addEventListener('submit', (evt) => {
 
     
     
-    userMood.value = '';
+    // userMood.value = '';
 
     
 
