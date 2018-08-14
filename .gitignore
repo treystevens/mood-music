@@ -3,4 +3,4 @@ public/.sass-cache/
 npm-debug.log
 .DS_Store
 /*.env
-node_modules
+node_modules/
