@@ -102,10 +102,8 @@ function createSongBody(trackObj) {
   // Reset the count for Scrolling Fetch
   myModule.scrollCount = 0;
 
-  // Refactor out event listeners these should be delegated by the parent div.
   songCardImgListener(songImg, playerControl, songAudio);
-
-  playerControlListener(playerControl);
+  playerControlListener(playerControl, songAudio);
 
   // Add tracks to playlist
   playlistAddBtnListener(playlistAddBtn);
@@ -122,6 +120,19 @@ function audioPlayingListener(elem, progressBar) {
   elem.addEventListener('playing', evt => {
     const duration = evt.target.duration;
     advance(duration, elem, progressBar);
+  });
+}
+
+/**
+ *
+ * Handles play and pause audio SVG state
+ * when user clicks on song control.
+ * @param {HTMLElement} elem
+ */
+function playerControlListener(elem, audioElem) {
+  elem.addEventListener('click', () => {
+    animatePlaySVG(elem);
+    togglePlay(audioElem);
   });
 }
 
@@ -161,42 +172,6 @@ function playlistAddBtnListener(elem) {
         [addedSong],
         myModule.currentChosenPlaylist.id
       );
-    }
-  });
-}
-
-/**
- *
- * Handles play and pause audio SVG state
- * when user clicks on song control.
- * @param {HTMLElement} elem
- */
-function playerControlListener(elem) {
-  elem.addEventListener('click', evt => {
-    // refactor into track event listener
-    if (evt.target.classList.contains('media-controls')) {
-      let gSVG = evt.target.firstChild;
-      let pausePath = gSVG.firstChild;
-      let playPath = gSVG.lastChild;
-      // let mediaControlsTarget = evt.target
-
-      playPath.classList.remove('inactive-dash');
-      pausePath.classList.remove('inactive-dash-pause');
-
-      playPath.classList.toggle('play-ani');
-      pausePath.classList.toggle('pause-ani');
-      evt.target.classList.toggle('media-controls-toggle');
-
-      let audioTrack = Array.from(
-        evt.target.parentElement.parentElement.children
-      );
-
-      audioTrack.forEach(child => {
-        if (child.className === 'track__img') {
-          let songAudio = child.firstChild;
-          songAudio.paused ? songAudio.play() : songAudio.pause();
-        }
-      });
     }
   });
 }
