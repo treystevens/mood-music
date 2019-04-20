@@ -1,3 +1,5 @@
+import spotifyGrab from './utils/fetch';
+
 let myModule = (function() {
   let module = {};
 
@@ -74,6 +76,12 @@ let eventModule = (function() {
   return events;
 })();
 
+// Initalize App on Startup
+(function init() {
+  mobileCheck();
+  initEventListeners();
+})();
+
 function mobileCheck() {
   let isMobile;
   let logoContainer = document.querySelector('.logo-container');
@@ -101,6 +109,7 @@ function mobileCheck() {
   return isMobile;
 }
 
+// !!! UTILS
 // Random Color for Playlist
 function playlistColorSequence() {
   let playlists = document.getElementsByClassName('playlist-list__playlist');
@@ -112,6 +121,7 @@ function playlistColorSequence() {
 }
 
 // Close Modal
+// !!! UTILS
 function closeModal() {
   let tranModal = document.querySelector('.tran-modal__show-modal');
   let removePlaylistForm = document.querySelector('.tran-modal__show-form');
@@ -384,7 +394,6 @@ function startTimer(duration, element, percentage, targetedElement) {
       pausePath.classList.toggle('pause-ani');
     }
     if (targetedElement.classList.contains('playlist-track__progress-bar')) {
-      console.dir(targetedElement);
       let grandparentTarget = targetedElement.parentNode.parentNode;
       let trackMedia = getChildElementByClass(
         grandparentTarget,
@@ -412,7 +421,6 @@ function createImportError(errorMessage) {
   errorBody.classList.add('im-pl__error');
 
   errorBody.textContent = errorMessage;
-  // contentBox.classList.toggle('no-transform');
 
   inputHook.parentNode.insertBefore(errorBody, inputHook.nextElementSibling);
 }
@@ -425,20 +433,8 @@ function processSongURI(uri) {
   return trackURI;
 }
 
-// GET Request to Spotify API
-function spotifyGrab(url) {
-  const init = {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + myModule.accessToken
-    }
-  };
-
-  let spotifyData = fetch(url, init);
-  return spotifyData;
-}
-
 // DELETE Request to Spotify API
+// !!! Fetch
 function deleteSong(url, track) {
   let data = {
     tracks: [
@@ -463,13 +459,13 @@ function deleteSong(url, track) {
 
 // Fetch to Spotify API...
 function spotifyProcessTracks(url) {
-  spotifyGrab(url).then(response => {
+  spotifyGrab(url, myModule.accessToken).then(response => {
     response
       .json()
       .then(data => {
         if (data.tracks.length === 0) {
           noTrackResult();
-          // smoothingScroll('.no-result');
+
           return -1;
         }
 
@@ -524,6 +520,7 @@ function removeFromTotalPlaylists(name) {
 }
 
 // Playlist Exists in Total Playlist
+// !!! UTIL playlist util
 function playlistAlreadyExistCheck(playlistID) {
   for (let property in myModule.totalPlaylists) {
     if (myModule.totalPlaylists[property].id === playlistID) {
@@ -735,9 +732,8 @@ function addSongToPlaylist(url, songLinks, playlistID) {
     .then(() => {
       // Get back updated playlist
       spotifyGrab(
-        `https://api.spotify.com/v1/users/${
-          myModule.userInfo.id
-        }/playlists/${playlistID}/tracks`
+        `users/${myModule.userInfo.id}/playlists/${playlistID}/tracks`,
+        myModule.accessToken
       )
         .then(playlist => {
           return playlist.json();
@@ -779,80 +775,60 @@ function smoothingScroll(elementName) {
 
 // Create DOM structure from Fetched songs
 function createSongBody(trackObj) {
-  const div = document.createElement('div');
-  const img = document.createElement('img');
-  // const trackLink = document.createElement('a');
-  const headings = {
-    h1: document.createElement('h1'),
-    h2: document.createElement('h2')
-  };
-  const playlistAddBtn = document.createElement('div');
-  const getDiv = document.querySelector('.tracks');
-  const progressBar = document.createElement('div');
-  const trackLink = document.createElement('audio');
-  const playerControl = document.createElement('div');
-
-  playerControl.classList.add('track__media');
+  const songCard = createElement('div', { class: 'track' });
+  const songImg = createElement('img', {
+    alt: `Artwork for the song "${trackObj.song_title}", from ${
+      trackObj.artist
+    }`,
+    class: 'track__img',
+    src: trackObj.album_img.url
+  });
+  const songName = createElement('h1', {
+    class: 'track__name',
+    textContent: trackObj.song_title
+  });
+  const songArtist = createElement('h2', {
+    class: 'track__artist',
+    textContent: trackObj.artist
+  });
+  const playlistAddBtn = createElement('div', {
+    class: ['track__pl-add', 'cr-pl__btn'],
+    'data-track-uri': trackObj.uri
+  });
+  const songCardsContainer = document.querySelector('.tracks');
+  const progressBar = createElement('div', { class: 'track__progress-bar' });
+  const trackLink = createElement('audio', {
+    class: 'track__link',
+    src: trackObj.preview_url
+  });
+  const playerControl = createElement('div', { class: 'track__media' });
 
   playerControl.innerHTML =
     '<svg class="media-controls" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><g fill="none" fill-rule="evenodd"><path class="media-controls__pause inactive-dash-pause" stroke="#3F3E3E" stroke-linecap="round" stroke-linejoin="round" stroke-width="5" d="M48,25 L48,71.8053097 C45.1666667,73.6017699 42.3333333,74.5 39.5,74.5 C36.6666667,74.5 33.8333333,73.6017699 31,71.8053097"/><path class="media-controls__play inactive-dash" stroke-linecap="round" stroke="#3F3E3E" stroke-width="5" d="M72.0763886,68.3352333 L62.1474475,68.3352333 L27.2723011,68.3352333 C25.0631621,68.3352333 23.2723011,66.5443723 23.2723011,64.3352333 C23.2723011,63.4859068 23.542644,62.6586256 24.0441798,61.9731933 L46.4462236,31.3570669 C47.7507422,29.5742247 50.2535427,29.1864669 52.0363849,30.4909855 C52.3678287,30.7335054 52.6599463,31.025623 52.9024662,31.3570669 L75.3045099,61.9731933 C76.6090286,63.7560355 76.2212708,66.258836 74.4384286,67.5633546 C73.7529963,68.0648904 72.9257152,68.3352333 72.0763886,68.3352333 L68.7548694,68.3352333" transform="rotate(90 49.674 49.027)"/></g></svg>';
 
-  // Setting up classes
-  trackLink.classList.add('track__link');
-  div.classList.add('track');
-  img.classList.add('track__img');
-  headings.h1.classList.add('track__name');
-  headings.h2.classList.add('track__arist');
-
-  playlistAddBtn.classList.add('track__pl-add', 'cr-pl__btn');
-  // progressBar.classList.add('track__progress');
-  playerControl.classList.add('track__media');
-
-  // Setting DOM display
-  // trackLink.setAttribute('href', trackObj.preview_url);
-  trackLink.src = trackObj.preview_url;
-
-  img.src = trackObj.album_img.url;
-  img.setAttribute(
-    'alt',
-    `Artwork for the song "${trackObj.song_title}", from ${trackObj.artist}`
-  );
-  headings.h1.textContent = trackObj.song_title;
-  headings.h2.textContent = trackObj.artist;
-
   // Attach to DOM
-  getDiv.appendChild(div);
-  div.appendChild(img);
-  img.appendChild(trackLink);
-  // div.appendChild(progressBar);
-  div.appendChild(playerControl);
-  div.appendChild(headings.h1);
-  // div.appendChild(headings.h4);
-  div.appendChild(headings.h2);
-  div.appendChild(playlistAddBtn);
+  songCardsContainer.appendChild(songCard);
+  songCard.appendChild(songImg);
+  songImg.appendChild(trackLink);
+  songCard.appendChild(playerControl);
+  songCard.appendChild(songName);
+  songCard.appendChild(songArtist);
+  songCard.appendChild(playlistAddBtn);
 
-  // let progressBar = document.createElement('div');
-  progressBar.classList.add('track__progress-bar');
-
-  let volumeIcon = document.createElement('i');
-  const volumeContainer = document.createElement('div');
-  const volumeSlider = document.createElement('input');
-
-  volumeSlider.setAttribute('type', 'range');
-  volumeSlider.setAttribute('min', '1');
-  volumeSlider.setAttribute('max', '100');
-  volumeSlider.setAttribute('value', '60');
-  playlistAddBtn.setAttribute('data-track-uri', trackObj.uri);
-
-  volumeContainer.classList.add('track__volume-container');
-  volumeSlider.classList.add('track__volume-slider');
-  volumeIcon.classList.add('track__volume-icon');
-
-  volumeIcon.className = 'fas fa-volume-up';
-
+  // Initialize Volume
+  const volumeIcon = createElement('i', { class: ['fas', 'fa-volume-up'] });
+  const volumeContainer = createElement('div', {
+    class: 'track__volume-container'
+  });
+  const volumeSlider = createElement('input', {
+    type: 'range',
+    min: '1',
+    max: '100',
+    value: '60',
+    class: 'track__volume-slider'
+  });
   volumeContainer.appendChild(volumeIcon);
   volumeContainer.appendChild(volumeSlider);
-
   playerControl.insertAdjacentElement('afterbegin', progressBar);
   playerControl.insertAdjacentElement('beforeend', volumeContainer);
 
@@ -869,60 +845,33 @@ function createSongBody(trackObj) {
 
   // Reset the count for Scrolling Fetch
   myModule.scrollCount = 0;
-  console.log(myModule.scrollCount, `inside tracks div`);
 
-  img.addEventListener('click', evt => {
-    let parentOfTarget = evt.target.parentElement;
-    // make this into a function, also used in advance function for progress bar
-    let trackMedia = getChildElementByClass(parentOfTarget, 'track__media');
-    let mediaControls = getChildElementByClass(trackMedia, 'media-controls');
-    let gPath = getChildElementByClass(mediaControls, 'media-controls')
-      .firstChild;
-    let playPath = gPath.lastChild;
-    let pausePath = gPath.firstElementChild;
+  // Refactor out event listeners these should be delegated by the parent div.
+  songCardImgListener(songImg);
 
-    playPath.classList.remove('inactive-dash');
-    pausePath.classList.remove('inactive-dash-pause');
-
-    playPath.classList.toggle('play-ani');
-    pausePath.classList.toggle('pause-ani');
-    mediaControls.classList.toggle('media-controls-toggle');
-
-    evt.target.firstElementChild.paused
-      ? evt.target.firstElementChild.play()
-      : evt.target.firstElementChild.pause();
-  });
-
-  playerControl.addEventListener('click', evt => {
-    // refactor into track event listener
-    if (evt.target.classList.contains('media-controls')) {
-      let gSVG = evt.target.firstChild;
-      let pausePath = gSVG.firstChild;
-      let playPath = gSVG.lastChild;
-      // let mediaControlsTarget = evt.target
-
-      playPath.classList.remove('inactive-dash');
-      pausePath.classList.remove('inactive-dash-pause');
-
-      playPath.classList.toggle('play-ani');
-      pausePath.classList.toggle('pause-ani');
-      evt.target.classList.toggle('media-controls-toggle');
-
-      let audioTrack = Array.from(
-        evt.target.parentElement.parentElement.children
-      );
-
-      audioTrack.forEach(child => {
-        if (child.className === 'track__img') {
-          let songAudio = child.firstChild;
-          songAudio.paused ? songAudio.play() : songAudio.pause();
-        }
-      });
-    }
-  });
+  playerControlListener(playerControl);
 
   // Add tracks to playlist
-  playlistAddBtn.addEventListener('click', evt => {
+  playlistAddBtnListener(playlistAddBtn);
+
+  trackLinkListener(trackLink);
+}
+
+function trackLinkListener(elem) {
+  elem.addEventListener('playing', evt => {
+    let song = evt.target;
+
+    let duration = song.duration;
+    let parentOfEvent = song.parentElement.parentElement;
+    let progressBar = getChildElementByClass(parentOfEvent, 'track__media')
+      .firstElementChild;
+
+    advance(duration, elem, progressBar);
+  });
+}
+
+function playlistAddBtnListener(elem) {
+  elem.addEventListener('click', evt => {
     // let addedSong = [getSongURI(evt.target)];
     let addedSong = evt.target.getAttribute('data-track-uri');
     let crImPlaylistModal = document.querySelector('.modal');
@@ -957,19 +906,62 @@ function createSongBody(trackObj) {
       );
     }
   });
+}
 
-  trackLink.addEventListener('playing', evt => {
-    let song = evt.target;
+function playerControlListener(elem) {
+  elem.addEventListener('click', evt => {
+    // refactor into track event listener
+    if (evt.target.classList.contains('media-controls')) {
+      let gSVG = evt.target.firstChild;
+      let pausePath = gSVG.firstChild;
+      let playPath = gSVG.lastChild;
+      // let mediaControlsTarget = evt.target
 
-    let duration = song.duration;
-    let parentOfEvent = song.parentElement.parentElement;
-    let progressBar = getChildElementByClass(parentOfEvent, 'track__media')
-      .firstElementChild;
+      playPath.classList.remove('inactive-dash');
+      pausePath.classList.remove('inactive-dash-pause');
 
-    advance(duration, trackLink, progressBar);
+      playPath.classList.toggle('play-ani');
+      pausePath.classList.toggle('pause-ani');
+      evt.target.classList.toggle('media-controls-toggle');
+
+      let audioTrack = Array.from(
+        evt.target.parentElement.parentElement.children
+      );
+
+      audioTrack.forEach(child => {
+        if (child.className === 'track__img') {
+          let songAudio = child.firstChild;
+          songAudio.paused ? songAudio.play() : songAudio.pause();
+        }
+      });
+    }
   });
 }
 
+function songCardImgListener(elem) {
+  // Refactor out event listeners these should be delegated by the parent div.
+  elem.addEventListener('click', evt => {
+    let parentOfTarget = evt.target.parentElement;
+    // make this into a function, also used in advance function for progress bar
+    let trackMedia = getChildElementByClass(parentOfTarget, 'track__media');
+    let mediaControls = getChildElementByClass(trackMedia, 'media-controls');
+    let gPath = getChildElementByClass(mediaControls, 'media-controls')
+      .firstChild;
+    let playPath = gPath.lastChild;
+    let pausePath = gPath.firstElementChild;
+
+    playPath.classList.remove('inactive-dash');
+    pausePath.classList.remove('inactive-dash-pause');
+
+    playPath.classList.toggle('play-ani');
+    pausePath.classList.toggle('pause-ani');
+    mediaControls.classList.toggle('media-controls-toggle');
+
+    evt.target.firstElementChild.paused
+      ? evt.target.firstElementChild.play()
+      : evt.target.firstElementChild.pause();
+  });
+}
 // Need to see what can be refactored from this and createSongBody function
 function createPlaylistTrackBody(playlistObj, importedPlaylistName) {
   const playlistTrackDiv = document.createElement('div');
@@ -1220,25 +1212,6 @@ function songVolume(element) {
   song.volume = sliderValue;
 }
 
-// For songs that are in the body
-// !!! Delete
-// function getSongURI(evt) {
-//   songReference = evt.parentElement.getElementsByTagName('a')[0].href;
-//   let addedSong;
-//   for (let k in myModule.currentTracks) {
-//     if (myModule.currentTracks[k].preview_url === songReference)
-//       addedSong = myModule.currentTracks[k].uri;
-//   }
-//   return addedSong;
-// }
-
-// !!! Delete
-// Play songs fetched from Spotify
-// function playSound(url) {
-//   var a = new Audio(url);
-//   a.play();
-// }
-
 function refreshPlaylistBody(playlistName) {
   let updateThisPlaylist;
   let trackWrapper = Array.from(
@@ -1279,9 +1252,8 @@ function moveSongFromPlaylist(url, songLinks, playlistID) {
     .then(() => {
       // Get back updated playlist
       spotifyGrab(
-        `https://api.spotify.com/v1/users/${
-          myModule.userInfo.id
-        }/playlists/${playlistID}/tracks`
+        `users/${myModule.userInfo.id}/playlists/${playlistID}/tracks`,
+        myModule.accessToken
       )
         .then(playlist => {
           return playlist.json();
@@ -1359,7 +1331,7 @@ function cleanUpGenres() {
 }
 
 function buildURL(genres, maxVal, minVal, dataFeatures) {
-  let url = `https://api.spotify.com/v1/recommendations?max_valence=${maxVal}&min_valence=${minVal}&limit=30`;
+  let url = `recommendations?max_valence=${maxVal}&min_valence=${minVal}&limit=30`;
 
   if (dataFeatures[0].hasOwnProperty('minEnergy')) {
     url += `&min_energy=${dataFeatures[0].minEnergy}`;
@@ -1377,7 +1349,7 @@ function buildURL(genres, maxVal, minVal, dataFeatures) {
 }
 
 // Get username
-spotifyGrab('https://api.spotify.com/v1/me')
+spotifyGrab('me', myModule.accessToken)
   .then(data => {
     // Check if user is logged into their account
     if (data.status === 401) {
@@ -1416,311 +1388,6 @@ spotifyGrab('https://api.spotify.com/v1/me')
     console.log(err);
   });
 
-/******* Window Events *******/
-
-// Song Volume
-window.addEventListener('mouseup', evt => {
-  if (evt.target.classList.contains('playlist-track__volume-slider')) {
-    songVolume(evt.target);
-  }
-  if (evt.target.classList.contains('track__volume-slider')) {
-    songVolume(evt.target);
-  }
-});
-window.addEventListener('input', evt => {
-  if (evt.target.classList.contains('playlist-track__volume-slider')) {
-    songVolume(evt.target);
-  }
-  if (evt.target.classList.contains('track__volume-slider')) {
-    songVolume(evt.target);
-  }
-});
-
-// When the user clicks anywhere outside of the modal, close it
-window.addEventListener('click', evt => {
-  let tranModal = document.querySelector('.tran-modal');
-  let crImPlaylistModal = document.querySelector('.modal');
-  let genres = document.querySelector('.genres-show');
-  let genreModal = document.querySelector('.tran-modal--genre');
-
-  // Creating/Importing a playlist modal view
-  if (evt.target == crImPlaylistModal) {
-    let tabContentContainer = document.querySelector('.tab-content-container');
-    let errorMess = document.querySelector('.im-pl__error');
-
-    crImPlaylistModal.classList.toggle('modal--show');
-    tabContentContainer.classList.remove('tab-content--error');
-
-    if (errorMess) {
-      removeElementFromDOM(errorMess);
-    }
-  }
-
-  // Move playlist modal view
-  if (evt.target === tranModal) {
-    closeModal();
-  }
-
-  if (evt.target === genreModal) {
-    closeModal();
-  }
-  if (evt.target.classList.contains('tran-modal--genre')) {
-    closeModal();
-  }
-
-  // More Options on playlist Tracks
-  if (evt.target !== myModule.optionsHelper) {
-    let dropdowns = document.getElementsByClassName('options-dropdown');
-
-    for (let i = 0; i < dropdowns.length; i++) {
-      dropdowns[i].classList.remove('show__elem');
-    }
-  }
-  if (evt.target !== genres) {
-    let genreAnimation = document.querySelector('.genres-active-animation');
-
-    if (genreAnimation) {
-      genreAnimation.classList.remove('genres-active-animation');
-      genres.classList.remove('genres-show');
-    }
-  }
-});
-
-/******* Modal Window & Mood Submit Events *******/
-
-// Creating a new playlist
-eventModule.createPlaylistSubmit.addEventListener('submit', evt => {
-  evt.preventDefault();
-
-  spotifyCreatePlaylist(
-    `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists`
-  );
-  closeModal();
-});
-
-// Importing a new playlist
-eventModule.importPlaylistSubmit.addEventListener('submit', evt => {
-  evt.preventDefault();
-
-  let importPlaylistName = document.querySelector('.im-pl__name').value;
-  let clearValue = document.querySelector('.im-pl__name');
-  let flexibleName = importPlaylistName.toLowerCase();
-  let importedPlaylistID;
-
-  let importError = document.querySelector('.im-pl__error');
-  let tabContentContainer = document.querySelector('.tab-content-container');
-
-  tabContentContainer.classList.remove('tab-content--error');
-
-  clearValue.value = '';
-
-  if (importError) {
-    removeElementFromDOM(importError);
-  }
-
-  spotifyGrab(`https://api.spotify.com/v1/me/playlists`)
-    .then(data => {
-      return data.json();
-    })
-    .then(listOfUserPlaylists => {
-      // Cycle through to get user requested playlist ID
-      listOfUserPlaylists.items.forEach(playlist => {
-        if (flexibleName == playlist.name.toLowerCase()) {
-          importedPlaylistID = playlist.id;
-          importPlaylistName = playlist.name;
-        }
-      });
-
-      let playlistExists = updateTotalPlaylists(
-        importPlaylistName,
-        importedPlaylistID
-      );
-
-      // If no matching playlist in Spotify account
-      if (!importedPlaylistID) {
-        createImportError(
-          `Sorry, there's no playlist matching this name "${importPlaylistName}" out of your Spotify playlists!`
-        );
-
-        return -1;
-      }
-
-      // A playlist with this name has already been imported
-      if (playlistExists) {
-        createImportError(
-          `A playlist with the name "${importPlaylistName}" has already been imported.`
-        );
-        return -1;
-      }
-
-      playlistPlate(importPlaylistName, importedPlaylistID);
-      closeModal();
-
-      // Fetch for that specfic ID
-      // Fetch that URL get the returned tracks and put into creat Playlist tracks
-      spotifyGrab(
-        `https://api.spotify.com/v1/users/${
-          myModule.userInfo.id
-        }/playlists/${importedPlaylistID}/tracks`
-      )
-        .then(response => {
-          return response.json();
-        })
-        .then(importedTracks => {
-          importedTracks.items.forEach(playlistSong => {
-            createPlaylistTrackBody(playlistSong, importPlaylistName);
-          });
-          confirmAction(importPlaylistName, 'import');
-        });
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
-
-// Move song from one playlist to another
-eventModule.moveSongModal.addEventListener('submit', evt => {
-  // Grab selection chosen from a User
-  evt.preventDefault();
-  let mvsSelect = document.querySelector('.mvs-select');
-  let moveSongForm = document.querySelector('.tran-modal__mv-song');
-  let songAttachment = document.querySelector('.song-action');
-  let tranModal = document.querySelector('.tran-modal');
-
-  // Why remove this?
-  removeElementFromDOM(mvsSelect);
-  removeElementFromDOM(songAttachment);
-
-  let moveSong = [myModule.deleteThis];
-  let moveToThisPlaylist;
-  myModule.playlistNameValue = mvsSelect.value;
-
-  moveToThisPlaylist = getPlaylistID(myModule.playlistNameValue);
-
-  tranModal.classList.toggle('tran-modal__show-modal');
-
-  // tranModal.classList.toggle('tran-modal__show');
-  moveSongForm.classList.toggle('tran-modal__show-form');
-
-  deleteSong(
-    `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${
-      myModule.currentChosenPlaylist.id
-    }/tracks`,
-    myModule.deleteThis
-  )
-    .then(response => {
-      response.json();
-    })
-    .then(() => {
-      // Get back updated playlist *** code from add songs to playlist section ** place into function
-      spotifyGrab(
-        `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${
-          myModule.currentChosenPlaylist.id
-        }/tracks`
-      )
-        .then(playlist => {
-          return playlist.json();
-        })
-
-        .then(updatedPlaylist => {
-          refreshPlaylistBody(myModule.currentChosenPlaylist.name);
-
-          updatedPlaylist.items.forEach(playlistSong => {
-            createPlaylistTrackBody(playlistSong);
-          });
-        })
-        .then(() => {
-          moveSongFromPlaylist(
-            `https://api.spotify.com/v1/users/${
-              myModule.userInfo.id
-            }/playlists/${moveToThisPlaylist}/tracks`,
-            moveSong,
-            moveToThisPlaylist
-          );
-        });
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
-
-// Delete song from Playlist
-eventModule.deleteSongModal.addEventListener('submit', evt => {
-  evt.preventDefault();
-
-  let delSongForm = document.querySelector('.tran-modal__del-song');
-
-  let songAttachment = document.querySelector('.song-action');
-  let tranModal = document.querySelector('.tran-modal');
-
-  removeElementFromDOM(songAttachment);
-  // deleteModal.classList.toggle("delete-modal__show-modal");
-
-  delSongForm.classList.toggle('tran-modal__show-form');
-  tranModal.classList.toggle('tran-modal__show-modal');
-
-  deleteSong(
-    `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${
-      myModule.currentChosenPlaylist.id
-    }/tracks`,
-    myModule.deleteThis
-  )
-    .then(response => {
-      response.json();
-    })
-    .then(() => {
-      // Get back updated playlist *** code from add songs to playlist section ** place into function
-      spotifyGrab(
-        `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${
-          myModule.currentChosenPlaylist.id
-        }/tracks`
-      )
-        .then(playlist => {
-          return playlist.json();
-        })
-        .then(updatedPlaylist => {
-          refreshPlaylistBody(myModule.currentChosenPlaylist.name);
-
-          updatedPlaylist.items.forEach(playlistSong => {
-            createPlaylistTrackBody(playlistSong);
-          });
-        });
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
-
-// Remove a playlist
-eventModule.removePlaylistModal.addEventListener('submit', evt => {
-  evt.preventDefault();
-  evt.stopPropagation();
-
-  let tranModal = document.querySelector('.tran-modal');
-  let removePlaylistForm = document.querySelector('.tran-modal__rm-playlist');
-
-  let currentHiddenPlaylists = document.querySelectorAll(
-    '.playlist-list__playlist--hide'
-  );
-
-  // Show other playlist when one chosen is deleted
-  currentHiddenPlaylists.forEach(hiddenElement => {
-    hiddenElement.classList.remove('playlist-list__playlist--hide');
-  });
-
-  tranModal.classList.toggle('tran-modal__show-modal');
-  removePlaylistForm.classList.toggle('tran-modal__show-form');
-
-  myModule.grandparentOfTarget.childNodes.forEach(child => {
-    if (child === myModule.deleteMe) {
-      myModule.grandparentOfTarget.removeChild(child);
-    }
-  });
-  // Takes in a playlist name to fetch the ID and index position to remove from Total Playlists array
-
-  removeFromTotalPlaylists(myModule.deleteMe.childNodes[0].textContent);
-});
-
 // Polyfill if Smooth Behavior is not supported
 function moveScrollPosition(timestamp, dist, duration) {
   let timeStamp = timestamp || new Date().getTime();
@@ -1748,657 +1415,6 @@ function noTrackResult() {
   document.body.appendChild(noResult);
 }
 
-// Show music
-eventModule.moodForm.addEventListener('submit', evt => {
-  evt.preventDefault();
-
-  const userMood = document.querySelector('.mood__val');
-  const userMoodValue = userMood.value.toLowerCase();
-  const playlistFooter = document.querySelector('.playlist');
-
-  myModule.storeMoodValue = userMood.value;
-  // const tracksDiv = document.querySelector('.tracks');
-  myModule.currentTracks = [];
-
-  myModule.wasSubmitted = true;
-
-  let storeGenres = cleanUpGenres();
-  moodSubmitCleanUp();
-
-  // userMood.value = '';
-
-  // Fetch emotion json from my database
-  fetch(`/user/mood/${userMoodValue}`)
-    .then(data => {
-      return data.json();
-    })
-    .then(audioFeatures => {
-      // No music for that mood
-      if (audioFeatures.length === 0) {
-        noTrackResult();
-        // smoothingScroll('.no-result');
-        return -1;
-      } else {
-        const maxVal = Math.max(...audioFeatures[0].idNumbers);
-        const minVal = Math.min(...audioFeatures[0].idNumbers);
-
-        myModule.closureURL = buildURL(
-          storeGenres,
-          maxVal,
-          minVal,
-          audioFeatures
-        );
-        let newURL = myModule.closureURL();
-
-        playlistFooter.classList.add('playlist__show');
-
-        spotifyProcessTracks(newURL);
-      }
-    })
-    .catch(err => {
-      console.log(err);
-    });
-});
-
-// Modal's Close Button
-eventModule.closeModalBtn.forEach(btn => {
-  btn.addEventListener('click', closeModal);
-});
-eventModule.declineModalBtn.forEach(btn => {
-  btn.addEventListener('click', closeModal);
-});
-
-/******  Feature Events *******/
-
-// Expand playlist footer
-eventModule.playlistFooter.addEventListener('click', evt => {
-  const playlist = document.querySelector('.playlist');
-  const createBtn = document.querySelector('.playlist-create');
-
-  const importTab = document.getElementById('im-pl-tab');
-  const createTab = document.getElementById('cr-pl-tab');
-  let tranModal = document.querySelector('.tran-modal');
-  let crImPlaylistModal = document.querySelector('.modal');
-
-  if (evt.target.className === 'playlist-bar') {
-    playlist.classList.toggle('extended-playlist');
-
-    if (myModule.isMobile) {
-      let logoContainer = document.querySelector('.logo-container');
-      logoContainer.classList.toggle('show__elem');
-    }
-  }
-
-  if (playlist.classList.contains('extended-playlist')) {
-    createBtn.textContent = 'Create New Playlist +';
-  }
-
-  if (!playlist.classList.contains('extended-playlist')) {
-    createBtn.innerHTML = '<span class="playlist-create__sign">+</span>';
-    // createBtn.textContent = '+';
-  }
-
-  if (evt.target.className === 'playlist-import') {
-    importTab.checked = true;
-    crImPlaylistModal.classList.toggle('modal--show');
-  }
-
-  if (evt.target.className === 'playlist-create') {
-    createTab.checked = true;
-    crImPlaylistModal.classList.toggle('modal--show');
-  }
-  if (evt.target.className === 'playlist-create__sign') {
-    createTab.checked = true;
-    crImPlaylistModal.classList.toggle('modal--show');
-  }
-
-  let playlistName;
-
-  // Playlist Name & ID
-  if (evt.target.classList.contains('playlist-list__playlist')) {
-    let referenceTarget = evt.target.firstChild.childNodes[1];
-    let svgContainer = getChildElementByClass(
-      referenceTarget,
-      'fa-chevron-right'
-    );
-
-    let playlistHidden = document.querySelectorAll(
-      '.playlist-list__playlist--hide'
-    );
-
-    svgContainer.classList.remove('no-animation');
-    svgContainer.classList.toggle('playlist-active-animation');
-
-    playlistName = evt.target.childNodes[0].textContent || ''; // need to fix
-
-    myModule.currentChosenPlaylist.name = playlistName;
-
-    playlistHidden.forEach(playlist => {
-      let playlistSVG = playlist.children[0].firstElementChild.firstChild;
-      playlistSVG.classList.add('no-animation');
-    });
-
-    // let trackWrapper = getChildElementByClass(evt.target, 'track-wrapper');
-    // let playlistTracks = Array.from(trackWrapper.children);
-
-    // playlistTracks.forEach((track) =>{
-    //     let trackMedia = getChildElementByClass(track, 'playlist-track__media');
-    //     let playPath = trackMedia.firstElementChild.firstChild.lastChild;
-
-    //     playPath.classList.add('inactive-dash');
-    // })
-
-    // if(!playlistShow){
-    //     playlistAll.forEach((playlist) => {
-
-    //     })
-    // }
-
-    // Playlist ID
-    for (let k in myModule.totalPlaylists) {
-      if (playlistName === myModule.totalPlaylists[k].name) {
-        // currentChosenPlaylist.name = totalPlaylists[k].name;
-        myModule.currentChosenPlaylist.id = myModule.totalPlaylists[k].id;
-      }
-    }
-  }
-
-  // Remove a playlist
-  if (evt.target.className === 'remove-playlist') {
-    let removePlaylistSpan = document.querySelector('.rm-playlist');
-    let removePlaylistForm = document.querySelector('.tran-modal__rm-playlist');
-
-    tranModal.classList.toggle('tran-modal__show-modal');
-    removePlaylistForm.classList.toggle('tran-modal__show-form');
-
-    removePlaylistSpan.textContent = `"${
-      evt.target.parentElement.childNodes[0].textContent
-    }"?`;
-
-    myModule.grandparentOfTarget = evt.target.parentElement.parentElement;
-    myModule.deleteMe = evt.target.parentElement;
-  }
-
-  // Delete Song Modal
-  if (evt.target.classList.contains('delete-modal-trigger')) {
-    evt.stopPropagation();
-
-    // HTML Dom Attachment variables
-    let deleteForm = document.querySelector('.tran-modal__del-song');
-    let deleteFormHook = document.querySelector('.tran-modal__del-verify-head');
-
-    // Dom traversing / set attributes
-    let songActionBody = modalSongBodyAttachment(evt.target);
-
-    tranModal.classList.toggle('tran-modal__show-modal');
-    deleteForm.classList.toggle('tran-modal__show-form');
-
-    deleteFormHook.parentNode.insertBefore(
-      songActionBody.songAction,
-      deleteFormHook.nextElementSibling
-    );
-  }
-
-  // Move Song from one playlist to another
-  if (evt.target.classList.contains('move-song')) {
-    // evt.stopPropagation();
-
-    let moveSongForm = document.querySelector('.tran-modal__mv-song');
-    let playlistSelect = document.createElement('select');
-    let playlistOptions = document.createElement('option');
-    let hookForSelectElem = document.querySelector(
-      '.tran-modal__mv-verify-head'
-    );
-
-    let songActionBody = modalSongBodyAttachment(evt.target);
-
-    // Create options for select
-    for (let i = 0; i < myModule.totalPlaylists.length; i++) {
-      if (
-        myModule.currentChosenPlaylist.name !== myModule.totalPlaylists[i].name
-      ) {
-        playlistOptions = document.createElement('option');
-        playlistOptions.setAttribute('value', myModule.totalPlaylists[i].name);
-        playlistOptions.setAttribute(
-          'data-playlistId',
-          myModule.totalPlaylists[i].id
-        );
-        playlistOptions.textContent = myModule.totalPlaylists[i].name;
-
-        playlistSelect.appendChild(playlistOptions);
-      }
-    }
-
-    playlistSelect.classList.add('mvs-select');
-
-    hookForSelectElem.parentNode.insertBefore(
-      playlistSelect,
-      hookForSelectElem.nextElementSibling
-    );
-    hookForSelectElem.parentNode.insertBefore(
-      songActionBody.songAction,
-      hookForSelectElem.nextElementSibling
-    );
-
-    tranModal.classList.toggle('tran-modal__show-modal');
-    moveSongForm.classList.toggle('tran-modal__show-form');
-  }
-
-  // More options drop down
-  if (evt.target.className === 'options') {
-    let currentShownOptions = document.querySelector('.show__elem');
-    if (currentShownOptions) {
-      currentShownOptions.classList.toggle('show__elem');
-    }
-    myModule.optionsHelper = evt.target;
-    evt.target.firstElementChild.classList.toggle('show__elem');
-  }
-
-  // Show trackwrapper on click showing playlist tracks
-  if (evt.target.classList.contains('playlist-list__playlist')) {
-    let playlistNames = document.querySelectorAll('.playlist-list__playlist');
-
-    // evt.target.classList.toggle('active-playlist');
-
-    playlistNames.forEach(playlist => {
-      if (evt.target !== playlist) {
-        playlist.classList.toggle('playlist-list__playlist--hide');
-      }
-    });
-
-    evt.target.firstElementChild.nextElementSibling.classList.toggle(
-      'track-wrapper--show'
-    );
-    evt.target.classList.toggle('playlist-list__playlist--show');
-  }
-
-  // Show trackwrapper on click showing playlist tracks
-  // if(evt.target.classList.contains('playlist-list__name')){
-  //     let playlistNames = document.querySelectorAll('.playlist-list__playlist');
-
-  //     // evt.target.classList.toggle('active-playlist');
-
-  //     playlistNames.forEach((playlist) =>{
-  //         if(evt.target.parentNode !== playlist){
-  //             playlist.classList.toggle('playlist-list__playlist--hide');
-  //         }
-  //     });
-
-  //     evt.target.parentNode.firstElementChild.nextElementSibling.classList.toggle('track-wrapper--show');
-  //     evt.target.parentNode.classList.toggle('playlist-list__playlist--show');
-  // }
-});
-
-// Refactor with "genres search "
-document
-  .querySelector('.genres-filter__search')
-  .addEventListener('input', evt => {
-    let currentValue = evt.target.value;
-
-    if (currentValue === '') {
-      let input = document.getElementsByClassName('genres-list__item');
-      let filter = document
-        .querySelector('.genres-filter__search')
-        .value.toUpperCase();
-
-      // Loop through all list items, and hide those who don't match the search query
-      for (let i = 0; i < input.length; i++) {
-        let currentElem = input[i];
-        if (currentElem.textContent.toUpperCase().indexOf(filter) > -1) {
-          currentElem.style.display = '';
-        } else {
-          currentElem.style.display = 'none';
-        }
-      }
-    }
-  });
-
-// Genres Section
-eventModule.genres.addEventListener('click', evt => {
-  evt.stopPropagation();
-
-  // Genres Dropdown
-  if (evt.target.classList.contains('genres-drop__header')) {
-    let rightCaret = document.querySelector('.fa-caret-right');
-
-    let genresDiv = document.querySelector('.genres');
-
-    let genreFilterToggle = document.querySelector('.genres-filter__toggle');
-    let genreModal = genreFilterToggle.parentElement.parentElement;
-    let genreModalContent = genreFilterToggle.parentElement;
-
-    // Set up Mobile Genre Header
-    if (myModule.isMobile == true) {
-      let genreModalCloseBtn = document.querySelector('.close-modal-btn--g');
-
-      // Remove Modal Btn on first instance
-      if (genreModalCloseBtn) {
-        removeElementFromDOM(genreModalCloseBtn);
-      }
-
-      genresDiv.classList.toggle('genres-mb');
-      genreModalContent.classList.toggle('tran-modal--genre-mb');
-      document
-        .querySelector('.genres-drop__header')
-        .classList.toggle('genres-drop__header-mb');
-
-      // setTimeout(function(){
-      //     let genresFilterTabHeight = document.querySelector('.genres-filter-tab').offsetHeight
-      //     let genresSearchHeadHeight = document.querySelector('.genres-filter__search-head').offsetHeight;
-      //     let genresDropHeight = document.querySelector('.genres-search-filter').offsetHeight;
-      //     let genresList = document.querySelector('.genres-list');
-
-      //     genresList.style.height = `calc(100vh - (${genresFilterTabHeight}px + ${genresSearchHeadHeight}px + ${genresDropHeight}px + 20px))`;
-
-      // }, 10);
-    }
-
-    // Genre Caret Animation
-    rightCaret.classList.remove('no-animation');
-    rightCaret.classList.toggle('genres-active-animation');
-    genreFilterToggle.classList.toggle('genres-show');
-    genreModal.classList.toggle('tran-modal__show-modal');
-  }
-
-  // Clear All Genres Button
-  if (evt.target.className === 'genres-filter-tab__clear') {
-    let filterList = document.querySelector('.genres-filter-tab__list');
-    let chosenGenres = Array.from(document.querySelectorAll('.genres-toggle'));
-    let moodDiv = document.querySelector('.genres-search-filter-genre');
-    chosenGenres.forEach(genre => {
-      genre.classList.remove('genres-toggle');
-    });
-
-    while (filterList.firstChild) {
-      filterList.removeChild(filterList.firstChild);
-    }
-    while (moodDiv.firstChild) {
-      moodDiv.removeChild(moodDiv.firstChild);
-    }
-  }
-
-  if (evt.target.classList.contains('genres-list__item')) {
-    let chosenGenresLength = document.querySelectorAll('.genres-toggle').length;
-    let filterList = document.querySelector('.genres-filter-tab__list');
-
-    let filterTags = document.querySelectorAll('.genres-filter-tab__tag');
-    let searchFilterTags = document.querySelectorAll(
-      '.genres-search-filter-genre__tag'
-    );
-
-    if (chosenGenresLength > 4) {
-      // Remove from DOM
-      filterTags.forEach(pickedGenre => {
-        if (evt.target.textContent === pickedGenre.textContent) {
-          pickedGenre.remove();
-        }
-      });
-      searchFilterTags.forEach(pickedGenre => {
-        if (evt.target.textContent === pickedGenre.textContent) {
-          pickedGenre.remove();
-        }
-      });
-
-      evt.target.classList.remove('genres-toggle');
-    } else if (evt.target.classList.contains('genres-toggle')) {
-      // Remove from DOM
-      filterTags.forEach(pickedGenre => {
-        if (evt.target.textContent === pickedGenre.textContent) {
-          pickedGenre.remove();
-        }
-      });
-      searchFilterTags.forEach(pickedGenre => {
-        if (evt.target.textContent === pickedGenre.textContent) {
-          pickedGenre.remove();
-        }
-      });
-      evt.target.classList.remove('genres-toggle');
-    } else {
-      evt.target.classList.toggle('genres-toggle');
-      let moodDiv = document.querySelector('.genres-search-filter-genre');
-
-      myModule.sortedChosenGenres.push(evt.target.textContent);
-
-      let genreTabListItem = document.createElement('li');
-      let underSearchGenreItem = document.createElement('span');
-      let closeIcon = document.createElement('i');
-      let searchCloseIcon = document.createElement('i');
-
-      underSearchGenreItem.textContent = evt.target.textContent;
-      genreTabListItem.textContent = evt.target.textContent;
-      underSearchGenreItem.classList.add('genres-search-filter-genre__tag');
-      genreTabListItem.classList.add('genres-filter-tab__tag');
-      closeIcon.className = 'fas fa-times genres-filter-tab__x';
-      searchCloseIcon.className = 'fas fa-times genres-search-filter-genre__x';
-
-      filterList.appendChild(genreTabListItem);
-      genreTabListItem.appendChild(closeIcon);
-      underSearchGenreItem.appendChild(searchCloseIcon);
-
-      // Set up Mobile Genre Header
-
-      if (myModule.isMobile !== true) {
-        moodDiv.appendChild(underSearchGenreItem);
-      }
-    }
-  }
-
-  // Genre Tags
-  if (evt.target.className === 'genres-filter-tab__tag') {
-    let chosenGenres = Array.from(document.querySelectorAll('.genres-toggle'));
-    let searchFilterTags = document.querySelectorAll(
-      '.genres-search-filter-genre__tag'
-    );
-
-    chosenGenres.forEach(genre => {
-      if (evt.target.textContent === genre.textContent) {
-        genre.classList.remove('genres-toggle');
-        // genre.remove();
-      }
-    });
-
-    searchFilterTags.forEach(pickedGenre => {
-      if (evt.target.textContent === pickedGenre.textContent) {
-        pickedGenre.remove();
-      }
-    });
-
-    evt.target.classList.remove('genres-filter-tab__tag');
-    evt.target.remove();
-  }
-  if (evt.target.className === 'genres-search-filter-genre__tag') {
-    let chosenGenres = Array.from(document.querySelectorAll('.genres-toggle'));
-    let genreTabTags = document.querySelectorAll('.genres-filter-tab__tag');
-
-    chosenGenres.forEach(genre => {
-      if (evt.target.textContent === genre.textContent) {
-        genre.classList.remove('genres-toggle');
-        // genre.remove();
-      }
-    });
-
-    genreTabTags.forEach(genre => {
-      if (evt.target.textContent === genre.textContent) {
-        genre.remove();
-      }
-    });
-
-    evt.target.classList.remove('genres-search-filter-genre__tag');
-    evt.target.remove();
-  }
-});
-
-// Genre search filter
-eventModule.genresFilterSearch.addEventListener('keyup', () => {
-  let input = document.getElementsByClassName('genres-list__item');
-  let filter = document
-    .querySelector('.genres-filter__search')
-    .value.toUpperCase();
-
-  // Loop through all list items, and hide those who don't match the search query
-  for (let i = 0; i < input.length; i++) {
-    let currentElem = input[i];
-    if (currentElem.textContent.toUpperCase().indexOf(filter) > -1) {
-      currentElem.style.display = '';
-    } else {
-      currentElem.style.display = 'none';
-    }
-  }
-});
-
-eventModule.logoContainer.addEventListener('click', () => {
-  if (myModule.smoothingSupported) {
-    smoothingScroll('.mood');
-  } else {
-    requestAnimationFrame(function(timestamp) {
-      myModule.startTime = timestamp || new Date().getTime();
-      moveScrollPosition(timestamp, 0, 500);
-    });
-  }
-});
-
-// function scrolledInto(){
-//     let executed = false;
-
-//     return function(){
-//         if(!executed){
-//             let scrollURL = myModule.closureURL();
-//             spotifyProcessTracks(scrollURL);
-//             executed = true;
-//         }
-//         else{
-//             return -1;
-//         }
-//     }
-// }
-
-// if(scrollPosition + windowSize >=  bodyHeight - (bodyHeight * 0.20)){
-//     myModule.inRange = true;
-// let scrollURL = myModule.closureURL();
-// spotifyProcessTracks(scrollURL);
-// }
-//
-// if (myModule.inRange === true && scrollPosition + windowSize >= bodyHeight){
-//     let shootFetch = scrolledInto();
-// }
-
-//  oNce that is done and dom is back loaded, myModule.inRange = false;
-
-// Infinite Scroll
-document.addEventListener('scroll', function() {
-  const tracksDiv = document.querySelector('.tracks');
-  let scrollPosition = window.pageYOffset;
-  let windowSize = window.innerHeight;
-  let bodyHeight = document.body.offsetHeight;
-  // const wrapWrap = document.querySelector('.wrap');
-
-  // Mobile scrolling features
-  if (myModule.isMobile) {
-    let webLogo = document.querySelector('.logo');
-    clearTimeout(myModule.mobileIsScrolling);
-
-    myModule.mobileIsScrolling = setTimeout(function() {
-      webLogo.classList.remove('logo--size');
-    }, 200);
-
-    if (scrollPosition > tracksDiv.getBoundingClientRect().top) {
-      webLogo.classList.add('logo--size');
-    }
-    if (tracksDiv.getBoundingClientRect().top > 0) {
-      webLogo.classList.remove('logo--size');
-    }
-  }
-
-  for (let i = 0; i < myModule.scrollPositionTracker.length; i++) {
-    if (
-      myModule.scrollPositionTracker[i].scrollPosition > scrollPosition - 500 &&
-      myModule.scrollPositionTracker[i].scrollPosition < scrollPosition + 500
-    ) {
-      let allMedia = Array.from(
-        document.querySelectorAll('.track__progress-bar')
-      );
-      let playlistMedia = Array.from(
-        document.querySelectorAll('.playlist-track__progress-bar')
-      );
-
-      allMedia.forEach(progressBar => {
-        progressBar.style.backgroundColor =
-          myModule.scrollPositionTracker[i].color;
-      });
-
-      playlistMedia.forEach(progressBar => {
-        progressBar.style.backgroundColor =
-          myModule.scrollPositionTracker[i].color;
-      });
-
-      document.body.style.backgroundColor =
-        myModule.scrollPositionTracker[i].color;
-    }
-    if (scrollPosition < myModule.initScroll.moment) {
-      let allMedia = Array.from(
-        document.querySelectorAll('.track__progress-bar')
-      );
-      let playlistMedia = Array.from(
-        document.querySelectorAll('.playlist-track__progress-bar')
-      );
-      allMedia.forEach(progressBar => {
-        progressBar.style.backgroundColor = '#E47A67';
-      });
-
-      playlistMedia.forEach(progressBar => {
-        progressBar.style.backgroundColor = '#E47A67';
-      });
-
-      document.body.style.backgroundColor = '#E47A67';
-    }
-  }
-
-  // Only fetch new songs if a mood was submitted
-  if (tracksDiv.childNodes.length > 0) {
-    if (scrollPosition + windowSize >= bodyHeight - bodyHeight * 0.05) {
-      myModule.scrollCount++;
-
-      if (myModule.scrollCount === 1) {
-        let scrollURL = myModule.closureURL();
-
-        myModule.wasSubmitted = false;
-
-        spotifyProcessTracks(scrollURL);
-
-        if (myModule.initScroll.happened === false) {
-          myModule.initScroll.happened = true;
-          myModule.initScroll.moment = scrollPosition;
-        }
-
-        let allMedia = Array.from(
-          document.querySelectorAll('.track__progress-bar')
-        );
-        let currentColor = myModule.initColor();
-
-        let referenceObj = {
-          color: currentColor,
-          scrollPosition: scrollPosition
-        };
-
-        myModule.scrollPositionTracker.push(referenceObj);
-
-        allMedia.forEach(progressBar => {
-          progressBar.style.backgroundColor = currentColor;
-        });
-
-        document.body.style.backgroundColor = currentColor;
-      }
-    }
-  }
-});
-
-document.querySelector('.tran-modal--genre').addEventListener('click', evt => {
-  // evt.stopPropagation()
-  if (evt.target === document.querySelector('.tran-modal--genre')) {
-    closeModal();
-  }
-});
-
 function handleBackgroundColor() {
   let count = 0;
   let colors = [
@@ -2419,4 +1435,984 @@ function handleBackgroundColor() {
     console.log(count);
     return colors[count];
   };
+}
+
+function initEventListeners() {
+  // Infinite Scroll
+  document.addEventListener('scroll', function() {
+    const tracksDiv = document.querySelector('.tracks');
+    let scrollPosition = window.pageYOffset;
+    let windowSize = window.innerHeight;
+    let bodyHeight = document.body.offsetHeight;
+    // const wrapWrap = document.querySelector('.wrap');
+
+    // Mobile scrolling features
+    if (myModule.isMobile) {
+      let webLogo = document.querySelector('.logo');
+      clearTimeout(myModule.mobileIsScrolling);
+
+      myModule.mobileIsScrolling = setTimeout(function() {
+        webLogo.classList.remove('logo--size');
+      }, 200);
+
+      if (scrollPosition > tracksDiv.getBoundingClientRect().top) {
+        webLogo.classList.add('logo--size');
+      }
+      if (tracksDiv.getBoundingClientRect().top > 0) {
+        webLogo.classList.remove('logo--size');
+      }
+    }
+
+    for (let i = 0; i < myModule.scrollPositionTracker.length; i++) {
+      if (
+        myModule.scrollPositionTracker[i].scrollPosition >
+          scrollPosition - 500 &&
+        myModule.scrollPositionTracker[i].scrollPosition < scrollPosition + 500
+      ) {
+        let allMedia = Array.from(
+          document.querySelectorAll('.track__progress-bar')
+        );
+        let playlistMedia = Array.from(
+          document.querySelectorAll('.playlist-track__progress-bar')
+        );
+
+        allMedia.forEach(progressBar => {
+          progressBar.style.backgroundColor =
+            myModule.scrollPositionTracker[i].color;
+        });
+
+        playlistMedia.forEach(progressBar => {
+          progressBar.style.backgroundColor =
+            myModule.scrollPositionTracker[i].color;
+        });
+
+        document.body.style.backgroundColor =
+          myModule.scrollPositionTracker[i].color;
+      }
+      if (scrollPosition < myModule.initScroll.moment) {
+        let allMedia = Array.from(
+          document.querySelectorAll('.track__progress-bar')
+        );
+        let playlistMedia = Array.from(
+          document.querySelectorAll('.playlist-track__progress-bar')
+        );
+        allMedia.forEach(progressBar => {
+          progressBar.style.backgroundColor = '#E47A67';
+        });
+
+        playlistMedia.forEach(progressBar => {
+          progressBar.style.backgroundColor = '#E47A67';
+        });
+
+        document.body.style.backgroundColor = '#E47A67';
+      }
+    }
+
+    // Only fetch new songs if a mood was submitted
+    if (tracksDiv.childNodes.length > 0) {
+      if (scrollPosition + windowSize >= bodyHeight - bodyHeight * 0.05) {
+        myModule.scrollCount++;
+
+        if (myModule.scrollCount === 1) {
+          let scrollURL = myModule.closureURL();
+
+          myModule.wasSubmitted = false;
+
+          spotifyProcessTracks(scrollURL);
+
+          if (myModule.initScroll.happened === false) {
+            myModule.initScroll.happened = true;
+            myModule.initScroll.moment = scrollPosition;
+          }
+
+          let allMedia = Array.from(
+            document.querySelectorAll('.track__progress-bar')
+          );
+          let currentColor = myModule.initColor();
+
+          let referenceObj = {
+            color: currentColor,
+            scrollPosition: scrollPosition
+          };
+
+          myModule.scrollPositionTracker.push(referenceObj);
+
+          allMedia.forEach(progressBar => {
+            progressBar.style.backgroundColor = currentColor;
+          });
+
+          document.body.style.backgroundColor = currentColor;
+        }
+      }
+    }
+  });
+
+  // Genres Section
+  eventModule.genres.addEventListener('click', evt => {
+    evt.stopPropagation();
+
+    // Genres Dropdown
+    if (evt.target.classList.contains('genres-drop__header')) {
+      let rightCaret = document.querySelector('.fa-caret-right');
+
+      let genresDiv = document.querySelector('.genres');
+
+      let genreFilterToggle = document.querySelector('.genres-filter__toggle');
+      let genreModal = genreFilterToggle.parentElement.parentElement;
+      let genreModalContent = genreFilterToggle.parentElement;
+
+      // Set up Mobile Genre Header
+      if (myModule.isMobile == true) {
+        let genreModalCloseBtn = document.querySelector('.close-modal-btn--g');
+
+        // Remove Modal Btn on first instance
+        if (genreModalCloseBtn) {
+          removeElementFromDOM(genreModalCloseBtn);
+        }
+
+        genresDiv.classList.toggle('genres-mb');
+        genreModalContent.classList.toggle('tran-modal--genre-mb');
+        document
+          .querySelector('.genres-drop__header')
+          .classList.toggle('genres-drop__header-mb');
+
+        // setTimeout(function(){
+        //     let genresFilterTabHeight = document.querySelector('.genres-filter-tab').offsetHeight
+        //     let genresSearchHeadHeight = document.querySelector('.genres-filter__search-head').offsetHeight;
+        //     let genresDropHeight = document.querySelector('.genres-search-filter').offsetHeight;
+        //     let genresList = document.querySelector('.genres-list');
+
+        //     genresList.style.height = `calc(100vh - (${genresFilterTabHeight}px + ${genresSearchHeadHeight}px + ${genresDropHeight}px + 20px))`;
+
+        // }, 10);
+      }
+
+      // Genre Caret Animation
+      rightCaret.classList.remove('no-animation');
+      rightCaret.classList.toggle('genres-active-animation');
+      genreFilterToggle.classList.toggle('genres-show');
+      genreModal.classList.toggle('tran-modal__show-modal');
+    }
+
+    // Clear All Genres Button
+    if (evt.target.className === 'genres-filter-tab__clear') {
+      let filterList = document.querySelector('.genres-filter-tab__list');
+      let chosenGenres = Array.from(
+        document.querySelectorAll('.genres-toggle')
+      );
+      let moodDiv = document.querySelector('.genres-search-filter-genre');
+      chosenGenres.forEach(genre => {
+        genre.classList.remove('genres-toggle');
+      });
+
+      while (filterList.firstChild) {
+        filterList.removeChild(filterList.firstChild);
+      }
+      while (moodDiv.firstChild) {
+        moodDiv.removeChild(moodDiv.firstChild);
+      }
+    }
+
+    if (evt.target.classList.contains('genres-list__item')) {
+      let chosenGenresLength = document.querySelectorAll('.genres-toggle')
+        .length;
+      let filterList = document.querySelector('.genres-filter-tab__list');
+
+      let filterTags = document.querySelectorAll('.genres-filter-tab__tag');
+      let searchFilterTags = document.querySelectorAll(
+        '.genres-search-filter-genre__tag'
+      );
+
+      if (chosenGenresLength > 4) {
+        // Remove from DOM
+        filterTags.forEach(pickedGenre => {
+          if (evt.target.textContent === pickedGenre.textContent) {
+            pickedGenre.remove();
+          }
+        });
+        searchFilterTags.forEach(pickedGenre => {
+          if (evt.target.textContent === pickedGenre.textContent) {
+            pickedGenre.remove();
+          }
+        });
+
+        evt.target.classList.remove('genres-toggle');
+      } else if (evt.target.classList.contains('genres-toggle')) {
+        // Remove from DOM
+        filterTags.forEach(pickedGenre => {
+          if (evt.target.textContent === pickedGenre.textContent) {
+            pickedGenre.remove();
+          }
+        });
+        searchFilterTags.forEach(pickedGenre => {
+          if (evt.target.textContent === pickedGenre.textContent) {
+            pickedGenre.remove();
+          }
+        });
+        evt.target.classList.remove('genres-toggle');
+      } else {
+        evt.target.classList.toggle('genres-toggle');
+        let moodDiv = document.querySelector('.genres-search-filter-genre');
+
+        myModule.sortedChosenGenres.push(evt.target.textContent);
+
+        let genreTabListItem = document.createElement('li');
+        let underSearchGenreItem = document.createElement('span');
+        let closeIcon = document.createElement('i');
+        let searchCloseIcon = document.createElement('i');
+
+        underSearchGenreItem.textContent = evt.target.textContent;
+        genreTabListItem.textContent = evt.target.textContent;
+        underSearchGenreItem.classList.add('genres-search-filter-genre__tag');
+        genreTabListItem.classList.add('genres-filter-tab__tag');
+        closeIcon.className = 'fas fa-times genres-filter-tab__x';
+        searchCloseIcon.className =
+          'fas fa-times genres-search-filter-genre__x';
+
+        filterList.appendChild(genreTabListItem);
+        genreTabListItem.appendChild(closeIcon);
+        underSearchGenreItem.appendChild(searchCloseIcon);
+
+        // Set up Mobile Genre Header
+
+        if (myModule.isMobile !== true) {
+          moodDiv.appendChild(underSearchGenreItem);
+        }
+      }
+    }
+
+    // Genre Tags
+    if (evt.target.className === 'genres-filter-tab__tag') {
+      let chosenGenres = Array.from(
+        document.querySelectorAll('.genres-toggle')
+      );
+      let searchFilterTags = document.querySelectorAll(
+        '.genres-search-filter-genre__tag'
+      );
+
+      chosenGenres.forEach(genre => {
+        if (evt.target.textContent === genre.textContent) {
+          genre.classList.remove('genres-toggle');
+          // genre.remove();
+        }
+      });
+
+      searchFilterTags.forEach(pickedGenre => {
+        if (evt.target.textContent === pickedGenre.textContent) {
+          pickedGenre.remove();
+        }
+      });
+
+      evt.target.classList.remove('genres-filter-tab__tag');
+      evt.target.remove();
+    }
+    if (evt.target.className === 'genres-search-filter-genre__tag') {
+      let chosenGenres = Array.from(
+        document.querySelectorAll('.genres-toggle')
+      );
+      let genreTabTags = document.querySelectorAll('.genres-filter-tab__tag');
+
+      chosenGenres.forEach(genre => {
+        if (evt.target.textContent === genre.textContent) {
+          genre.classList.remove('genres-toggle');
+          // genre.remove();
+        }
+      });
+
+      genreTabTags.forEach(genre => {
+        if (evt.target.textContent === genre.textContent) {
+          genre.remove();
+        }
+      });
+
+      evt.target.classList.remove('genres-search-filter-genre__tag');
+      evt.target.remove();
+    }
+  });
+
+  // Genre search filter
+  eventModule.genresFilterSearch.addEventListener('keyup', () => {
+    let input = document.getElementsByClassName('genres-list__item');
+    let filter = document
+      .querySelector('.genres-filter__search')
+      .value.toUpperCase();
+
+    // Loop through all list items, and hide those who don't match the search query
+    for (let i = 0; i < input.length; i++) {
+      let currentElem = input[i];
+      if (currentElem.textContent.toUpperCase().indexOf(filter) > -1) {
+        currentElem.style.display = '';
+      } else {
+        currentElem.style.display = 'none';
+      }
+    }
+  });
+
+  eventModule.logoContainer.addEventListener('click', () => {
+    if (myModule.smoothingSupported) {
+      smoothingScroll('.mood');
+    } else {
+      requestAnimationFrame(function(timestamp) {
+        myModule.startTime = timestamp || new Date().getTime();
+        moveScrollPosition(timestamp, 0, 500);
+      });
+    }
+  });
+
+  /******* Modal Window & Mood Submit Events *******/
+
+  // Creating a new playlist
+  eventModule.createPlaylistSubmit.addEventListener('submit', evt => {
+    evt.preventDefault();
+
+    spotifyCreatePlaylist(
+      `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists`
+    );
+    closeModal();
+  });
+
+  // Importing a new playlist
+  eventModule.importPlaylistSubmit.addEventListener('submit', evt => {
+    evt.preventDefault();
+
+    let importPlaylistName = document.querySelector('.im-pl__name').value;
+    let clearValue = document.querySelector('.im-pl__name');
+    let flexibleName = importPlaylistName.toLowerCase();
+    let importedPlaylistID;
+
+    let importError = document.querySelector('.im-pl__error');
+    let tabContentContainer = document.querySelector('.tab-content-container');
+
+    tabContentContainer.classList.remove('tab-content--error');
+
+    clearValue.value = '';
+
+    if (importError) {
+      removeElementFromDOM(importError);
+    }
+
+    spotifyGrab(`me/playlists`, myModule.accessToken)
+      .then(data => {
+        return data.json();
+      })
+      .then(listOfUserPlaylists => {
+        // Cycle through to get user requested playlist ID
+        listOfUserPlaylists.items.forEach(playlist => {
+          if (flexibleName == playlist.name.toLowerCase()) {
+            importedPlaylistID = playlist.id;
+            importPlaylistName = playlist.name;
+          }
+        });
+
+        let playlistExists = updateTotalPlaylists(
+          importPlaylistName,
+          importedPlaylistID
+        );
+
+        // If no matching playlist in Spotify account
+        if (!importedPlaylistID) {
+          createImportError(
+            `Sorry, there's no playlist matching this name "${importPlaylistName}" out of your Spotify playlists!`
+          );
+
+          return -1;
+        }
+
+        // A playlist with this name has already been imported
+        if (playlistExists) {
+          createImportError(
+            `A playlist with the name "${importPlaylistName}" has already been imported.`
+          );
+          return -1;
+        }
+
+        playlistPlate(importPlaylistName, importedPlaylistID);
+        closeModal();
+
+        // Fetch for that specfic ID
+        // Fetch that URL get the returned tracks and put into creat Playlist tracks
+        spotifyGrab(
+          `users/${
+            myModule.userInfo.id
+          }/playlists/${importedPlaylistID}/tracks`,
+          myModule.accessToken
+        )
+          .then(response => {
+            return response.json();
+          })
+          .then(importedTracks => {
+            importedTracks.items.forEach(playlistSong => {
+              createPlaylistTrackBody(playlistSong, importPlaylistName);
+            });
+            confirmAction(importPlaylistName, 'import');
+          });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  });
+
+  // Move song from one playlist to another
+  eventModule.moveSongModal.addEventListener('submit', evt => {
+    // Grab selection chosen from a User
+    evt.preventDefault();
+    let mvsSelect = document.querySelector('.mvs-select');
+    let moveSongForm = document.querySelector('.tran-modal__mv-song');
+    let songAttachment = document.querySelector('.song-action');
+    let tranModal = document.querySelector('.tran-modal');
+
+    // Why remove this?
+    removeElementFromDOM(mvsSelect);
+    removeElementFromDOM(songAttachment);
+
+    let moveSong = [myModule.deleteThis];
+    let moveToThisPlaylist;
+    myModule.playlistNameValue = mvsSelect.value;
+
+    moveToThisPlaylist = getPlaylistID(myModule.playlistNameValue);
+
+    tranModal.classList.toggle('tran-modal__show-modal');
+
+    // tranModal.classList.toggle('tran-modal__show');
+    moveSongForm.classList.toggle('tran-modal__show-form');
+
+    deleteSong(
+      `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${
+        myModule.currentChosenPlaylist.id
+      }/tracks`,
+      myModule.deleteThis
+    )
+      .then(response => {
+        response.json();
+      })
+      .then(() => {
+        // Get back updated playlist *** code from add songs to playlist section ** place into function
+        spotifyGrab(
+          `users/${myModule.userInfo.id}/playlists/${
+            myModule.currentChosenPlaylist.id
+          }/tracks`,
+          myModule.accessToken
+        )
+          .then(playlist => {
+            return playlist.json();
+          })
+
+          .then(updatedPlaylist => {
+            refreshPlaylistBody(myModule.currentChosenPlaylist.name);
+
+            updatedPlaylist.items.forEach(playlistSong => {
+              createPlaylistTrackBody(playlistSong);
+            });
+          })
+          .then(() => {
+            moveSongFromPlaylist(
+              `https://api.spotify.com/v1/users/${
+                myModule.userInfo.id
+              }/playlists/${moveToThisPlaylist}/tracks`,
+              moveSong,
+              moveToThisPlaylist
+            );
+          });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  });
+
+  // Delete song from Playlist
+  eventModule.deleteSongModal.addEventListener('submit', evt => {
+    evt.preventDefault();
+
+    let delSongForm = document.querySelector('.tran-modal__del-song');
+
+    let songAttachment = document.querySelector('.song-action');
+    let tranModal = document.querySelector('.tran-modal');
+
+    removeElementFromDOM(songAttachment);
+    // deleteModal.classList.toggle("delete-modal__show-modal");
+
+    delSongForm.classList.toggle('tran-modal__show-form');
+    tranModal.classList.toggle('tran-modal__show-modal');
+
+    deleteSong(
+      `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${
+        myModule.currentChosenPlaylist.id
+      }/tracks`,
+      myModule.deleteThis
+    )
+      .then(response => {
+        response.json();
+      })
+      .then(() => {
+        // Get back updated playlist *** code from add songs to playlist section ** place into function
+        spotifyGrab(
+          `users/${myModule.userInfo.id}/playlists/${
+            myModule.currentChosenPlaylist.id
+          }/tracks`,
+          myModule.accessToken
+        )
+          .then(playlist => {
+            return playlist.json();
+          })
+          .then(updatedPlaylist => {
+            refreshPlaylistBody(myModule.currentChosenPlaylist.name);
+
+            updatedPlaylist.items.forEach(playlistSong => {
+              createPlaylistTrackBody(playlistSong);
+            });
+          });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  });
+
+  // Remove a playlist
+  eventModule.removePlaylistModal.addEventListener('submit', evt => {
+    evt.preventDefault();
+    evt.stopPropagation();
+
+    let tranModal = document.querySelector('.tran-modal');
+    let removePlaylistForm = document.querySelector('.tran-modal__rm-playlist');
+
+    let currentHiddenPlaylists = document.querySelectorAll(
+      '.playlist-list__playlist--hide'
+    );
+
+    // Show other playlist when one chosen is deleted
+    currentHiddenPlaylists.forEach(hiddenElement => {
+      hiddenElement.classList.remove('playlist-list__playlist--hide');
+    });
+
+    tranModal.classList.toggle('tran-modal__show-modal');
+    removePlaylistForm.classList.toggle('tran-modal__show-form');
+
+    myModule.grandparentOfTarget.childNodes.forEach(child => {
+      if (child === myModule.deleteMe) {
+        myModule.grandparentOfTarget.removeChild(child);
+      }
+    });
+    // Takes in a playlist name to fetch the ID and index position to remove from Total Playlists array
+
+    removeFromTotalPlaylists(myModule.deleteMe.childNodes[0].textContent);
+  });
+
+  // Show music
+  eventModule.moodForm.addEventListener('submit', evt => {
+    evt.preventDefault();
+
+    const userMood = document.querySelector('.mood__val');
+    const userMoodValue = userMood.value.toLowerCase();
+    const playlistFooter = document.querySelector('.playlist');
+
+    myModule.storeMoodValue = userMood.value;
+    // const tracksDiv = document.querySelector('.tracks');
+    myModule.currentTracks = [];
+
+    myModule.wasSubmitted = true;
+
+    let storeGenres = cleanUpGenres();
+    moodSubmitCleanUp();
+
+    // userMood.value = '';
+
+    // Fetch emotion json from my database
+    fetch(`/user/mood/${userMoodValue}`)
+      .then(data => {
+        return data.json();
+      })
+      .then(audioFeatures => {
+        // No music for that mood
+        if (audioFeatures.length === 0) {
+          noTrackResult();
+          // smoothingScroll('.no-result');
+          return -1;
+        } else {
+          const maxVal = Math.max(...audioFeatures[0].idNumbers);
+          const minVal = Math.min(...audioFeatures[0].idNumbers);
+
+          myModule.closureURL = buildURL(
+            storeGenres,
+            maxVal,
+            minVal,
+            audioFeatures
+          );
+          let newURL = myModule.closureURL();
+
+          playlistFooter.classList.add('playlist__show');
+
+          spotifyProcessTracks(newURL);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  });
+
+  // Modal's Close Button
+  eventModule.closeModalBtn.forEach(btn => {
+    btn.addEventListener('click', closeModal);
+  });
+  eventModule.declineModalBtn.forEach(btn => {
+    btn.addEventListener('click', closeModal);
+  });
+
+  /******  Feature Events *******/
+
+  // Expand playlist footer
+  eventModule.playlistFooter.addEventListener('click', evt => {
+    const playlist = document.querySelector('.playlist');
+    const createBtn = document.querySelector('.playlist-create');
+
+    const importTab = document.getElementById('im-pl-tab');
+    const createTab = document.getElementById('cr-pl-tab');
+    let tranModal = document.querySelector('.tran-modal');
+    let crImPlaylistModal = document.querySelector('.modal');
+
+    if (evt.target.className === 'playlist-bar') {
+      playlist.classList.toggle('extended-playlist');
+
+      if (myModule.isMobile) {
+        let logoContainer = document.querySelector('.logo-container');
+        logoContainer.classList.toggle('show__elem');
+      }
+    }
+
+    if (playlist.classList.contains('extended-playlist')) {
+      createBtn.textContent = 'Create New Playlist +';
+    }
+
+    if (!playlist.classList.contains('extended-playlist')) {
+      createBtn.innerHTML = '<span class="playlist-create__sign">+</span>';
+      // createBtn.textContent = '+';
+    }
+
+    if (evt.target.className === 'playlist-import') {
+      importTab.checked = true;
+      crImPlaylistModal.classList.toggle('modal--show');
+    }
+
+    if (evt.target.className === 'playlist-create') {
+      createTab.checked = true;
+      crImPlaylistModal.classList.toggle('modal--show');
+    }
+    if (evt.target.className === 'playlist-create__sign') {
+      createTab.checked = true;
+      crImPlaylistModal.classList.toggle('modal--show');
+    }
+
+    let playlistName;
+
+    // Playlist Name & ID
+    if (evt.target.classList.contains('playlist-list__playlist')) {
+      let referenceTarget = evt.target.firstChild.childNodes[1];
+      let svgContainer = getChildElementByClass(
+        referenceTarget,
+        'fa-chevron-right'
+      );
+
+      let playlistHidden = document.querySelectorAll(
+        '.playlist-list__playlist--hide'
+      );
+
+      svgContainer.classList.remove('no-animation');
+      svgContainer.classList.toggle('playlist-active-animation');
+
+      playlistName = evt.target.childNodes[0].textContent || ''; // need to fix
+
+      myModule.currentChosenPlaylist.name = playlistName;
+
+      playlistHidden.forEach(playlist => {
+        let playlistSVG = playlist.children[0].firstElementChild.firstChild;
+        playlistSVG.classList.add('no-animation');
+      });
+
+      // let trackWrapper = getChildElementByClass(evt.target, 'track-wrapper');
+      // let playlistTracks = Array.from(trackWrapper.children);
+
+      // playlistTracks.forEach((track) =>{
+      //     let trackMedia = getChildElementByClass(track, 'playlist-track__media');
+      //     let playPath = trackMedia.firstElementChild.firstChild.lastChild;
+
+      //     playPath.classList.add('inactive-dash');
+      // })
+
+      // if(!playlistShow){
+      //     playlistAll.forEach((playlist) => {
+
+      //     })
+      // }
+
+      // Playlist ID
+      for (let k in myModule.totalPlaylists) {
+        if (playlistName === myModule.totalPlaylists[k].name) {
+          // currentChosenPlaylist.name = totalPlaylists[k].name;
+          myModule.currentChosenPlaylist.id = myModule.totalPlaylists[k].id;
+        }
+      }
+    }
+
+    // Remove a playlist
+    if (evt.target.className === 'remove-playlist') {
+      let removePlaylistSpan = document.querySelector('.rm-playlist');
+      let removePlaylistForm = document.querySelector(
+        '.tran-modal__rm-playlist'
+      );
+
+      tranModal.classList.toggle('tran-modal__show-modal');
+      removePlaylistForm.classList.toggle('tran-modal__show-form');
+
+      removePlaylistSpan.textContent = `"${
+        evt.target.parentElement.childNodes[0].textContent
+      }"?`;
+
+      myModule.grandparentOfTarget = evt.target.parentElement.parentElement;
+      myModule.deleteMe = evt.target.parentElement;
+    }
+
+    // Delete Song Modal
+    if (evt.target.classList.contains('delete-modal-trigger')) {
+      evt.stopPropagation();
+
+      // HTML Dom Attachment variables
+      let deleteForm = document.querySelector('.tran-modal__del-song');
+      let deleteFormHook = document.querySelector(
+        '.tran-modal__del-verify-head'
+      );
+
+      // Dom traversing / set attributes
+      let songActionBody = modalSongBodyAttachment(evt.target);
+
+      tranModal.classList.toggle('tran-modal__show-modal');
+      deleteForm.classList.toggle('tran-modal__show-form');
+
+      deleteFormHook.parentNode.insertBefore(
+        songActionBody.songAction,
+        deleteFormHook.nextElementSibling
+      );
+    }
+
+    // Move Song from one playlist to another
+    if (evt.target.classList.contains('move-song')) {
+      // evt.stopPropagation();
+
+      let moveSongForm = document.querySelector('.tran-modal__mv-song');
+      let playlistSelect = document.createElement('select');
+      let playlistOptions = document.createElement('option');
+      let hookForSelectElem = document.querySelector(
+        '.tran-modal__mv-verify-head'
+      );
+
+      let songActionBody = modalSongBodyAttachment(evt.target);
+
+      // Create options for select
+      for (let i = 0; i < myModule.totalPlaylists.length; i++) {
+        if (
+          myModule.currentChosenPlaylist.name !==
+          myModule.totalPlaylists[i].name
+        ) {
+          playlistOptions = document.createElement('option');
+          playlistOptions.setAttribute(
+            'value',
+            myModule.totalPlaylists[i].name
+          );
+          playlistOptions.setAttribute(
+            'data-playlistId',
+            myModule.totalPlaylists[i].id
+          );
+          playlistOptions.textContent = myModule.totalPlaylists[i].name;
+
+          playlistSelect.appendChild(playlistOptions);
+        }
+      }
+
+      playlistSelect.classList.add('mvs-select');
+
+      hookForSelectElem.parentNode.insertBefore(
+        playlistSelect,
+        hookForSelectElem.nextElementSibling
+      );
+      hookForSelectElem.parentNode.insertBefore(
+        songActionBody.songAction,
+        hookForSelectElem.nextElementSibling
+      );
+
+      tranModal.classList.toggle('tran-modal__show-modal');
+      moveSongForm.classList.toggle('tran-modal__show-form');
+    }
+
+    // More options drop down
+    if (evt.target.className === 'options') {
+      let currentShownOptions = document.querySelector('.show__elem');
+      if (currentShownOptions) {
+        currentShownOptions.classList.toggle('show__elem');
+      }
+      myModule.optionsHelper = evt.target;
+      evt.target.firstElementChild.classList.toggle('show__elem');
+    }
+
+    // Show trackwrapper on click showing playlist tracks
+    if (evt.target.classList.contains('playlist-list__playlist')) {
+      let playlistNames = document.querySelectorAll('.playlist-list__playlist');
+
+      // evt.target.classList.toggle('active-playlist');
+
+      playlistNames.forEach(playlist => {
+        if (evt.target !== playlist) {
+          playlist.classList.toggle('playlist-list__playlist--hide');
+        }
+      });
+
+      evt.target.firstElementChild.nextElementSibling.classList.toggle(
+        'track-wrapper--show'
+      );
+      evt.target.classList.toggle('playlist-list__playlist--show');
+    }
+
+    // Show trackwrapper on click showing playlist tracks
+    // if(evt.target.classList.contains('playlist-list__name')){
+    //     let playlistNames = document.querySelectorAll('.playlist-list__playlist');
+
+    //     // evt.target.classList.toggle('active-playlist');
+
+    //     playlistNames.forEach((playlist) =>{
+    //         if(evt.target.parentNode !== playlist){
+    //             playlist.classList.toggle('playlist-list__playlist--hide');
+    //         }
+    //     });
+
+    //     evt.target.parentNode.firstElementChild.nextElementSibling.classList.toggle('track-wrapper--show');
+    //     evt.target.parentNode.classList.toggle('playlist-list__playlist--show');
+    // }
+  });
+
+  // Refactor with "genres search "
+  document
+    .querySelector('.genres-filter__search')
+    .addEventListener('input', evt => {
+      let currentValue = evt.target.value;
+
+      if (currentValue === '') {
+        let input = document.getElementsByClassName('genres-list__item');
+        let filter = document
+          .querySelector('.genres-filter__search')
+          .value.toUpperCase();
+
+        // Loop through all list items, and hide those who don't match the search query
+        for (let i = 0; i < input.length; i++) {
+          let currentElem = input[i];
+          if (currentElem.textContent.toUpperCase().indexOf(filter) > -1) {
+            currentElem.style.display = '';
+          } else {
+            currentElem.style.display = 'none';
+          }
+        }
+      }
+    });
+
+  document
+    .querySelector('.tran-modal--genre')
+    .addEventListener('click', evt => {
+      // evt.stopPropagation()
+      if (evt.target === document.querySelector('.tran-modal--genre')) {
+        closeModal();
+      }
+    });
+
+  /******* Window Events *******/
+
+  // Song Volume
+  window.addEventListener('mouseup', evt => {
+    if (evt.target.classList.contains('playlist-track__volume-slider')) {
+      songVolume(evt.target);
+    }
+    if (evt.target.classList.contains('track__volume-slider')) {
+      songVolume(evt.target);
+    }
+  });
+  window.addEventListener('input', evt => {
+    if (evt.target.classList.contains('playlist-track__volume-slider')) {
+      songVolume(evt.target);
+    }
+    if (evt.target.classList.contains('track__volume-slider')) {
+      songVolume(evt.target);
+    }
+  });
+
+  // When the user clicks anywhere outside of the modal, close it
+  window.addEventListener('click', evt => {
+    let tranModal = document.querySelector('.tran-modal');
+    let crImPlaylistModal = document.querySelector('.modal');
+    let genres = document.querySelector('.genres-show');
+    let genreModal = document.querySelector('.tran-modal--genre');
+
+    // Creating/Importing a playlist modal view
+    if (evt.target == crImPlaylistModal) {
+      let tabContentContainer = document.querySelector(
+        '.tab-content-container'
+      );
+      let errorMess = document.querySelector('.im-pl__error');
+
+      crImPlaylistModal.classList.toggle('modal--show');
+      tabContentContainer.classList.remove('tab-content--error');
+
+      if (errorMess) {
+        removeElementFromDOM(errorMess);
+      }
+    }
+
+    // Move playlist modal view
+    if (evt.target === tranModal) {
+      closeModal();
+    }
+
+    if (evt.target === genreModal) {
+      closeModal();
+    }
+    if (evt.target.classList.contains('tran-modal--genre')) {
+      closeModal();
+    }
+
+    // More Options on playlist Tracks
+    if (evt.target !== myModule.optionsHelper) {
+      let dropdowns = document.getElementsByClassName('options-dropdown');
+
+      for (let i = 0; i < dropdowns.length; i++) {
+        dropdowns[i].classList.remove('show__elem');
+      }
+    }
+    if (evt.target !== genres) {
+      let genreAnimation = document.querySelector('.genres-active-animation');
+
+      if (genreAnimation) {
+        genreAnimation.classList.remove('genres-active-animation');
+        genres.classList.remove('genres-show');
+      }
+    }
+  });
+}
+
+/**
+ *
+ * Creates an element with optional configuration.
+ * @param {String} tag
+ * @param {Object} config - Takes a valid Element attribute property and key.
+ *                          Key must be a string or an array
+ *
+ */
+function createElement(tag, config) {
+  const elem = document.createElement(tag);
+
+  if (config === undefined) return elem;
+
+  for (let property in config) {
+    if (property === 'textContent') elem.textContent = config[property];
+    if (typeof config[property] === 'object')
+      elem.setAttribute(property, config[property].join(' '));
+    else {
+      elem.setAttribute(property, config[property]);
+    }
+  }
+
+  return elem;
 }
