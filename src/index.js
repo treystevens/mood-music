@@ -1,6 +1,7 @@
-import spotifyGrab from './utils/fetch';
+import { spotifyGrab, addSongToPlaylist } from './utils/fetch';
+import createSongBody, { advance } from './audio';
 
-let myModule = (function() {
+export let myModule = (function() {
   let module = {};
 
   module.accessToken = getParameterByName('access_token');
@@ -364,53 +365,6 @@ function modalSongBodyAttachment(element) {
   return songBody;
 }
 
-// Song Duration Div Show
-function advance(duration, element, targetedElement) {
-  let increment = 10 / duration;
-  let percent = Math.min(increment * element.currentTime * 10, 100);
-  targetedElement.style.width = `${percent}%`;
-  startTimer(duration, element, percent, targetedElement);
-}
-
-function startTimer(duration, element, percentage, targetedElement) {
-  if (percentage < 100) {
-    setTimeout(function() {
-      advance(duration, element, targetedElement);
-    }, 100);
-  }
-  if (percentage == 100) {
-    // refactor
-    if (targetedElement.classList.contains('track__progress-bar')) {
-      let parentOfTarget = targetedElement.parentNode;
-      let trackMedia = getChildElementByClass(parentOfTarget, 'track__media');
-      let mediaControls = getChildElementByClass(trackMedia, 'media-controls');
-      let gPath = getChildElementByClass(mediaControls, 'media-controls')
-        .firstChild;
-      let playPath = gPath.lastChild;
-      let pausePath = gPath.firstElementChild;
-
-      mediaControls.classList.toggle('media-controls-toggle');
-      playPath.classList.toggle('play-ani');
-      pausePath.classList.toggle('pause-ani');
-    }
-    if (targetedElement.classList.contains('playlist-track__progress-bar')) {
-      let grandparentTarget = targetedElement.parentNode.parentNode;
-      let trackMedia = getChildElementByClass(
-        grandparentTarget,
-        'playlist-track__media'
-      );
-      let mediaControls = getChildElementByClass(trackMedia, 'media-controls');
-      let gPath = getChildElementByClass(mediaControls, 'media-controls')
-        .firstChild;
-      let playPath = gPath.lastChild;
-      let pausePath = gPath.firstElementChild;
-
-      playPath.classList.toggle('play-ani');
-      pausePath.classList.toggle('pause-ani');
-    }
-  }
-}
-
 // Takes a String as an argument for Import Modal Error Message
 function createImportError(errorMessage) {
   let errorBody = document.createElement('span');
@@ -608,7 +562,7 @@ function spotifyCreatePlaylist(url) {
     });
 }
 
-function getChildElementByClass(element, className) {
+export function getChildElementByClass(element, className) {
   // Check if element already contains class
   if (element.classList.contains(className)) {
     return element;
@@ -676,7 +630,7 @@ function playlistPlate(name, id) {
   playlistColorSequence();
 }
 
-function confirmAction(playlistName, source) {
+export function confirmAction(playlistName, source) {
   let confirmationContainer = document.createElement('div');
   let confirmationInfo = document.createElement('h1');
 
@@ -708,50 +662,6 @@ function confirmAction(playlistName, source) {
   }, 2000);
 }
 
-function addSongToPlaylist(url, songLinks, playlistID) {
-  let data = {
-    uris: songLinks
-  };
-  const init = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + myModule.accessToken
-    },
-    body: JSON.stringify(data)
-  };
-
-  // Add song(s) to playlist
-  fetch(url, init)
-    .then(response => {
-      while (myModule.songQueue.length > 0) {
-        myModule.songQueue.pop();
-      }
-      return response.json();
-    })
-    .then(() => {
-      // Get back updated playlist
-      spotifyGrab(
-        `users/${myModule.userInfo.id}/playlists/${playlistID}/tracks`,
-        myModule.accessToken
-      )
-        .then(playlist => {
-          return playlist.json();
-        })
-        .then(updatedPlaylist => {
-          refreshPlaylistBody(myModule.currentChosenPlaylist.name);
-
-          updatedPlaylist.items.forEach(playlistSong => {
-            createPlaylistTrackBody(playlistSong);
-          });
-          confirmAction(myModule.currentChosenPlaylist.name, 'song');
-        });
-    })
-    .catch(err => {
-      console.log(err);
-    });
-}
-
 function smoothingScroll(elementName) {
   window.scrollTo({
     top: 500,
@@ -773,197 +683,8 @@ function smoothingScroll(elementName) {
   });
 }
 
-// Create DOM structure from Fetched songs
-function createSongBody(trackObj) {
-  const songCard = createElement('div', { class: 'track' });
-  const songImg = createElement('img', {
-    alt: `Artwork for the song "${trackObj.song_title}", from ${
-      trackObj.artist
-    }`,
-    class: 'track__img',
-    src: trackObj.album_img.url
-  });
-  const songName = createElement('h1', {
-    class: 'track__name',
-    textContent: trackObj.song_title
-  });
-  const songArtist = createElement('h2', {
-    class: 'track__artist',
-    textContent: trackObj.artist
-  });
-  const playlistAddBtn = createElement('div', {
-    class: ['track__pl-add', 'cr-pl__btn'],
-    'data-track-uri': trackObj.uri
-  });
-  const songCardsContainer = document.querySelector('.tracks');
-  const progressBar = createElement('div', { class: 'track__progress-bar' });
-  const trackLink = createElement('audio', {
-    class: 'track__link',
-    src: trackObj.preview_url
-  });
-  const playerControl = createElement('div', { class: 'track__media' });
-
-  playerControl.innerHTML =
-    '<svg class="media-controls" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><g fill="none" fill-rule="evenodd"><path class="media-controls__pause inactive-dash-pause" stroke="#3F3E3E" stroke-linecap="round" stroke-linejoin="round" stroke-width="5" d="M48,25 L48,71.8053097 C45.1666667,73.6017699 42.3333333,74.5 39.5,74.5 C36.6666667,74.5 33.8333333,73.6017699 31,71.8053097"/><path class="media-controls__play inactive-dash" stroke-linecap="round" stroke="#3F3E3E" stroke-width="5" d="M72.0763886,68.3352333 L62.1474475,68.3352333 L27.2723011,68.3352333 C25.0631621,68.3352333 23.2723011,66.5443723 23.2723011,64.3352333 C23.2723011,63.4859068 23.542644,62.6586256 24.0441798,61.9731933 L46.4462236,31.3570669 C47.7507422,29.5742247 50.2535427,29.1864669 52.0363849,30.4909855 C52.3678287,30.7335054 52.6599463,31.025623 52.9024662,31.3570669 L75.3045099,61.9731933 C76.6090286,63.7560355 76.2212708,66.258836 74.4384286,67.5633546 C73.7529963,68.0648904 72.9257152,68.3352333 72.0763886,68.3352333 L68.7548694,68.3352333" transform="rotate(90 49.674 49.027)"/></g></svg>';
-
-  // Attach to DOM
-  songCardsContainer.appendChild(songCard);
-  songCard.appendChild(songImg);
-  songImg.appendChild(trackLink);
-  songCard.appendChild(playerControl);
-  songCard.appendChild(songName);
-  songCard.appendChild(songArtist);
-  songCard.appendChild(playlistAddBtn);
-
-  // Initialize Volume
-  const volumeIcon = createElement('i', { class: ['fas', 'fa-volume-up'] });
-  const volumeContainer = createElement('div', {
-    class: 'track__volume-container'
-  });
-  const volumeSlider = createElement('input', {
-    type: 'range',
-    min: '1',
-    max: '100',
-    value: '60',
-    class: 'track__volume-slider'
-  });
-  volumeContainer.appendChild(volumeIcon);
-  volumeContainer.appendChild(volumeSlider);
-  playerControl.insertAdjacentElement('afterbegin', progressBar);
-  playerControl.insertAdjacentElement('beforeend', volumeContainer);
-
-  playlistAddBtn.innerHTML =
-    '<svg class="track__svg-add-btn" xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 100 100"><g fill="none" fill-rule="evenodd"><circle cx="50" cy="50" r="50" fill="#469B6E"/><g fill="#FFF" transform="translate(25.926 25.926)"><rect width="11.111" height="48.148" x="18.519" rx="5" transform="rotate(-90 24.074 24.074)"/><rect width="11.111" height="48.148" x="18.519" rx="5"/></g></g></svg>';
-
-  // Preview Songs change to add an   event
-  let audioTrack = new Audio(trackLink.href);
-  trackLink.addEventListener('click', evt => {
-    evt.preventDefault();
-
-    audioTrack.paused ? audioTrack.play() : audioTrack.pause();
-  });
-
-  // Reset the count for Scrolling Fetch
-  myModule.scrollCount = 0;
-
-  // Refactor out event listeners these should be delegated by the parent div.
-  songCardImgListener(songImg);
-
-  playerControlListener(playerControl);
-
-  // Add tracks to playlist
-  playlistAddBtnListener(playlistAddBtn);
-
-  trackLinkListener(trackLink);
-}
-
-function trackLinkListener(elem) {
-  elem.addEventListener('playing', evt => {
-    let song = evt.target;
-
-    let duration = song.duration;
-    let parentOfEvent = song.parentElement.parentElement;
-    let progressBar = getChildElementByClass(parentOfEvent, 'track__media')
-      .firstElementChild;
-
-    advance(duration, elem, progressBar);
-  });
-}
-
-function playlistAddBtnListener(elem) {
-  elem.addEventListener('click', evt => {
-    // let addedSong = [getSongURI(evt.target)];
-    let addedSong = evt.target.getAttribute('data-track-uri');
-    let crImPlaylistModal = document.querySelector('.modal');
-    const createTab = document.getElementById('cr-pl-tab');
-    createTab.checked = true;
-
-    if (myModule.totalPlaylists.length === 0) {
-      let queuedSong = addedSong;
-      myModule.songQueue.push(queuedSong);
-
-      // Pop out Playlist create modal..change to toggle class
-
-      crImPlaylistModal.classList.toggle('modal--show');
-    } else if (myModule.totalPlaylists.length === 1) {
-      myModule.currentChosenPlaylist.name = myModule.totalPlaylists[0].name;
-      myModule.currentChosenPlaylist.id = myModule.totalPlaylists[0].id;
-
-      addSongToPlaylist(
-        `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${
-          myModule.currentChosenPlaylist.id
-        }/tracks`,
-        [addedSong],
-        myModule.currentChosenPlaylist.id
-      );
-    } else {
-      addSongToPlaylist(
-        `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${
-          myModule.currentChosenPlaylist.id
-        }/tracks`,
-        [addedSong],
-        myModule.currentChosenPlaylist.id
-      );
-    }
-  });
-}
-
-function playerControlListener(elem) {
-  elem.addEventListener('click', evt => {
-    // refactor into track event listener
-    if (evt.target.classList.contains('media-controls')) {
-      let gSVG = evt.target.firstChild;
-      let pausePath = gSVG.firstChild;
-      let playPath = gSVG.lastChild;
-      // let mediaControlsTarget = evt.target
-
-      playPath.classList.remove('inactive-dash');
-      pausePath.classList.remove('inactive-dash-pause');
-
-      playPath.classList.toggle('play-ani');
-      pausePath.classList.toggle('pause-ani');
-      evt.target.classList.toggle('media-controls-toggle');
-
-      let audioTrack = Array.from(
-        evt.target.parentElement.parentElement.children
-      );
-
-      audioTrack.forEach(child => {
-        if (child.className === 'track__img') {
-          let songAudio = child.firstChild;
-          songAudio.paused ? songAudio.play() : songAudio.pause();
-        }
-      });
-    }
-  });
-}
-
-function songCardImgListener(elem) {
-  // Refactor out event listeners these should be delegated by the parent div.
-  elem.addEventListener('click', evt => {
-    let parentOfTarget = evt.target.parentElement;
-    // make this into a function, also used in advance function for progress bar
-    let trackMedia = getChildElementByClass(parentOfTarget, 'track__media');
-    let mediaControls = getChildElementByClass(trackMedia, 'media-controls');
-    let gPath = getChildElementByClass(mediaControls, 'media-controls')
-      .firstChild;
-    let playPath = gPath.lastChild;
-    let pausePath = gPath.firstElementChild;
-
-    playPath.classList.remove('inactive-dash');
-    pausePath.classList.remove('inactive-dash-pause');
-
-    playPath.classList.toggle('play-ani');
-    pausePath.classList.toggle('pause-ani');
-    mediaControls.classList.toggle('media-controls-toggle');
-
-    evt.target.firstElementChild.paused
-      ? evt.target.firstElementChild.play()
-      : evt.target.firstElementChild.pause();
-  });
-}
 // Need to see what can be refactored from this and createSongBody function
-function createPlaylistTrackBody(playlistObj, importedPlaylistName) {
+export function createPlaylistTrackBody(playlistObj, importedPlaylistName) {
   const playlistTrackDiv = document.createElement('div');
   const playerControl = document.createElement('div');
   const img = document.createElement('img');
@@ -1212,7 +933,7 @@ function songVolume(element) {
   song.volume = sliderValue;
 }
 
-function refreshPlaylistBody(playlistName) {
+export function refreshPlaylistBody(playlistName) {
   let updateThisPlaylist;
   let trackWrapper = Array.from(
     document.getElementsByClassName('track-wrapper')
@@ -2390,29 +2111,4 @@ function initEventListeners() {
       }
     }
   });
-}
-
-/**
- *
- * Creates an element with optional configuration.
- * @param {String} tag
- * @param {Object} config - Takes a valid Element attribute property and key.
- *                          Key must be a string or an array
- *
- */
-function createElement(tag, config) {
-  const elem = document.createElement(tag);
-
-  if (config === undefined) return elem;
-
-  for (let property in config) {
-    if (property === 'textContent') elem.textContent = config[property];
-    if (typeof config[property] === 'object')
-      elem.setAttribute(property, config[property].join(' '));
-    else {
-      elem.setAttribute(property, config[property]);
-    }
-  }
-
-  return elem;
 }
