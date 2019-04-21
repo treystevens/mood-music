@@ -138,18 +138,34 @@ function playerControlListener(elem, audioElem) {
 
 /**
  *
+ * Handles play and pause audio SVG state when user clicks on song image.
+ * @param {HTMLElement} elem
+ */
+function songCardImgListener(elem, refElem, audioElem) {
+  elem.addEventListener('click', () => {
+    animatePlaySVG(refElem);
+    togglePlay(audioElem);
+  });
+}
+
+/**
+ *
+ * Adds a chosen song to a playlist.
+ * - If there are no playlists the song gets added to a queue.
+ * - If not, there is a total of one playlist the song is added to the available playlist/
+ * - Lastly, song is added to the user's chosen playlist.
  *
  * @param {HTMLElement} elem
  */
 function playlistAddBtnListener(elem) {
   elem.addEventListener('click', evt => {
-    let addedSong = evt.target.getAttribute('data-track-uri');
-    let crImPlaylistModal = document.querySelector('.modal');
+    const addedSong = evt.target.getAttribute('data-track-uri');
+    const crImPlaylistModal = document.querySelector('.modal');
     const createTab = document.getElementById('cr-pl-tab');
     createTab.checked = true;
 
     if (myModule.totalPlaylists.length === 0) {
-      let queuedSong = addedSong;
+      const queuedSong = addedSong;
       myModule.songQueue.push(queuedSong);
 
       crImPlaylistModal.classList.toggle('modal--show');
@@ -173,18 +189,6 @@ function playlistAddBtnListener(elem) {
         myModule.currentChosenPlaylist.id
       );
     }
-  });
-}
-
-/**
- *
- * Handles play and pause audio SVG state when user clicks on song image.
- * @param {HTMLElement} elem
- */
-function songCardImgListener(elem, refElem, audioElem) {
-  elem.addEventListener('click', () => {
-    animatePlaySVG(refElem);
-    togglePlay(audioElem);
   });
 }
 
@@ -216,12 +220,10 @@ function togglePlay(elem) {
   elem.paused ? elem.play() : elem.pause();
 }
 
-export default createSongBody;
-
 // Song Duration Div Show
 export function advance(duration, element, targetedElement) {
-  let increment = 10 / duration;
-  let percent = Math.min(increment * element.currentTime * 10, 100);
+  const increment = 10 / duration;
+  const percent = Math.min(increment * element.currentTime * 10, 100);
   targetedElement.style.width = `${percent}%`;
   startTimer(duration, element, percent, targetedElement);
 }
@@ -264,3 +266,5 @@ function startTimer(duration, element, percentage, targetedElement) {
     }
   }
 }
+
+export default createSongBody;
