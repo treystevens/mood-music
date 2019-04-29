@@ -1043,6 +1043,11 @@ body {
         display: flex;
         justify-content: flex-end;
         backface-visibility: hidden;
+        align-items: center;
+    }
+
+    &__volume-slider {
+        padding: .6em 0;
     }
 
 
