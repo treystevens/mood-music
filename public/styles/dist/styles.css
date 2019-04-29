@@ -956,10 +956,10 @@ body {
   justify-content: flex-end;
   -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
+  align-items: center;
 }
-.track__media {
-  margin-bottom: 20px;
-  height: 150px;
+.track__volume-slider {
+  padding: 0.6em 0;
 }
 .track__svg-add-btn {
   cursor: pointer;

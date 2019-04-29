@@ -884,6 +884,10 @@ body {
   display: flex;
   justify-content: flex-end;
   backface-visibility: hidden;
+  align-items: center;
+}
+.track__volume-slider {
+  padding: 0.6em 0;
 }
 .track__svg-add-btn {
   cursor: pointer;
