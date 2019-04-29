@@ -885,10 +885,6 @@ body {
   justify-content: flex-end;
   backface-visibility: hidden;
 }
-.track__media {
-  margin-bottom: 20px;
-  height: 150px;
-}
 .track__svg-add-btn {
   cursor: pointer;
   pointer-events: none;
