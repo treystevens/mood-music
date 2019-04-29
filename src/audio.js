@@ -1,4 +1,5 @@
-import { myModule, getChildElementByClass, addSongToPlaylist } from './index';
+import { myModule, getChildElementByClass } from './index';
+import { addSongToPlaylist } from './utils/fetch';
 
 /**
  *
