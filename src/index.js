@@ -1,5 +1,8 @@
 import { spotifyGrab, addSongToPlaylist } from './utils/fetch';
-import createSongBody, { advance } from './audio';
+import createSongBody, { advance, validCard } from './audio';
+import getAccount from './api/getAccount';
+import { id, setID } from './user';
+import createPlaylist from './api/createPlaylist';
 
 export let myModule = (function() {
   let module = {};
@@ -513,55 +516,6 @@ function updatePlaylistCount() {
   playlistAmount.textContent = myModule.totalPlaylists.length;
 }
 
-// POST Request to Spotify API
-function spotifyCreatePlaylist(url) {
-  let data = {
-    description: '' || document.querySelector('.cr-pl__description').value,
-    public: true,
-    name: document.querySelector('.cr-pl__name').value
-  };
-
-  const init = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + myModule.accessToken
-    },
-    body: JSON.stringify(data)
-  };
-
-  fetch(url, init)
-    .then(data => {
-      return data.json();
-    })
-    .then(createdPlaylist => {
-      let crPlName = document.querySelector('.cr-pl__name');
-      let crPlDescription = document.querySelector('.cr-pl__description');
-
-      updateTotalPlaylists(createdPlaylist.name, createdPlaylist.id);
-      playlistPlate(createdPlaylist.name, createdPlaylist.id);
-
-      crPlName.value = '';
-      crPlDescription.value = '';
-
-      // If there are songs in the queue add them to the newly created playlist
-      if (myModule.songQueue.length > 0) {
-        addSongToPlaylist(
-          `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${
-            createdPlaylist.id
-          }/tracks`,
-          myModule.songQueue,
-          createdPlaylist.id
-        );
-      }
-
-      confirmAction(createdPlaylist.name, 'create');
-    })
-    .catch(err => {
-      console.log(err);
-    });
-}
-
 export function getChildElementByClass(element, className) {
   // Check if element already contains class
   if (element.classList.contains(className)) {
@@ -973,7 +927,7 @@ function moveSongFromPlaylist(url, songLinks, playlistID) {
     .then(() => {
       // Get back updated playlist
       spotifyGrab(
-        `users/${myModule.userInfo.id}/playlists/${playlistID}/tracks`,
+        `users/${id}/playlists/${playlistID}/tracks`,
         myModule.accessToken
       )
         .then(playlist => {
@@ -1070,43 +1024,33 @@ function buildURL(genres, maxVal, minVal, dataFeatures) {
 }
 
 // Get username
-spotifyGrab('me', myModule.accessToken)
-  .then(data => {
-    // Check if user is logged into their account
-    if (data.status === 401) {
+getAccount()
+  .then(response => {
+    if (response.status === 401) {
       window.location.href = '/login';
+      return;
     }
 
-    data.json().then(jsonData => {
-      let username = document.getElementById('username');
-      jsonData.display_name
-        ? (username.textContent = jsonData.display_name)
-        : (username.textContent = jsonData.id);
+    const { display_name, id } = response.data;
+    const usernameElem = document.querySelector('.username');
+    display_name
+      ? (usernameElem.textContent = display_name)
+      : (usernameElem.textContent = id);
 
-      // Copy Spotify User Info
-      for (let i in jsonData) {
-        myModule.userInfo[i] = jsonData[i];
-      }
-    });
+    myModule.userInfo.id = id;
+
+    setID(id);
   })
-  .catch(err => {
-    let content = document.querySelector('.content-wrapper');
-    let loginLink = document.createElement('a');
+  .catch(() => {
+    const content = document.querySelector('.content-wrapper');
+    const loginLink = document.createElement('a');
 
-    // content.removeChild(content.firstChild);
     while (content.firstChild) {
       content.removeChild(content.firstChild);
     }
-
     loginLink.setAttribute('href', 'login.html');
     loginLink.textContent = `login here!`;
-
     document.body.appendChild(loginLink);
-
-    {
-      /* <a href="login.html">hey</a> */
-    }
-    console.log(err);
   });
 
 // Polyfill if Smooth Behavior is not supported
@@ -1485,11 +1429,41 @@ function initEventListeners() {
   // Creating a new playlist
   eventModule.createPlaylistSubmit.addEventListener('submit', evt => {
     evt.preventDefault();
+    const data = {
+      description: '' || document.querySelector('.cr-pl__description').value,
+      public: true,
+      name: document.querySelector('.cr-pl__name').value
+    };
 
-    spotifyCreatePlaylist(
-      `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists`
-    );
-    closeModal();
+    createPlaylist(data)
+      .then(response => {
+        const createdPlaylist = response.data;
+        const crPlName = document.querySelector('.cr-pl__name');
+        const crPlDescription = document.querySelector('.cr-pl__description');
+
+        updateTotalPlaylists(createdPlaylist.name, createdPlaylist.id);
+        playlistPlate(createdPlaylist.name, createdPlaylist.id);
+
+        crPlName.value = '';
+        crPlDescription.value = '';
+
+        // If there are songs in the queue add them to the newly created playlist
+        if (myModule.songQueue.length > 0) {
+          addSongToPlaylist(
+            `https://api.spotify.com/v1/users/${id}/playlists/${
+              createdPlaylist.id
+            }/tracks`,
+            myModule.songQueue,
+            createdPlaylist.id
+          );
+        }
+
+        confirmAction(createdPlaylist.name, 'create');
+        closeModal();
+      })
+      .catch(err => {
+        console.log(err);
+      });
   });
 
   // Importing a new playlist
@@ -1553,9 +1527,7 @@ function initEventListeners() {
         // Fetch for that specfic ID
         // Fetch that URL get the returned tracks and put into creat Playlist tracks
         spotifyGrab(
-          `users/${
-            myModule.userInfo.id
-          }/playlists/${importedPlaylistID}/tracks`,
+          `users/${id}/playlists/${importedPlaylistID}/tracks`,
           myModule.accessToken
         )
           .then(response => {
@@ -1598,7 +1570,7 @@ function initEventListeners() {
     moveSongForm.classList.toggle('tran-modal__show-form');
 
     deleteSong(
-      `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${
+      `https://api.spotify.com/v1/users/${id}/playlists/${
         myModule.currentChosenPlaylist.id
       }/tracks`,
       myModule.deleteThis
@@ -1609,9 +1581,7 @@ function initEventListeners() {
       .then(() => {
         // Get back updated playlist *** code from add songs to playlist section ** place into function
         spotifyGrab(
-          `users/${myModule.userInfo.id}/playlists/${
-            myModule.currentChosenPlaylist.id
-          }/tracks`,
+          `users/${id}/playlists/${myModule.currentChosenPlaylist.id}/tracks`,
           myModule.accessToken
         )
           .then(playlist => {
@@ -1627,9 +1597,7 @@ function initEventListeners() {
           })
           .then(() => {
             moveSongFromPlaylist(
-              `https://api.spotify.com/v1/users/${
-                myModule.userInfo.id
-              }/playlists/${moveToThisPlaylist}/tracks`,
+              `https://api.spotify.com/v1/users/${id}/playlists/${moveToThisPlaylist}/tracks`,
               moveSong,
               moveToThisPlaylist
             );
@@ -1656,7 +1624,7 @@ function initEventListeners() {
     tranModal.classList.toggle('tran-modal__show-modal');
 
     deleteSong(
-      `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${
+      `https://api.spotify.com/v1/users/${id}/playlists/${
         myModule.currentChosenPlaylist.id
       }/tracks`,
       myModule.deleteThis
@@ -1667,9 +1635,7 @@ function initEventListeners() {
       .then(() => {
         // Get back updated playlist *** code from add songs to playlist section ** place into function
         spotifyGrab(
-          `users/${myModule.userInfo.id}/playlists/${
-            myModule.currentChosenPlaylist.id
-          }/tracks`,
+          `users/${id}/playlists/${myModule.currentChosenPlaylist.id}/tracks`,
           myModule.accessToken
         )
           .then(playlist => {
@@ -2066,6 +2032,9 @@ function initEventListeners() {
     let crImPlaylistModal = document.querySelector('.modal');
     let genres = document.querySelector('.genres-show');
     let genreModal = document.querySelector('.tran-modal--genre');
+    console.log(evt.target);
+
+    validCard(evt.target);
 
     // Creating/Importing a playlist modal view
     if (evt.target == crImPlaylistModal) {
