@@ -92,19 +92,8 @@ function createSongBody(trackObj) {
   playlistAddBtn.innerHTML =
     '<svg class="track__svg-add-btn" xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 100 100"><g fill="none" fill-rule="evenodd"><circle cx="50" cy="50" r="50" fill="#469B6E"/><g fill="#FFF" transform="translate(25.926 25.926)"><rect width="11.111" height="48.148" x="18.519" rx="5" transform="rotate(-90 24.074 24.074)"/><rect width="11.111" height="48.148" x="18.519" rx="5"/></g></g></svg>';
 
-  // Preview Songs change to add an   event
-  let audioTrack = new Audio(songAudio.href);
-  songAudio.addEventListener('click', evt => {
-    evt.preventDefault();
-
-    audioTrack.paused ? audioTrack.play() : audioTrack.pause();
-  });
-
   // Reset the count for Scrolling Fetch
   myModule.scrollCount = 0;
-
-  songCardImgListener(songImg, playerControl, songAudio);
-  playerControlListener(playerControl, songAudio);
 
   // Add tracks to playlist
   playlistAddBtnListener(playlistAddBtn);
@@ -121,31 +110,6 @@ function audioPlayingListener(elem, progressBar) {
   elem.addEventListener('playing', evt => {
     const duration = evt.target.duration;
     advance(duration, elem, progressBar);
-  });
-}
-
-/**
- *
- * Handles play and pause audio SVG state
- * when user clicks on song control.
- * @param {HTMLElement} elem
- */
-function playerControlListener(elem, audioElem) {
-  elem.addEventListener('click', () => {
-    animatePlaySVG(elem);
-    togglePlay(audioElem);
-  });
-}
-
-/**
- *
- * Handles play and pause audio SVG state when user clicks on song image.
- * @param {HTMLElement} elem
- */
-function songCardImgListener(elem, refElem, audioElem) {
-  elem.addEventListener('click', () => {
-    animatePlaySVG(refElem);
-    togglePlay(audioElem);
   });
 }
 
@@ -199,8 +163,9 @@ function playlistAddBtnListener(elem) {
  * @param {HTMLElement} refElem
  *
  */
-function animatePlaySVG(refElem) {
-  const playSVG = refElem.firstChild;
+function animatePlaySVG(elem) {
+  const trackMedia = elem.querySelector('.track__media');
+  const playSVG = trackMedia.firstChild;
   const gPath = playSVG.firstChild;
   const playPath = gPath.lastChild;
   const pausePath = gPath.firstElementChild;
@@ -219,6 +184,22 @@ function animatePlaySVG(refElem) {
  */
 function togglePlay(elem) {
   elem.paused ? elem.play() : elem.pause();
+}
+
+export function validCard(elem) {
+  if (
+    elem.classList.contains('track__img') ||
+    elem.classList.contains('track__media')
+  ) {
+    getCard(elem);
+  }
+}
+
+function getCard(elem) {
+  const card = elem.parentNode;
+  const audio = card.querySelector('audio');
+  animatePlaySVG(card);
+  togglePlay(audio);
 }
 
 // Song Duration Div Show
