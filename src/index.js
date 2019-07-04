@@ -7,8 +7,6 @@ import createPlaylist from './api/createPlaylist';
 export let myModule = (function() {
   let module = {};
 
-  module.accessToken = getParameterByName('access_token');
-
   module.closureURL = '';
 
   module.currentTracks = [];
@@ -319,17 +317,6 @@ function handleGenres(url, storedGenres) {
   }
   url += buildGenres;
   return url;
-}
-
-// Get accessToken from URI
-function getParameterByName(name, url) {
-  if (!url) url = window.location.href;
-  name = name.replace(/[\[\]]/g, '\\$&');
-  var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
-    results = regex.exec(url);
-  if (!results) return null;
-  if (!results[2]) return '';
-  return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
 
 // Songs Added to Modal Action Confirmation
