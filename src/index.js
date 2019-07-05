@@ -1,9 +1,16 @@
-import { spotifyGrab, addSongToPlaylist } from './utils/fetch';
-import createSongBody, { advance, validCard } from './audio';
+import {
+  createSongBody,
+  advance,
+  validCard,
+  getUpdatedPlaylist
+} from './audio';
 import { id, setID } from './user';
 import getAccount from './api/getAccount';
 import createPlaylist from './api/createPlaylist';
 import getTracks from './api/getTracks';
+import getPlaylistTracks from './api/getPlaylistTracks';
+import getCurrentUserPlaylist from './api/getCurrentUserPlaylist';
+import addTrackToPlaylist from './api/addTrackToPlaylist';
 import { buildURL, browseURL } from './shared/browse';
 import axios from 'axios';
 
@@ -743,20 +750,15 @@ function moveSongFromPlaylist(url, songLinks, playlistID) {
     })
     .then(() => {
       // Get back updated playlist
-      spotifyGrab(
-        `users/${id}/playlists/${playlistID}/tracks`,
-        myModule.accessToken
-      )
-        .then(playlist => {
-          return playlist.json();
-        })
-        .then(movedPlaylist => {
-          refreshPlaylistBody(myModule.playlistNameValue);
+      return getPlaylistTracks(playlistID);
+    })
+    .then(response => {
+      const movedPlaylist = response.data;
+      refreshPlaylistBody(myModule.playlistNameValue);
 
-          movedPlaylist.items.forEach(playlistSong => {
-            createPlaylistTrackBody(playlistSong, myModule.playlistNameValue);
-          });
-        });
+      movedPlaylist.items.forEach(playlistSong => {
+        createPlaylistTrackBody(playlistSong, myModule.playlistNameValue);
+      });
     })
     .catch(err => {
       console.log(err);
@@ -792,34 +794,6 @@ function moodSubmitCleanUp() {
   if (noResult) {
     removeElementFromDOM(noResult);
   }
-}
-
-function cleanUpGenres() {
-  let genresChosen = Array.from(document.querySelectorAll('.genres-toggle'));
-  let storeGenres = [];
-  const regForGenres = /&/g;
-  const genresToggleEvent = document.querySelector('.genres-show');
-  // let genreToggleEvent = getChildElementByClass(genresDiv, 'genres-show');
-
-  if (genresToggleEvent) {
-    genresToggleEvent.classList.toggle('genres-show');
-  }
-
-  genresChosen.forEach(genre => {
-    let genreName = genre.textContent.toLowerCase();
-    if (genreName === 'r & b' || genreName === 'rock & roll') {
-      genreName = genre.textContent.replace(regForGenres, 'n').toLowerCase();
-    }
-    if (genreName === 'drum & bass') {
-      genreName = genre.textContent.replace(regForGenres, 'and').toLowerCase();
-    }
-
-    genre.classList.remove('genres-toggle');
-    genreName = genreName.replace(/ /g, '-');
-    storeGenres.push(genreName);
-  });
-
-  return storeGenres;
 }
 
 // Get username
@@ -1247,13 +1221,17 @@ function initEventListeners() {
 
         // If there are songs in the queue add them to the newly created playlist
         if (myModule.songQueue.length > 0) {
-          addSongToPlaylist(
-            `https://api.spotify.com/v1/users/${id}/playlists/${
-              createdPlaylist.id
-            }/tracks`,
-            myModule.songQueue,
-            createdPlaylist.id
-          );
+          const data = { uris: myModule.songQueue };
+          addTrackToPlaylist(createdPlaylist.id, data)
+            .then(() => {
+              getUpdatedPlaylist(
+                createdPlaylist.id,
+                myModule.currentChosenPlaylist.name
+              );
+            })
+            .catch(err => {
+              console.log(err);
+            });
         }
 
         confirmAction(createdPlaylist.name, 'create');
@@ -1284,11 +1262,9 @@ function initEventListeners() {
       removeElementFromDOM(importError);
     }
 
-    spotifyGrab(`me/playlists`, myModule.accessToken)
-      .then(data => {
-        return data.json();
-      })
-      .then(listOfUserPlaylists => {
+    getCurrentUserPlaylist()
+      .then(response => {
+        const listOfUserPlaylists = response.data;
         // Cycle through to get user requested playlist ID
         listOfUserPlaylists.items.forEach(playlist => {
           if (flexibleName == playlist.name.toLowerCase()) {
@@ -1324,19 +1300,14 @@ function initEventListeners() {
 
         // Fetch for that specfic ID
         // Fetch that URL get the returned tracks and put into creat Playlist tracks
-        spotifyGrab(
-          `users/${id}/playlists/${importedPlaylistID}/tracks`,
-          myModule.accessToken
-        )
-          .then(response => {
-            return response.json();
-          })
-          .then(importedTracks => {
-            importedTracks.items.forEach(playlistSong => {
-              createPlaylistTrackBody(playlistSong, importPlaylistName);
-            });
-            confirmAction(importPlaylistName, 'import');
-          });
+        return getPlaylistTracks(importedPlaylistID);
+      })
+      .then(response => {
+        const importedTracks = response.data;
+        importedTracks.items.forEach(playlistSong => {
+          createPlaylistTrackBody(playlistSong, importPlaylistName);
+        });
+        confirmAction(importPlaylistName, 'import');
       })
       .catch(err => {
         console.log(err);
@@ -1378,28 +1349,22 @@ function initEventListeners() {
       })
       .then(() => {
         // Get back updated playlist *** code from add songs to playlist section ** place into function
-        spotifyGrab(
-          `users/${id}/playlists/${myModule.currentChosenPlaylist.id}/tracks`,
-          myModule.accessToken
-        )
-          .then(playlist => {
-            return playlist.json();
-          })
+        return getPlaylistTracks(myModule.currentChosenPlaylist.id);
+      })
+      .then(response => {
+        const updatedPlaylist = response.data;
+        refreshPlaylistBody(myModule.currentChosenPlaylist.name);
 
-          .then(updatedPlaylist => {
-            refreshPlaylistBody(myModule.currentChosenPlaylist.name);
-
-            updatedPlaylist.items.forEach(playlistSong => {
-              createPlaylistTrackBody(playlistSong);
-            });
-          })
-          .then(() => {
-            moveSongFromPlaylist(
-              `https://api.spotify.com/v1/users/${id}/playlists/${moveToThisPlaylist}/tracks`,
-              moveSong,
-              moveToThisPlaylist
-            );
-          });
+        updatedPlaylist.items.forEach(playlistSong => {
+          createPlaylistTrackBody(playlistSong);
+        });
+      })
+      .then(() => {
+        moveSongFromPlaylist(
+          `https://api.spotify.com/v1/users/${id}/playlists/${moveToThisPlaylist}/tracks`,
+          moveSong,
+          moveToThisPlaylist
+        );
       })
       .catch(err => {
         console.log(err);
@@ -1432,20 +1397,15 @@ function initEventListeners() {
       })
       .then(() => {
         // Get back updated playlist *** code from add songs to playlist section ** place into function
-        spotifyGrab(
-          `users/${id}/playlists/${myModule.currentChosenPlaylist.id}/tracks`,
-          myModule.accessToken
-        )
-          .then(playlist => {
-            return playlist.json();
-          })
-          .then(updatedPlaylist => {
-            refreshPlaylistBody(myModule.currentChosenPlaylist.name);
+        return getPlaylistTracks(myModule.currentChosenPlaylist.id);
+      })
+      .then(response => {
+        const updatedPlaylist = response.data;
+        refreshPlaylistBody(myModule.currentChosenPlaylist.name);
 
-            updatedPlaylist.items.forEach(playlistSong => {
-              createPlaylistTrackBody(playlistSong);
-            });
-          });
+        updatedPlaylist.items.forEach(playlistSong => {
+          createPlaylistTrackBody(playlistSong);
+        });
       })
       .catch(err => {
         console.log(err);

@@ -1,5 +1,12 @@
 import { myModule, getChildElementByClass } from './index';
-import { addSongToPlaylist } from './utils/fetch';
+// import { addSongToPlaylist } from './utils/fetch';
+import addTrackToPlaylist from './api/addTrackToPlaylist';
+import getPlaylistTracks from './api/getPlaylistTracks';
+import {
+  createPlaylistTrackBody,
+  refreshPlaylistBody,
+  confirmAction
+} from './index';
 
 /**
  *
@@ -137,24 +144,49 @@ function playlistAddBtnListener(elem) {
     } else if (myModule.totalPlaylists.length === 1) {
       myModule.currentChosenPlaylist.name = myModule.totalPlaylists[0].name;
       myModule.currentChosenPlaylist.id = myModule.totalPlaylists[0].id;
-
-      addSongToPlaylist(
-        `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${
-          myModule.currentChosenPlaylist.id
-        }/tracks`,
-        [addedSong],
-        myModule.currentChosenPlaylist.id
-      );
+      const data = { uris: [addedSong] };
+      addTrackToPlaylist(myModule.currentChosenPlaylist.id, data)
+        .then(() => {
+          getUpdatedPlaylist(
+            myModule.currentChosenPlaylist.id,
+            myModule.currentChosenPlaylist.name
+          );
+        })
+        .catch(err => {
+          console.log(err);
+        });
     } else {
-      addSongToPlaylist(
-        `https://api.spotify.com/v1/users/${myModule.userInfo.id}/playlists/${
-          myModule.currentChosenPlaylist.id
-        }/tracks`,
-        [addedSong],
-        myModule.currentChosenPlaylist.id
-      );
+      const data = { uris: [addedSong] };
+      addTrackToPlaylist(myModule.currentChosenPlaylist.id, data)
+        .then(() => {
+          getUpdatedPlaylist(
+            myModule.currentChosenPlaylist.id,
+            myModule.currentChosenPlaylist.name
+          );
+        })
+        .catch(err => {
+          console.log(err);
+        });
     }
   });
+}
+
+function getUpdatedPlaylist(playlistName, playlistID) {
+  myModule.songQueue = [];
+
+  getPlaylistTracks(playlistID)
+    .then(response => {
+      const updatedPlaylist = response.data;
+      refreshPlaylistBody(playlistName);
+
+      updatedPlaylist.items.forEach(playlistSong => {
+        createPlaylistTrackBody(playlistSong);
+      });
+      confirmAction(playlistName, 'song');
+    })
+    .catch(err => {
+      console.log(err);
+    });
 }
 
 /**
@@ -186,7 +218,7 @@ function togglePlay(elem) {
   elem.paused ? elem.play() : elem.pause();
 }
 
-export function validCard(elem) {
+function validCard(elem) {
   if (
     elem.classList.contains('track__img') ||
     elem.classList.contains('track__media')
@@ -203,7 +235,7 @@ function getCard(elem) {
 }
 
 // Song Duration Div Show
-export function advance(duration, element, targetedElement) {
+function advance(duration, element, targetedElement) {
   const increment = 10 / duration;
   const percent = Math.min(increment * element.currentTime * 10, 100);
   targetedElement.style.width = `${percent}%`;
@@ -249,4 +281,6 @@ function startTimer(duration, element, percentage, targetedElement) {
   }
 }
 
-export default createSongBody;
+export { getUpdatedPlaylist, validCard, createSongBody, advance };
+
+// export default createSongBody;
