@@ -11,6 +11,7 @@ import getTracks from './api/getTracks';
 import getPlaylistTracks from './api/getPlaylistTracks';
 import getCurrentUserPlaylist from './api/getCurrentUserPlaylist';
 import addTrackToPlaylist from './api/addTrackToPlaylist';
+import deleteTrack from './api/deleteTrack';
 import { buildURL, browseURL } from './shared/browse';
 import axios from 'axios';
 
@@ -228,30 +229,6 @@ function processSongURI(uri) {
   let trackURI = uri.replace(reg, '');
 
   return trackURI;
-}
-
-// DELETE Request to Spotify API
-// !!! Fetch
-function deleteSong(url, track) {
-  let data = {
-    tracks: [
-      {
-        uri: track
-      }
-    ]
-  };
-
-  const init = {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: 'Bearer ' + myModule.accessToken
-    },
-    body: JSON.stringify(data)
-  };
-
-  let spotifyData = fetch(url, init);
-  return spotifyData;
 }
 
 // Fetch to Spotify API...
@@ -1334,19 +1311,9 @@ function initEventListeners() {
     moveToThisPlaylist = getPlaylistID(myModule.playlistNameValue);
 
     tranModal.classList.toggle('tran-modal__show-modal');
-
-    // tranModal.classList.toggle('tran-modal__show');
     moveSongForm.classList.toggle('tran-modal__show-form');
 
-    deleteSong(
-      `https://api.spotify.com/v1/users/${id}/playlists/${
-        myModule.currentChosenPlaylist.id
-      }/tracks`,
-      myModule.deleteThis
-    )
-      .then(response => {
-        response.json();
-      })
+    deleteTrack(myModule.currentChosenPlaylist.id, myModule.deleteThis)
       .then(() => {
         // Get back updated playlist *** code from add songs to playlist section ** place into function
         return getPlaylistTracks(myModule.currentChosenPlaylist.id);
@@ -1376,25 +1343,15 @@ function initEventListeners() {
     evt.preventDefault();
 
     let delSongForm = document.querySelector('.tran-modal__del-song');
-
     let songAttachment = document.querySelector('.song-action');
     let tranModal = document.querySelector('.tran-modal');
 
     removeElementFromDOM(songAttachment);
-    // deleteModal.classList.toggle("delete-modal__show-modal");
 
     delSongForm.classList.toggle('tran-modal__show-form');
     tranModal.classList.toggle('tran-modal__show-modal');
 
-    deleteSong(
-      `https://api.spotify.com/v1/users/${id}/playlists/${
-        myModule.currentChosenPlaylist.id
-      }/tracks`,
-      myModule.deleteThis
-    )
-      .then(response => {
-        response.json();
-      })
+    deleteTrack(myModule.currentChosenPlaylist.id, myModule.deleteThis)
       .then(() => {
         // Get back updated playlist *** code from add songs to playlist section ** place into function
         return getPlaylistTracks(myModule.currentChosenPlaylist.id);
