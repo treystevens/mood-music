@@ -1,8 +1,11 @@
 import { spotifyGrab, addSongToPlaylist } from './utils/fetch';
 import createSongBody, { advance, validCard } from './audio';
-import getAccount from './api/getAccount';
 import { id, setID } from './user';
+import getAccount from './api/getAccount';
 import createPlaylist from './api/createPlaylist';
+import getTracks from './api/getTracks';
+import { buildURL, browseURL } from './shared/browse';
+import axios from 'axios';
 
 export let myModule = (function() {
   let module = {};
@@ -162,163 +165,6 @@ function closeModal() {
   }
 }
 
-// Build URL with genres
-function handleGenres(url, storedGenres) {
-  const genres = [
-    'acoustic',
-    'afrobeat',
-    'alt-rock',
-    'alternative',
-    'ambient',
-    'anime',
-    'black-metal',
-    'bluegrass',
-    'blues',
-    'bossanova',
-    'brazil',
-    'breakbeat',
-    'british',
-    'cantopop',
-    'chicago-house',
-    'children',
-    'chill',
-    'classical',
-    'club',
-    'comedy',
-    'country',
-    'dance',
-    'dancehall',
-    'death-metal',
-    'deep-house',
-    'detroit-techno',
-    'disco',
-    'disney',
-    'drum-and-bass',
-    'dub',
-    'dubstep',
-    'edm',
-    'electro',
-    'electronic',
-    'emo',
-    'folk',
-    'forro',
-    'french',
-    'funk',
-    'garage',
-    'german',
-    'gospel',
-    'goth',
-    'grindcore',
-    'groove',
-    'grunge',
-    'guitar',
-    'happy',
-    'hard-rock',
-    'hardcore',
-    'hardstyle',
-    'heavy-metal',
-    'hip-hop',
-    'holidays',
-    'honky-tonk',
-    'house',
-    'idm',
-    'indian',
-    'indie',
-    'indie-pop',
-    'industrial',
-    'iranian',
-    'j-dance',
-    'j-idol',
-    'j-pop',
-    'j-rock',
-    'jazz',
-    'k-pop',
-    'kids',
-    'latin',
-    'latino',
-    'malay',
-    'mandopop',
-    'metal',
-    'metal-misc',
-    'metalcore',
-    'minimal-techno',
-    'movies',
-    'mpb',
-    'new-age',
-    'new-release',
-    'opera',
-    'pagode',
-    'party',
-    'philippines-opm',
-    'piano',
-    'pop',
-    'pop-film',
-    'post-dubstep',
-    'power-pop',
-    'progressive-house',
-    'psych-rock',
-    'punk',
-    'punk-rock',
-    'r-n-b',
-    'rainy-day',
-    'reggae',
-    'reggaeton',
-    'road-trip',
-    'rock',
-    'rock-n-roll',
-    'rockabilly',
-    'romance',
-    'sad',
-    'salsa',
-    'samba',
-    'sertanejo',
-    'show-tunes',
-    'singer-songwriter',
-    'ska',
-    'sleep',
-    'songwriter',
-    'soul',
-    'soundtracks',
-    'spanish',
-    'study',
-    'summer',
-    'swedish',
-    'synth-pop',
-    'tango',
-    'techno',
-    'trance',
-    'trip-hop',
-    'turkish',
-    'work-out',
-    'world-music'
-  ];
-  let buildGenres;
-
-  // Use user chosen genres
-  if (storedGenres.length > 0) {
-    storedGenres.forEach(genre => {
-      if (buildGenres === undefined) {
-        buildGenres = `&seed_genres=${genre}`;
-      } else {
-        buildGenres += `,${genre}`;
-      }
-    });
-  } else {
-    // Randomize 5 genres if no genres were chosen
-    for (let i = 0; i < 5; i++) {
-      let randomNumber = Math.floor(Math.random() * Math.floor(genres.length));
-
-      if (buildGenres === undefined)
-        buildGenres = `&seed_genres=${genres[randomNumber]}`;
-      else {
-        buildGenres += `,${genres[randomNumber]}`;
-      }
-    }
-  }
-  url += buildGenres;
-  return url;
-}
-
 // Songs Added to Modal Action Confirmation
 function modalSongBodyAttachment(element) {
   let ancestorElem = element.parentElement.parentElement.parentElement;
@@ -402,45 +248,29 @@ function deleteSong(url, track) {
 }
 
 // Fetch to Spotify API...
-function spotifyProcessTracks(url) {
-  spotifyGrab(url, myModule.accessToken).then(response => {
-    response
-      .json()
-      .then(data => {
-        if (data.tracks.length === 0) {
-          noTrackResult();
+function spotifyProcessTracks(tracks) {
+  tracks.forEach(track => {
+    // Check if song is already in the DOM
+    if (myModule.currentTracks.length > 0) {
+      for (let i = 0; i < myModule.currentTracks.length; i++) {
+        if (track.album.name === myModule.currentTracks[i].album_name) return;
+      }
+    }
 
-          return -1;
-        }
+    if (track.preview_url && track.album.images[1] && track.uri) {
+      let newTrack = {
+        album_name: track.album.name,
+        album_img: track.album.images[1],
+        artist: track.artists[0].name,
+        preview_url: track.preview_url,
+        song_title: track.name,
+        trackID: track.id,
+        uri: track.uri
+      };
 
-        data.tracks.forEach(track => {
-          // Check if song is already in the DOM
-          if (myModule.currentTracks.length > 0) {
-            for (let i = 0; i < myModule.currentTracks.length; i++) {
-              if (track.album.name === myModule.currentTracks[i].album_name)
-                return;
-            }
-          }
-
-          if (track.preview_url && track.album.images[1] && track.uri) {
-            let newTrack = {
-              album_name: track.album.name,
-              album_img: track.album.images[1],
-              artist: track.artists[0].name,
-              preview_url: track.preview_url,
-              song_title: track.name,
-              trackID: track.id,
-              uri: track.uri
-            };
-
-            createSongBody(newTrack);
-            myModule.currentTracks.push(newTrack);
-          }
-        });
-      })
-      .catch(err => {
-        console.log(err);
-      });
+      createSongBody(newTrack);
+      myModule.currentTracks.push(newTrack);
+    }
   });
 }
 
@@ -992,24 +822,6 @@ function cleanUpGenres() {
   return storeGenres;
 }
 
-function buildURL(genres, maxVal, minVal, dataFeatures) {
-  let url = `recommendations?max_valence=${maxVal}&min_valence=${minVal}&limit=30`;
-
-  if (dataFeatures[0].hasOwnProperty('minEnergy')) {
-    url += `&min_energy=${dataFeatures[0].minEnergy}`;
-  }
-  if (dataFeatures[0].hasOwnProperty('maxEnergy')) {
-    url += `&max_energy=${dataFeatures[0].maxEnergy}`;
-  }
-
-  function urlGenerate() {
-    let newUrl = handleGenres(url, genres);
-    return newUrl;
-  }
-
-  return urlGenerate;
-}
-
 // Get username
 getAccount()
   .then(response => {
@@ -1025,7 +837,6 @@ getAccount()
       : (usernameElem.textContent = id);
 
     myModule.userInfo.id = id;
-
     setID(id);
   })
   .catch(() => {
@@ -1035,7 +846,7 @@ getAccount()
     while (content.firstChild) {
       content.removeChild(content.firstChild);
     }
-    loginLink.setAttribute('href', 'login.html');
+    loginLink.setAttribute('href', '/login.html');
     loginLink.textContent = `login here!`;
     document.body.appendChild(loginLink);
   });
@@ -1084,7 +895,6 @@ function handleBackgroundColor() {
     if (count === colors.length) {
       count = 0;
     }
-    console.log(count);
     return colors[count];
   };
 }
@@ -1166,34 +976,35 @@ function initEventListeners() {
         myModule.scrollCount++;
 
         if (myModule.scrollCount === 1) {
-          let scrollURL = myModule.closureURL();
-
           myModule.wasSubmitted = false;
 
-          spotifyProcessTracks(scrollURL);
+          getTracks(browseURL).then(response => {
+            const { tracks } = response.data;
+            spotifyProcessTracks(tracks);
 
-          if (myModule.initScroll.happened === false) {
-            myModule.initScroll.happened = true;
-            myModule.initScroll.moment = scrollPosition;
-          }
+            if (myModule.initScroll.happened === false) {
+              myModule.initScroll.happened = true;
+              myModule.initScroll.moment = scrollPosition;
+            }
 
-          let allMedia = Array.from(
-            document.querySelectorAll('.track__progress-bar')
-          );
-          let currentColor = myModule.initColor();
+            let allMedia = Array.from(
+              document.querySelectorAll('.track__progress-bar')
+            );
+            let currentColor = myModule.initColor();
 
-          let referenceObj = {
-            color: currentColor,
-            scrollPosition: scrollPosition
-          };
+            let referenceObj = {
+              color: currentColor,
+              scrollPosition: scrollPosition
+            };
 
-          myModule.scrollPositionTracker.push(referenceObj);
+            myModule.scrollPositionTracker.push(referenceObj);
 
-          allMedia.forEach(progressBar => {
-            progressBar.style.backgroundColor = currentColor;
+            allMedia.forEach(progressBar => {
+              progressBar.style.backgroundColor = currentColor;
+            });
+
+            document.body.style.backgroundColor = currentColor;
           });
-
-          document.body.style.backgroundColor = currentColor;
         }
       }
     }
@@ -1675,48 +1486,36 @@ function initEventListeners() {
   eventModule.moodForm.addEventListener('submit', evt => {
     evt.preventDefault();
 
-    const userMood = document.querySelector('.mood__val');
-    const userMoodValue = userMood.value.toLowerCase();
+    const mood = document.querySelector('.mood__val').value;
     const playlistFooter = document.querySelector('.playlist');
 
-    myModule.storeMoodValue = userMood.value;
-    // const tracksDiv = document.querySelector('.tracks');
+    myModule.storeMoodValue = mood;
     myModule.currentTracks = [];
-
     myModule.wasSubmitted = true;
 
-    let storeGenres = cleanUpGenres();
     moodSubmitCleanUp();
 
-    // userMood.value = '';
-
-    // Fetch emotion json from my database
-    fetch(`/user/mood/${userMoodValue}`)
-      .then(data => {
-        return data.json();
-      })
-      .then(audioFeatures => {
-        // No music for that mood
-        if (audioFeatures.length === 0) {
+    axios
+      .get(`/user/mood/${mood}`)
+      .then(response => {
+        const moodFeatures = response.data;
+        if (moodFeatures.length === 0) {
           noTrackResult();
-          // smoothingScroll('.no-result');
-          return -1;
-        } else {
-          const maxVal = Math.max(...audioFeatures[0].idNumbers);
-          const minVal = Math.min(...audioFeatures[0].idNumbers);
-
-          myModule.closureURL = buildURL(
-            storeGenres,
-            maxVal,
-            minVal,
-            audioFeatures
-          );
-          let newURL = myModule.closureURL();
-
-          playlistFooter.classList.add('playlist__show');
-
-          spotifyProcessTracks(newURL);
+          return;
         }
+        const maxVal = Math.max(...moodFeatures[0].idNumbers);
+        const minVal = Math.min(...moodFeatures[0].idNumbers);
+        playlistFooter.classList.add('playlist__show');
+
+        return getTracks(buildURL(maxVal, minVal, moodFeatures));
+      })
+      .then(response => {
+        const { tracks } = response.data;
+        if (tracks.length === 0) {
+          noTrackResult();
+          return;
+        }
+        spotifyProcessTracks(tracks);
       })
       .catch(err => {
         console.log(err);
