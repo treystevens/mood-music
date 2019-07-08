@@ -4,15 +4,16 @@ import {
   validCard,
   getUpdatedPlaylist
 } from './audio';
+import { importPlaylist, playlistPlate, findPlaylist } from './playlist';
 import { id, setID } from './user';
 import getAccount from './api/getAccount';
 import createPlaylist from './api/createPlaylist';
 import getTracks from './api/getTracks';
 import getPlaylistTracks from './api/getPlaylistTracks';
-import getCurrentUserPlaylist from './api/getCurrentUserPlaylist';
 import addTrackToPlaylist from './api/addTrackToPlaylist';
 import deleteTrack from './api/deleteTrack';
 import { buildURL, browseURL } from './shared/browse';
+import isMobile from './utils/isMobile';
 import axios from 'axios';
 
 export let myModule = (function() {
@@ -21,7 +22,6 @@ export let myModule = (function() {
   module.closureURL = '';
 
   module.currentTracks = [];
-  module.userInfo = {};
   module.totalPlaylists = [];
   module.songQueue = [];
   module.currentChosenPlaylist = {};
@@ -37,7 +37,7 @@ export let myModule = (function() {
   module.initColor = handleBackgroundColor();
   module.scrollPositionTracker = [];
 
-  module.isMobile = mobileCheck();
+  module.isMobile = isMobile();
 
   module.initScroll = {
     happened: false,
@@ -91,51 +91,13 @@ let eventModule = (function() {
 
 // Initalize App on Startup
 (function init() {
-  mobileCheck();
+  isMobile();
   initEventListeners();
 })();
 
-function mobileCheck() {
-  let isMobile;
-  let logoContainer = document.querySelector('.logo-container');
-  let cssProp = window
-    .getComputedStyle(logoContainer, null)
-    .getPropertyValue('position');
-
-  if (cssProp == 'fixed') {
-    let genreModalCloseBtn = Array.from(
-      document.querySelectorAll('.close-modal-btn')
-    );
-    logoContainer.classList.toggle('show__elem');
-    isMobile = true;
-
-    // Remove Modal Close Button on phones
-    if (genreModalCloseBtn.length > 0) {
-      genreModalCloseBtn.forEach(element => {
-        removeElementFromDOM(element);
-      });
-    }
-  } else {
-    isMobile = false;
-  }
-
-  return isMobile;
-}
-
-// !!! UTILS
-// Random Color for Playlist
-function playlistColorSequence() {
-  let playlists = document.getElementsByClassName('playlist-list__playlist');
-  let colors = ['#E8A5A5', '#783E3E', '#BF4949', '#D15273'];
-
-  for (let i = 0; i < playlists.length; i++) {
-    playlists[i].style.backgroundColor = colors[i % colors.length];
-  }
-}
-
 // Close Modal
 // !!! UTILS
-function closeModal() {
+export function closeModal() {
   let tranModal = document.querySelector('.tran-modal__show-modal');
   let removePlaylistForm = document.querySelector('.tran-modal__show-form');
   let selectMvs = document.querySelector('.mvs-select');
@@ -207,20 +169,6 @@ function modalSongBodyAttachment(element) {
   songBody.songActionInfo.appendChild(songBody.songActionArtist);
 
   return songBody;
-}
-
-// Takes a String as an argument for Import Modal Error Message
-function createImportError(errorMessage) {
-  let errorBody = document.createElement('span');
-  let contentBox = document.querySelector('.tab-content-container');
-  let inputHook = document.querySelector('.im-pl__name');
-
-  contentBox.classList.add('tab-content--error');
-  errorBody.classList.add('im-pl__error');
-
-  errorBody.textContent = errorMessage;
-
-  inputHook.parentNode.insertBefore(errorBody, inputHook.nextElementSibling);
 }
 
 // Make Song URI into URI format
@@ -298,7 +246,8 @@ function updateTotalPlaylists(name, id) {
     id: id
   };
 
-  let index = playlistAlreadyExistCheck(id);
+  // let index = playlistAlreadyExistCheck(id);
+  let index = findPlaylist(name);
 
   if (index === undefined) {
     myModule.totalPlaylists.push(playlist);
@@ -338,51 +287,6 @@ export function getChildElementByClass(element, className) {
   }
   // If no element by that class is found
   // return undefined;
-}
-
-// Playlist Template
-function playlistPlate(name, id) {
-  const playlistList = document.querySelector('.playlist-list');
-  const playlistDiv = document.createElement('div');
-  const trackWrapper = document.createElement('div');
-  const playlistName = document.createElement('h4');
-  const removePlaylist = document.createElement('span');
-  let currentShownPlaylist = document.querySelector(
-    '.playlist-list__playlist--show'
-  );
-
-  let caretDrop = document.createElement('span');
-  // caretDrop.innerHTML = '<i class="fas fa-caret-right no-transform"></i>'
-  caretDrop.innerHTML = '<i class="fas fa-chevron-right no-animation"></i>';
-
-  // playlistDiv.textContent = name;
-  playlistName.textContent = name;
-  // removePlaylist.textContent = 'x';
-
-  playlistDiv.classList.add('playlist-list__playlist');
-  playlistName.classList.add('playlist-list__name');
-  caretDrop.classList.add('playlist-list__caret-container');
-  trackWrapper.classList.add('track-wrapper');
-  removePlaylist.classList.add('remove-playlist');
-
-  if (currentShownPlaylist) {
-    playlistDiv.classList.add('playlist-list__playlist--hide');
-  }
-
-  playlistDiv.setAttribute('data-playlist-id', id);
-
-  // playlistDiv.style.backgroundColor = playlistColorSequence();
-
-  myModule.currentChosenPlaylist.name = name;
-  myModule.currentChosenPlaylist.id = id;
-
-  playlistList.appendChild(playlistDiv);
-  playlistDiv.appendChild(playlistName);
-  playlistName.appendChild(caretDrop);
-  playlistDiv.appendChild(trackWrapper);
-  playlistDiv.appendChild(removePlaylist); // Unsure may break code
-
-  playlistColorSequence();
 }
 
 export function confirmAction(playlistName, source) {
@@ -787,7 +691,6 @@ getAccount()
       ? (usernameElem.textContent = display_name)
       : (usernameElem.textContent = id);
 
-    myModule.userInfo.id = id;
     setID(id);
   })
   .catch(() => {
@@ -1220,76 +1123,7 @@ function initEventListeners() {
   });
 
   // Importing a new playlist
-  eventModule.importPlaylistSubmit.addEventListener('submit', evt => {
-    evt.preventDefault();
-
-    let importPlaylistName = document.querySelector('.im-pl__name').value;
-    let clearValue = document.querySelector('.im-pl__name');
-    let flexibleName = importPlaylistName.toLowerCase();
-    let importedPlaylistID;
-
-    let importError = document.querySelector('.im-pl__error');
-    let tabContentContainer = document.querySelector('.tab-content-container');
-
-    tabContentContainer.classList.remove('tab-content--error');
-
-    clearValue.value = '';
-
-    if (importError) {
-      removeElementFromDOM(importError);
-    }
-
-    getCurrentUserPlaylist()
-      .then(response => {
-        const listOfUserPlaylists = response.data;
-        // Cycle through to get user requested playlist ID
-        listOfUserPlaylists.items.forEach(playlist => {
-          if (flexibleName == playlist.name.toLowerCase()) {
-            importedPlaylistID = playlist.id;
-            importPlaylistName = playlist.name;
-          }
-        });
-
-        let playlistExists = updateTotalPlaylists(
-          importPlaylistName,
-          importedPlaylistID
-        );
-
-        // If no matching playlist in Spotify account
-        if (!importedPlaylistID) {
-          createImportError(
-            `Sorry, there's no playlist matching this name "${importPlaylistName}" out of your Spotify playlists!`
-          );
-
-          return -1;
-        }
-
-        // A playlist with this name has already been imported
-        if (playlistExists) {
-          createImportError(
-            `A playlist with the name "${importPlaylistName}" has already been imported.`
-          );
-          return -1;
-        }
-
-        playlistPlate(importPlaylistName, importedPlaylistID);
-        closeModal();
-
-        // Fetch for that specfic ID
-        // Fetch that URL get the returned tracks and put into creat Playlist tracks
-        return getPlaylistTracks(importedPlaylistID);
-      })
-      .then(response => {
-        const importedTracks = response.data;
-        importedTracks.items.forEach(playlistSong => {
-          createPlaylistTrackBody(playlistSong, importPlaylistName);
-        });
-        confirmAction(importPlaylistName, 'import');
-      })
-      .catch(err => {
-        console.log(err);
-      });
-  });
+  eventModule.importPlaylistSubmit.addEventListener('submit', importPlaylist);
 
   // Move song from one playlist to another
   eventModule.moveSongModal.addEventListener('submit', evt => {
