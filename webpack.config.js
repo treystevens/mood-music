@@ -6,5 +6,5 @@ module.exports = {
     path: path.resolve(__dirname, 'public/scripts/'),
     filename: 'index.js'
   },
-  mode: 'development'
+  mode: 'production'
 };
