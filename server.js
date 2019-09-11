@@ -11,13 +11,12 @@ require('dotenv').config();
 const redirect_uri =
   process.env.REDIRECT_URI || 'http://localhost:5000/user/callback/';
 
-// Show login page when user types in moodmusic.com
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/login.html');
 });
-
-app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/login', (req, res) => {
   res.sendFile(__dirname + '/public/login.html');
@@ -27,7 +26,6 @@ app.get('/user', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
-// User enters a mood
 app.get('/user/mood/:mood', (req, res) => {
   const word = req.params.mood;
   const mood = Moods.filter(mood => {
@@ -68,8 +66,8 @@ app.get('/spotifylogin', function(req, res) {
 });
 
 app.get('/user/callback', function(req, res) {
-  let code = req.query.code || null;
-  let authOptions = {
+  const code = req.query.code || null;
+  const authOptions = {
     url: 'https://accounts.spotify.com/api/token',
     form: {
       code: code,
@@ -88,9 +86,9 @@ app.get('/user/callback', function(req, res) {
     json: true
   };
   request.post(authOptions, function(error, response, body) {
-    var access_token = body.access_token;
-    let uri = process.env.FRONTEND_URI || 'http://localhost:5000/user/';
-    res.redirect(uri + '?access_token=' + access_token);
+    const accessToken = body.access_token;
+    const uri = process.env.FRONTEND_URI || 'http://localhost:5000/user/';
+    res.redirect(uri + '?access_token=' + accessToken);
   });
 });
 
