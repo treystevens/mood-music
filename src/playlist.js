@@ -28,7 +28,6 @@ function createPlaylistView(name, id) {
   );
 
   const caretDrop = document.createElement('span');
-  // caretDrop.innerHTML = '<i class="fas fa-caret-right no-transform"></i>'
   caretDrop.innerHTML = '<i class="fas fa-chevron-right no-animation"></i>';
 
   // playlistDiv.textContent = name;
@@ -54,7 +53,7 @@ function createPlaylistView(name, id) {
   playlistDiv.appendChild(playlistName);
   playlistName.appendChild(caretDrop);
   playlistDiv.appendChild(trackWrapper);
-  playlistDiv.appendChild(removePlaylist); // Unsure may break code
+  playlistDiv.appendChild(removePlaylist);
 
   playlistColorSequence();
 }
