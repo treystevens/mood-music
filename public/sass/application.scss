@@ -1025,6 +1025,7 @@ body {
         background-size: 200% 100%;
         background-position: right bottom;
         transition: all 0.2s ease-in-out;
+        pointer-events: none;
 
         &-toggle {
             background-position: 0% 100%;
