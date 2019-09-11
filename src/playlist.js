@@ -2,15 +2,16 @@ import {
   myModule,
   createPlaylistTrackBody,
   closeModal,
-  confirmAction
+  confirmAction,
+  updatePlaylistCount
 } from './index';
 import getCurrentUsersPlaylists from './api/getCurrentUsersPlaylists';
 import getPlaylistTracks from './api/getPlaylistTracks';
 
 function findPlaylist(name) {
-  for (let playlist in myModule.totalPlaylists) {
-    if (myModule.totalPlaylists[playlist].name === name) {
-      return myModule.totalPlaylists.indexOf(myModule.totalPlaylists[playlist]);
+  for (let i = 0; i < myModule.totalPlaylists.length; i++) {
+    if (myModule.totalPlaylists[i].name === name) {
+      return i;
     }
   }
   return -1;
@@ -56,6 +57,10 @@ function createPlaylistView(name, id) {
   playlistDiv.appendChild(removePlaylist);
 
   playlistColorSequence();
+
+  const playlist = { name, id };
+  myModule.totalPlaylists.push(playlist);
+  updatePlaylistCount();
 }
 
 async function importPlaylist(evt) {
