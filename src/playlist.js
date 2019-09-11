@@ -17,17 +17,17 @@ function findPlaylist(name) {
 }
 
 // Playlist Template
-function playlistPlate(name, id) {
+function createPlaylistView(name, id) {
   const playlistList = document.querySelector('.playlist-list');
   const playlistDiv = document.createElement('div');
   const trackWrapper = document.createElement('div');
   const playlistName = document.createElement('h4');
   const removePlaylist = document.createElement('span');
-  let currentShownPlaylist = document.querySelector(
+  const currentShownPlaylist = document.querySelector(
     '.playlist-list__playlist--show'
   );
 
-  let caretDrop = document.createElement('span');
+  const caretDrop = document.createElement('span');
   // caretDrop.innerHTML = '<i class="fas fa-caret-right no-transform"></i>'
   caretDrop.innerHTML = '<i class="fas fa-chevron-right no-animation"></i>';
 
@@ -75,8 +75,8 @@ async function importPlaylist(evt) {
   }
 
   try {
-    const response = await getCurrentUsersPlaylists();
-    const playlists = response.data;
+    const playlistsResponse = await getCurrentUsersPlaylists();
+    const playlists = playlistsResponse.data;
     const playlistNameLowerCase = playlistName.toLowerCase();
     let playlistID;
 
@@ -102,15 +102,15 @@ async function importPlaylist(evt) {
       return;
     }
 
-    playlistPlate(playlistName, playlistID);
+    createPlaylistView(playlistName, playlistID);
     closeModal();
 
     // Fetch for that specfic ID
-    // Fetch that URL get the returned tracks and put into creat Playlist tracks
+    // Fetch that URL get the returned tracks and put into create Playlist tracks
     const tracksResponse = await getPlaylistTracks(playlistID);
-    const importedTracks = tracksResponse.data;
-    importedTracks.items.forEach(playlistSong => {
-      createPlaylistTrackBody(playlistSong, playlistName);
+    const tracks = tracksResponse.data;
+    tracks.items.forEach(track => {
+      createPlaylistTrackBody(track, playlistName);
     });
     confirmAction(playlistName, 'import');
   } catch (err) {
@@ -142,4 +142,4 @@ function playlistColorSequence() {
   }
 }
 
-export { importPlaylist, playlistPlate, findPlaylist };
+export { importPlaylist, createPlaylistView, findPlaylist };

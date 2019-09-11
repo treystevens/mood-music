@@ -4,7 +4,7 @@ import {
   validCard,
   getUpdatedPlaylist
 } from './audio';
-import { importPlaylist, playlistPlate, findPlaylist } from './playlist';
+import { importPlaylist, createPlaylistView, findPlaylist } from './playlist';
 import { id, setID } from './user';
 import getAccount from './api/getAccount';
 import createPlaylist from './api/createPlaylist';
@@ -1094,7 +1094,7 @@ function initEventListeners() {
         const crPlDescription = document.querySelector('.cr-pl__description');
 
         updateTotalPlaylists(createdPlaylist.name, createdPlaylist.id);
-        playlistPlate(createdPlaylist.name, createdPlaylist.id);
+        createPlaylistView(createdPlaylist.name, createdPlaylist.id);
 
         crPlName.value = '';
         crPlDescription.value = '';
@@ -1250,10 +1250,6 @@ function initEventListeners() {
       .get(`/user/mood/${mood}`)
       .then(response => {
         const moodFeatures = response.data;
-        if (moodFeatures.length === 0) {
-          noTrackResult();
-          return;
-        }
         const maxVal = Math.max(...moodFeatures[0].idNumbers);
         const minVal = Math.min(...moodFeatures[0].idNumbers);
         playlistFooter.classList.add('playlist__show');
@@ -1268,8 +1264,8 @@ function initEventListeners() {
         }
         spotifyProcessTracks(tracks);
       })
-      .catch(err => {
-        console.log(err);
+      .catch(() => {
+        noTrackResult();
       });
   });
 
