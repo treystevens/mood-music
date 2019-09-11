@@ -1565,7 +1565,6 @@ function initEventListeners() {
     let crImPlaylistModal = document.querySelector('.modal');
     let genres = document.querySelector('.genres-show');
     let genreModal = document.querySelector('.tran-modal--genre');
-    console.log(evt.target);
 
     validCard(evt.target);
 
