@@ -1,34 +1,23 @@
+/* eslint-disable no-undef */
 const request = require('request');
 const querystring = require('querystring');
 const express = require('express');
-const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const Mood = require('./models/mood');
-require('dotenv').config();
+const Moods = require('./moods');
 const app = express();
+const port = process.env.PORT || 5000;
+require('dotenv').config();
 
-
-const redirect_uri = process.env.REDIRECT_URI || 'http://localhost:5000/user/callback/';
-
-const mongoDB = process.env.MONGODB_URI || 'mongodb://localhost/moodmusic';
-
-mongoose.Promise = global.Promise;
-mongoose.connect(mongoDB);
-
-mongoose.connection.once('open', (mssg) =>{
-    console.log(`Connected to mongoDB`);
-});
+const redirect_uri =
+  process.env.REDIRECT_URI || 'http://localhost:5000/user/callback/';
 
 // Show login page when user types in moodmusic.com
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/login.html');
 });
 
-
 app.use(express.static('public'));
-app.use(bodyParser.urlencoded({extended: true}));
-
-
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/login', (req, res) => {
   res.sendFile(__dirname + '/public/login.html');
@@ -38,34 +27,45 @@ app.get('/user', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
-
 // User enters a mood
-app.get('/user/mood/:mood', (req,res) => {
-  
+app.get('/user/mood/:mood', (req, res) => {
   const word = req.params.mood;
-
-  Mood.find({synonyms: word})
-  .then((results) => {
-      res.send(results);
-  })
-  .catch((err) => {
-      console.log(err);
+  const mood = Moods.filter(mood => {
+    return findSynonym(mood.synonyms, word);
   });
+
+  if (mood.length === 0) res.sendStatus(404);
+  else {
+    res.status(200).send(mood);
+  }
 });
+
+function findSynonym(synonyms, word) {
+  let foundSynonym = false;
+
+  for (let i = 0; i < synonyms.length; i++) {
+    if (word === synonyms[i]) {
+      foundSynonym = true;
+      return foundSynonym;
+    }
+  }
+
+  return foundSynonym;
+}
 
 // Authorize account
 app.get('/spotifylogin', function(req, res) {
-  
-  res.redirect('https://accounts.spotify.com/authorize?' +
-    querystring.stringify({
-      response_type: 'code',
-      client_id: process.env.SPOTIFY_CLIENT_ID,
-      scope: 'user-read-private playlist-modify-public playlist-modify-private',
-      redirect_uri
-    })
+  res.redirect(
+    'https://accounts.spotify.com/authorize?' +
+      querystring.stringify({
+        response_type: 'code',
+        client_id: process.env.SPOTIFY_CLIENT_ID,
+        scope:
+          'user-read-private playlist-modify-public playlist-modify-private',
+        redirect_uri
+      })
   );
 });
-
 
 app.get('/user/callback', function(req, res) {
   let code = req.query.code || null;
@@ -77,9 +77,13 @@ app.get('/user/callback', function(req, res) {
       grant_type: 'authorization_code'
     },
     headers: {
-      'Authorization': 'Basic ' + (new Buffer(
-        process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET
-      ).toString('base64'))
+      Authorization:
+        'Basic ' +
+        new Buffer(
+          process.env.SPOTIFY_CLIENT_ID +
+            ':' +
+            process.env.SPOTIFY_CLIENT_SECRET
+        ).toString('base64')
     },
     json: true
   };
@@ -90,11 +94,4 @@ app.get('/user/callback', function(req, res) {
   });
 });
 
-
-
-
-const port = process.env.PORT || 5000;
-console.log(`Listening on port ${port}. Go to "/" or "/login" to initiate authentication flow.`);
 app.listen(port);
-
-
