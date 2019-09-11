@@ -148,8 +148,8 @@ function playlistAddBtnListener(elem) {
       addTrackToPlaylist(myModule.currentChosenPlaylist.id, data)
         .then(() => {
           getUpdatedPlaylist(
-            myModule.currentChosenPlaylist.id,
-            myModule.currentChosenPlaylist.name
+            myModule.currentChosenPlaylist.name,
+            myModule.currentChosenPlaylist.id
           );
         })
         .catch(err => {
@@ -160,8 +160,8 @@ function playlistAddBtnListener(elem) {
       addTrackToPlaylist(myModule.currentChosenPlaylist.id, data)
         .then(() => {
           getUpdatedPlaylist(
-            myModule.currentChosenPlaylist.id,
-            myModule.currentChosenPlaylist.name
+            myModule.currentChosenPlaylist.name,
+            myModule.currentChosenPlaylist.id
           );
         })
         .catch(err => {
