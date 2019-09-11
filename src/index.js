@@ -249,7 +249,7 @@ function updateTotalPlaylists(name, id) {
   // let index = playlistAlreadyExistCheck(id);
   let index = findPlaylist(name);
 
-  if (index === undefined) {
+  if (index === -1) {
     myModule.totalPlaylists.push(playlist);
     updatePlaylistCount();
     exists = false;
@@ -261,7 +261,7 @@ function updateTotalPlaylists(name, id) {
 }
 
 // Update Playlist Footer Count
-function updatePlaylistCount() {
+export function updatePlaylistCount() {
   const playlistAmount = document.querySelector('.playlist-amount');
   playlistAmount.textContent = myModule.totalPlaylists.length;
 }
@@ -1105,8 +1105,8 @@ function initEventListeners() {
           addTrackToPlaylist(createdPlaylist.id, data)
             .then(() => {
               getUpdatedPlaylist(
-                createdPlaylist.id,
-                myModule.currentChosenPlaylist.name
+                myModule.currentChosenPlaylist.name,
+                createdPlaylist.id
               );
             })
             .catch(err => {
